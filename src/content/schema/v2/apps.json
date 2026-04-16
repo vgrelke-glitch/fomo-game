@@ -1,0 +1,9 @@
+[
+  { "id": "app1", "type": "notes", "title": "Заметки" },
+  { "id": "app7", "type": "terminal", "title": "Терминал" },
+  { "id": "app3", "type": "messenger", "title": "Мессенджер" },
+  { "id": "app4", "type": "social", "title": "Соцсеть" },
+  { "id": "app5", "type": "work-conveyor", "title": "Конвейер" },
+  { "id": "app6", "type": "calendar", "title": "Календарь" },
+  { "id": "exit", "type": "exit", "title": "Выход" }
+]

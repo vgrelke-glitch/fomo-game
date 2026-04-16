@@ -1,0 +1,8 @@
+[
+  {
+    "id": "accept_adventure_prompt",
+    "title": "Запустить процесс: приключение.exe",
+    "actId": "act1",
+    "kind": "decision"
+  }
+]

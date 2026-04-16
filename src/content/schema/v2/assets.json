@@ -1,0 +1,12 @@
+[
+  {
+    "id": "act1_social_feed",
+    "kind": "ui-seed",
+    "description": "Идеализированная лента как источник FoMO."
+  },
+  {
+    "id": "act1_terminal_voice",
+    "kind": "ui-seed",
+    "description": "Внутренний голос в терминале."
+  }
+]

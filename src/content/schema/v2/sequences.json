@@ -1,0 +1,34 @@
+[
+  {
+    "id": "desktop_intro",
+    "title": "Старт рабочего стола",
+    "trigger": "desktop:start",
+    "steps": [
+      { "at": 0, "type": "showNotification", "appId": "app3", "text": "МЕТЕОРИТ ПО БАШКЕ" },
+      { "at": 0, "type": "openApp", "appId": "app3" },
+      { "at": 80, "type": "focusApp", "appId": "app3" },
+      { "at": 120, "type": "openApp", "appId": "app7" },
+      { "at": 220, "type": "pushTerminalLine", "text": "...а теперь я тут" },
+      {
+        "at": 520,
+        "type": "startWorkTask",
+        "taskId": "act1-task-cats",
+        "title": "10 удивительных фактов о кошачьих лапках",
+        "prompt": "Написать 100 слов на тему: \"10 удивительных фактов о кошачьих лапках\"",
+        "targetText": "Кошачьи лапки устроены так, чтобы двигаться бесшумно, цепко и точно. Подушечки смягчают шаг, помогают сохранять равновесие и чувствовать поверхность."
+      },
+      { "at": 60000, "type": "deliverChatEvent", "chatId": "chat3", "eventId": "mom_001" },
+      { "at": 60050, "type": "showNotification", "appId": "app3", "text": "Мама: Сына, ты купил билет? Я волнуюсь." }
+    ]
+  },
+  {
+    "id": "social_doomscroll_demo",
+    "title": "Думскролл соцсети",
+    "trigger": "",
+    "schemaTrigger": "app:open:app4",
+    "steps": [
+      { "at": 0, "type": "openApp", "appId": "app4" },
+      { "at": 200, "type": "focusApp", "appId": "app4" }
+    ]
+  }
+]

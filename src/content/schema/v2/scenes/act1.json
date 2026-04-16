@@ -1,0 +1,245 @@
+[
+  {
+    "id": "act1_prologue",
+    "actId": "act1",
+    "title": "Пролог",
+    "kind": "system",
+    "summary": "Черный экран, текст о лете, затем резкий врез в рабочий стол.",
+    "events": []
+  },
+  {
+    "id": "scene_friend_main",
+    "actId": "act1",
+    "chatId": "chat-druk",
+    "title": "Ссора с другом",
+    "dateLabel": "Сегодня",
+    "nextSceneId": "",
+    "events": [
+      { "id": "friend_001", "type": "message_other", "text": "ты серьезно?", "typingSpeedMs": 38 },
+      { "id": "friend_002", "type": "message_other", "text": "господи, в чем твоя проблема, ты же обещал", "typingSpeedMs": 38 },
+      { "id": "friend_003", "type": "message_other", "text": "ДВАЖДЫ", "typingSpeedMs": 38 },
+      { "id": "friend_004", "type": "message_other", "text": "ты мог бы хотя бы написать, что не придешь", "typingSpeedMs": 38 },
+      { "id": "friend_005", "type": "message_other", "text": "я же тебя ждал", "typingSpeedMs": 38 },
+      { "id": "friend_006", "type": "message_other", "text": "класс, спасибо", "typingSpeedMs": 38 },
+      {
+        "id": "friend_007",
+        "type": "message_player",
+        "text": "Прости, я свалился, у меня никаких сил, я просто мертвый.",
+        "onFocusEffects": [
+          { "id": "friend_fx_focus_1", "type": "pushTerminalLine", "text": "статус худший человек на земле" },
+          { "id": "friend_fx_focus_2", "type": "pushTerminalLine", "text": "ЗАПУСК ПРОЦЕССА: меланхолия.exe" },
+          { "id": "friend_fx_focus_3", "type": "pushTerminalLine", "text": "генерация протокола «извинение»" }
+        ],
+        "onSendEffects": [
+          { "id": "friend_fx_send_1", "type": "pushTerminalLine", "text": "...как-то не клеится." }
+        ],
+        "schema": {
+          "sendBehavior": "blocked_and_wiped"
+        }
+      }
+    ]
+  },
+  {
+    "id": "scene_mom_main",
+    "actId": "act1",
+    "chatId": "chat3",
+    "title": "Мама пишет утром",
+    "dateLabel": "Сегодня",
+    "nextSceneId": "",
+    "events": [
+      { "id": "mom_001", "type": "message_other", "text": "Сына, ты купил билет? Я волнуюсь.", "typingSpeedMs": 40, "schema": { "autoDeliver": false } },
+      { "id": "mom_002", "type": "message_player", "text": "Привет, мам. Нет, еще не купил. Очень много работы сейчас..." },
+      { "id": "mom_003", "type": "effect", "effects": [ { "id": "mom_fx_1", "type": "pushTerminalLine", "text": "...много работы... всегда..." } ] },
+      { "id": "mom_004", "type": "message_other", "text": "Понимаю…", "typingSpeedMs": 40 },
+      {
+        "id": "mom_005",
+        "type": "message_other",
+        "text": "Я тете Гале рассказывала, что ты на скалодром ходишь! Пришли фотографию, я хочу показать, какой ты молодец))",
+        "typingSpeedMs": 40,
+        "onFocusEffects": [
+          { "id": "mom_fx_2", "type": "pushTerminalLine", "text": "...скалодром. Один раз. Три года назад." },
+          { "id": "mom_fx_3", "type": "pushTerminalLine", "text": "Статус \"молодец\": не подтвержден." }
+        ]
+      },
+      {
+        "id": "mom_006",
+        "type": "effect",
+        "effects": []
+      },
+      { "id": "mom_007", "type": "message_player", "text": "Эээ нет мам давно не ходил" },
+      { "id": "mom_008", "type": "message_player", "text": "Пойду работать." },
+      { "id": "mom_009", "type": "message_other", "text": "Умничка!", "typingSpeedMs": 40 },
+      {
+        "id": "mom_010",
+        "type": "effect",
+        "effects": [
+          { "id": "mom_fx_4", "type": "pushTerminalLine", "text": "Статус \"умничка\": не подтвержден." }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "scene_k_act1_invite",
+    "actId": "act1",
+    "chatId": "chat-k",
+    "title": "Сообщение от К.",
+    "dateLabel": "Сегодня",
+    "nextSceneId": "",
+    "events": [
+      { "id": "k_001", "type": "message_other", "text": "привет. Помнишь меня?", "typingSpeedMs": 42 },
+      {
+        "id": "k_002",
+        "type": "effect",
+        "effects": [
+          { "id": "k_fx_1", "type": "pushTerminalLine", "text": "… … ..." },
+          { "id": "k_fx_2", "type": "pushTerminalLine", "text": "ЗАПУСК ПРОЦЕССА: archive_search.exe" },
+          { "id": "k_fx_3", "type": "pushTerminalLine", "text": "СВЯЗАННЫЙ ПРОЦЕСС: параметр \"поход\"" },
+          { "id": "k_fx_4", "type": "pushTerminalLine", "text": "СВЯЗАННЫЙ ПРОЦЕСС: \"приключение.ехе\"" },
+          { "id": "k_fx_5", "type": "pushTerminalLine", "text": "СТАТУС: прерван пользователем 978 дней назад." }
+        ]
+      },
+      { "id": "k_003", "type": "message_player", "text": "Конечно, помню. Кажется, это было в прошлой жизни." },
+      { "id": "k_004", "type": "message_other", "text": "да, даже сто жизней назад)", "typingSpeedMs": 42 },
+      { "id": "k_005", "type": "message_player", "text": "Привет!" },
+      { "id": "k_006", "type": "message_other", "text": "привет!!", "typingSpeedMs": 42 },
+      { "id": "k_007", "type": "message_other", "text": "как поживаешь??", "typingSpeedMs": 42 },
+      { "id": "k_008", "type": "message_player", "text": "Нормально!" },
+      {
+        "id": "k_009",
+        "type": "effect",
+        "effects": [
+          { "id": "k_fx_6", "type": "pushTerminalLine", "text": "> зачем она написала?" },
+          { "id": "k_fx_7", "type": "pushTerminalLine", "text": "> что ей нужно?" },
+          { "id": "k_fx_8", "type": "pushTerminalLine", "text": "> ей точно что-то нужно, иначе бы она не написала…" }
+        ]
+      },
+      { "id": "k_010", "type": "message_player", "text": "Так… чем обязан?" },
+      { "id": "k_011", "type": "message_other", "text": "ты сейчас очень занят?", "typingSpeedMs": 42 },
+      { "id": "k_012", "type": "effect", "effects": [ { "id": "k_fx_9", "type": "pushTerminalLine", "text": "достаточно занят, чтобы не отвечать маме и лучшему другу" } ] },
+      { "id": "k_012a", "type": "effect", "delayMs": 2000, "effects": [ { "id": "k_fx_9b", "type": "pushTerminalLine", "text": "ОЧЕНЬ ЗАНЯТ" } ] },
+      { "id": "k_013", "type": "message_player", "text": "А что такое?" },
+      { "id": "k_014", "type": "message_other", "text": "У меня есть к тебе дело.", "typingSpeedMs": 42 },
+      { "id": "k_016", "type": "message_other", "text": "пару месяцев назад ко мне пришло одно клевое издательство и предложило проиллюстрировать книжку", "typingSpeedMs": 42 },
+      { "id": "k_016a", "type": "effect", "effects": [ { "id": "k_fx_10a", "type": "pushTerminalLine", "text": "она работает \"свободной художницей\"" } ] },
+      { "id": "k_017", "type": "message_player", "text": "Оо, я кстати слежу за твоим творчеством!" },
+      { "id": "k_017a", "type": "message_other", "text": "вау! очень приятно)", "typingSpeedMs": 42 },
+      { "id": "k_017c", "type": "effect", "delayMs": 4000, "effects": [ { "id": "k_fx_10c", "type": "pushTerminalLine", "text": "скажи что-нибудь" } ] },
+      { "id": "k_018", "type": "message_player", "text": "О чем книжка?", "waitForEventId": "k_017c" },
+      { "id": "k_019", "type": "message_other", "text": "ага, вот в этом и проблема", "typingSpeedMs": 42 },
+      { "id": "k_020", "type": "message_other", "text": "они сказали, что я могу выбрать что угодно, любой сюжет. Это «что угодно» меня так парализовало, что я ничего не смогла придумать хах", "typingSpeedMs": 42, "delayMs": 2000 },
+      { "id": "k_021", "type": "message_other", "text": "я с неделю как приехала в тихий городишко. Типа в поисках тишины.", "typingSpeedMs": 42 },
+      { "id": "k_022", "type": "message_other", "text": "и это правда малюсенький городишко, и правда очень тихий. Но вчера тут кое-что случилось!", "typingSpeedMs": 42 },
+      { "id": "k_023", "type": "message_player", "text": "?" },
+      { "id": "k_024", "type": "message_other", "text": "Вчера тут вроде как упал метеорит!", "typingSpeedMs": 42 },
+      { "id": "k_025", "type": "effect", "effects": [ { "id": "k_fx_12", "type": "pushTerminalLine", "text": ">> ???" } ] },
+      { "id": "k_026", "type": "message_player", "text": "???" },
+      { "id": "k_027", "type": "message_other", "text": "представляешь??", "typingSpeedMs": 42 },
+      { "id": "k_027a", "type": "message_player", "text": "Не очень..." },
+      { "id": "k_027b", "type": "message_other", "text": "ну вот а это правда...", "typingSpeedMs": 42 },
+      { "id": "k_028", "type": "message_player", "text": "Эээ... кажется, ты не нашла тишину" },
+      { "id": "k_029", "type": "message_other", "text": "я тоже так подумала)", "typingSpeedMs": 42 },
+      { "id": "k_030", "type": "message_player", "text": "Большой метеорит?" },
+      { "id": "k_031", "type": "message_other", "text": "я его не видела!", "typingSpeedMs": 42 },
+      { "id": "k_032", "type": "message_other", "text": "вчера этот городишко гудел. Метеорит пробил крышу в каком-то старом доме, все ходили смотреть.", "typingSpeedMs": 42 },
+      { "id": "k_033", "type": "message_player", "text": "А ты не ходила?" },
+      { "id": "k_034", "type": "message_other", "text": "я вчера предпринимала последние попытки поработать.", "typingSpeedMs": 42 },
+      { "id": "k_035", "type": "message_player", "text": "А сегодня?" },
+      { "id": "k_036", "type": "message_other", "text": "а сегодня уже грех работать, потому что", "typingSpeedMs": 42 },
+      { "id": "k_037", "type": "message_other", "text": "метеорит УКРАЛИ", "typingSpeedMs": 42 },
+      { "id": "k_038", "type": "effect", "effects": [ { "id": "k_fx_13", "type": "pushTerminalLine", "text": ">> ??????" } ] },
+      { "id": "k_039", "type": "message_player", "text": "Так, это какая-то шутка?" },
+      { "id": "k_039a", "type": "message_other", "text": "Я АБСОЛЮТНО СЕРЬЕЗНО", "typingSpeedMs": 42 },
+      { "id": "k_039aa", "type": "message_player", "text": "..." },
+      { "id": "k_039ab", "type": "message_player", "text": "Вау?.." },
+      { "id": "k_039b", "type": "effect", "effects": [ { "id": "k_fx_13b", "type": "pushTerminalLine", "text": "Это какой-то странный сон..." } ] },
+      { "id": "k_040", "type": "message_other", "text": "СОГЛАСНА", "typingSpeedMs": 42 },
+      { "id": "k_041", "type": "message_other", "text": "мне хозяйка домика рассказала", "typingSpeedMs": 42 },
+      { "id": "k_042", "type": "message_player", "text": "Звучит весело" },
+      { "id": "k_043", "type": "message_other", "text": "согласна!", "typingSpeedMs": 42 },
+      { "id": "k_044", "type": "message_other", "text": "ну и сегодня я короче подумала, черт с ним, что может быть большей причиной выйти на улицу, чем метеорит?", "typingSpeedMs": 42 },
+      { "id": "k_017", "type": "effect", "delayMs": 2000, "effects": [ { "id": "k_fx_11", "type": "pushTerminalLine", "text": "данный процесс несовместим с операционной системой \"унылое_существование_v.2.0\"." } ] },
+      { "id": "k_045", "type": "message_player", "text": "))" },
+      { "id": "k_046", "type": "message_other", "text": "ну да. А потом меня осенило. Издательство же сказало сделать книжку о чем угодно.", "typingSpeedMs": 42 },
+      { "id": "k_047", "type": "effect", "effects": [ { "id": "k_fx_14", "type": "pushTerminalLine", "text": "загрузка… загрузка…" } ] },
+      { "id": "k_048", "type": "message_other", "text": "и можно вообще-то написать свою историю!!", "typingSpeedMs": 42 },
+      { "id": "k_049", "type": "effect", "effects": [ { "id": "k_fx_15", "type": "pushTerminalLine", "text": "загрузка… загрузка…" } ] },
+      { "id": "k_050", "type": "message_player", "text": "Подожди, а при чем тут метеорит?" },
+      { "id": "k_051", "type": "message_other", "text": "а тебе не кажется, что это красиво?", "typingSpeedMs": 42 },
+      { "id": "k_053", "type": "message_player", "text": "Ага, типа… кто-то украл звезду, чтобы она исполняла желания?" },
+      { "id": "k_054", "type": "message_other", "text": "боже, ну вот, именно за этим я тебе и пишу! ", "typingSpeedMs": 42 },
+      { "id": "k_054a", "type": "message_other", "text": "Ты единственный настоящий писатель, которого я знаю", "typingSpeedMs": 42 },
+      {
+        "id": "k_055",
+        "type": "effect",
+        "effects": [
+          { "id": "k_fx_17", "type": "pushTerminalLine", "text": "Статус \"писатель\": не подтвержден." },
+          { "id": "k_fx_18", "type": "pushTerminalLine", "text": "Текущий статус: оператор_тупого_конвейера_текстов" }
+        ]
+      },
+      { "id": "k_056", "type": "message_other", "text": "ты рассказывал, что любишь доставать истории даже из походов за продуктами, что все дело в наблюдении", "typingSpeedMs": 42 },
+      { "id": "k_057", "type": "message_other", "text": "а еще я помню, как ты рассказывал у костра сказки, я это все очень хорошо запомнила)", "typingSpeedMs": 42 },
+      { "id": "k_058", "type": "message_other", "text": "В общем я поняла, что мне нужно вдохновение и компания. И вспомнила о тебе :)", "typingSpeedMs": 42 },
+      { "id": "k_058a", "type": "effect", "delayMs": 3000, "effects": [ { "id": "k_fx_18b", "type": "pushTerminalLine", "text": "> > C:\\Users\\G> >> Штормовое предупреждение\nОсторожно. Вы попали в область действия урагана. Возможна турбулентность, потеря ориентации и повреждение окружающей и внутренней среды..." } ] },
+      { "id": "k_059", "type": "message_player", "text": "Так, еще раз. Чего ты хочешь?" },
+      { "id": "k_060", "type": "message_other", "text": "я подумала, что лучший способ решить сложную задачу - проще к ней подойти", "typingSpeedMs": 42 },
+      { "id": "k_060a", "type": "message_other", "text": "я предлагаю тебе стать соавтором сказки для детской книги", "typingSpeedMs": 42 },
+      { "id": "k_060aa", "type": "effect", "effects": [ { "id": "k_fx_flash_1", "type": "flashScreen", "durationMs": 1000 } ] },
+      { "id": "k_060b", "type": "message_other", "text": "сюжет для сказки я предлагаю достать из одного прогулочного дня. по кранейней мере попытаться!", "typingSpeedMs": 42 },
+      { "id": "k_060c", "type": "message_other", "text": "можешь считать, что это вызов! Тебе нужно написать сказку о том, что мы встретим на \"прогулке\". Хочу, чтобы звезда с неба стала ядром истории", "typingSpeedMs": 42 },
+      { "id": "k_060d", "type": "message_other", "text": "если получится - напечатаем книгу с твоим текстом!", "typingSpeedMs": 42 },
+      { "id": "k_060da", "type": "effect", "effects": [ { "id": "k_fx_flash_2", "type": "flashScreen", "durationMs": 1000 } ] },
+      { "id": "k_062", "type": "message_player", "text": "А... как ты себе это представляешь? Я же здесь, за компом." },
+      { "id": "k_063", "type": "message_other", "text": "я буду твоими ногами и глазами на месте", "typingSpeedMs": 42 },
+      { "id": "k_063a", "type": "message_other", "text": "буду присылать тебе что вижу и что попросишь", "typingSpeedMs": 42 },
+      { "id": "k_064", "type": "message_other", "text": "с вашего позволения я предлагаю некоторое ПРИКЛЮЧЕНИЕ", "typingSpeedMs": 42 },
+      { "id": "k_065", "type": "message_other", "text": "если у тебя, конечно, есть на это время", "typingSpeedMs": 42 },
+      {
+        "id": "k_066",
+        "type": "effect",
+        "effects": [
+          { "id": "k_fx_20", "type": "pushTerminalLine", "text": "… …" },
+          { "id": "k_fx_21", "type": "pushTerminalLine", "text": "> > запустить_процесс: приключение.ехе?.." }
+        ],
+        "schema": {
+          "choice": {
+            "id": "accept_adventure",
+            "presentation": "terminal_prompt",
+            "options": [
+              {
+                "id": "yes",
+                "label": "да",
+                "resultText": "да"
+              },
+              {
+                "id": "no",
+                "label": "нет",
+                "enabledOnce": true,
+                "rejectedEffects": [
+                  "ЗАПРОС НА ОТКАЗ ПРИНЯТ. ЗАПУСК ДИАГНОСТИКИ...",
+                  "АНАЛИЗ ПОВЕДЕНЧЕСКИХ МЕТРИК:",
+                  "...Соотношение чужих и личных успехов: 17475...",
+                  "...Попыток физического контакта с реальным миром: 2 (неудачно).",
+                  "ЗАПРОС НА ОТКАЗ ОТКЛОНЕН СИСТЕМОЙ. Попробуйте еще раз."
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "k_067",
+        "type": "message_player",
+        "text": "Да, время найдется",
+        "onSendEffects": [
+          { "id": "k_fx_22", "type": "setFlag", "key": "acceptedAdventure", "value": true }
+        ]
+      },
+      {
+        "id": "k_068",
+        "type": "message_other",
+        "text": "ура!",
+        "typingSpeedMs": 42
+      }
+    ]
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "chat-druk",
+    "title": "Друг",
+    "preview": "ты серьезно?",
+    "seedHistoryEventIds": [
+      "friend_001",
+      "friend_002",
+      "friend_003",
+      "friend_004",
+      "friend_005",
+      "friend_006"
+    ]
+  },
+  {
+    "id": "chat3",
+    "title": "Мама",
+    "preview": "Сына, ты купил билет?"
+  },
+  {
+    "id": "chat-k",
+    "title": "К.",
+    "preview": "привет. Помнишь меня?",
+    "hiddenByDefault": true
+  }
+]
