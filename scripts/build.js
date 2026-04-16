@@ -5,6 +5,7 @@ const reactScriptsBin = require.resolve('react-scripts/bin/react-scripts.js');
 const env = {
   ...process.env,
   GENERATE_SOURCEMAP: 'false',
+  CI: 'false',
 };
 
 const child = spawn(process.execPath, [reactScriptsBin, 'build'], {
