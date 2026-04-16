@@ -527,6 +527,7 @@ function App() {
   const [screenFlashActive, setScreenFlashActive] = useState(false);
   const [typedByChat, setTypedByChat] = useState({});
   const [activeNoteId, setActiveNoteId] = useState('note1');
+  const [calendarMonthOffset, setCalendarMonthOffset] = useState(0);
   const [activeChatId, setActiveChatId] = useState(() => (
     storyState.ui.activeChatId || editorContent.messenger.chats[0]?.id || 'chat1'
   ));
@@ -2799,7 +2800,7 @@ function App() {
   }, [editorContent.sequences, storyState.ui?.view]);
 
   const minimizeWindow = (id) => {
-    if (storyState.terminal?.prompt?.active) return;
+    if (storyState.terminal?.prompt?.active && id === 'app7') return;
     setMinimized((p) => ({ ...p, [id]: true }));
   };
 
@@ -2993,6 +2994,21 @@ function App() {
     'декабря',
   ];
   const calendarEventSeeds = editorContent.appData?.calendar?.seedEvents || [];
+  const currentDate = useMemo(() => new Date(), []);
+  const getCalendarViewDate = useCallback(() => (
+    new Date(currentDate.getFullYear(), currentDate.getMonth() + calendarMonthOffset, 1)
+  ), [calendarMonthOffset, currentDate]);
+  const canViewPreviousCalendarMonth = calendarMonthOffset > -2;
+  const canViewNextCalendarMonth = calendarMonthOffset < 0;
+  const goToPreviousCalendarMonth = useCallback(() => {
+    setCalendarMonthOffset((prev) => Math.max(-2, prev - 1));
+  }, []);
+  const goToNextCalendarMonth = useCallback(() => {
+    setCalendarMonthOffset((prev) => Math.min(0, prev + 1));
+  }, []);
+  const resetCalendarMonth = useCallback(() => {
+    setCalendarMonthOffset(0);
+  }, []);
   useEffect(() => {
     if (!notes.length) {
       if (activeNoteId !== '') {
@@ -3319,10 +3335,11 @@ function App() {
         );
   };
   const renderCalendarBody = () => {
-    const today = new Date();
-    const viewYear = today.getFullYear();
-    const viewMonth = today.getMonth();
-    const monthLabel = `${calendarMonthNames[viewMonth]} ${viewYear}`;
+    const today = currentDate;
+    const viewDate = getCalendarViewDate();
+    const viewYear = viewDate.getFullYear();
+    const viewMonth = viewDate.getMonth();
+    const monthLabel = calendarMonthNames[viewMonth];
     const firstDay = new Date(viewYear, viewMonth, 1);
     const firstWeekday = (firstDay.getDay() + 6) % 7;
     const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
@@ -3340,12 +3357,10 @@ function App() {
       let date;
       let inMonth = true;
       if (index < firstWeekday) {
-        const day = daysInPrevMonth - firstWeekday + index + 1;
-        date = new Date(viewYear, viewMonth - 1, day);
+        date = new Date(viewYear, viewMonth, 1);
         inMonth = false;
       } else if (index >= firstWeekday + daysInMonth) {
-        const day = index - (firstWeekday + daysInMonth) + 1;
-        date = new Date(viewYear, viewMonth + 1, day);
+        date = new Date(viewYear, viewMonth, daysInMonth);
         inMonth = false;
       } else {
         const day = index - firstWeekday + 1;
@@ -3368,9 +3383,9 @@ function App() {
       <div className="calendar">
         <div className="calendar-shell">
           <div className="calendar-header">
-            <button className="calendar-nav" type="button" aria-label="Назад">‹</button>
+            <button className="calendar-nav" type="button" aria-label="Назад" onClick={goToPreviousCalendarMonth} disabled={!canViewPreviousCalendarMonth}>‹</button>
             <div className="calendar-month">{monthLabel}</div>
-            <button className="calendar-nav" type="button" aria-label="Вперед">›</button>
+            <button className="calendar-nav" type="button" aria-label="Вперед" onClick={goToNextCalendarMonth} disabled={!canViewNextCalendarMonth}>›</button>
           </div>
           <div className="calendar-weekdays">
             {calendarWeekdays.map((day) => (
@@ -3383,8 +3398,8 @@ function App() {
                 key={cell.key}
                 className={`calendar-cell${cell.inMonth ? '' : ' is-out'}${cell.isToday ? ' is-today' : ''}${cell.weekend ? ' is-weekend' : ''}`}
               >
-                <span className="calendar-date">{cell.date.getDate()}</span>
-                {cell.events.length > 0 && (
+                <span className="calendar-date">{cell.inMonth ? cell.date.getDate() : ''}</span>
+                {cell.inMonth && cell.events.length > 0 && (
                   <div className="calendar-dots">
                     {cell.events.map((event) => (
                       <span className="calendar-dot" key={event.id} title={event.title} />
@@ -3412,10 +3427,11 @@ function App() {
   };
 
   const renderCalendarBodyDesktop = () => {
-    const today = new Date();
-    const viewYear = today.getFullYear();
-    const viewMonth = today.getMonth();
-    const monthLabel = `${calendarMonthNames[viewMonth]} ${viewYear}`;
+    const today = currentDate;
+    const viewDate = getCalendarViewDate();
+    const viewYear = viewDate.getFullYear();
+    const viewMonth = viewDate.getMonth();
+    const monthLabel = calendarMonthNames[viewMonth];
     const firstDay = new Date(viewYear, viewMonth, 1);
     const firstWeekday = (firstDay.getDay() + 6) % 7;
     const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
@@ -3455,12 +3471,10 @@ function App() {
       let inMonth = true;
 
       if (index < firstWeekday) {
-        const day = daysInPrevMonth - firstWeekday + index + 1;
-        date = new Date(viewYear, viewMonth - 1, day);
+        date = new Date(viewYear, viewMonth, 1);
         inMonth = false;
       } else if (index >= firstWeekday + daysInMonth) {
-        const day = index - (firstWeekday + daysInMonth) + 1;
-        date = new Date(viewYear, viewMonth + 1, day);
+        date = new Date(viewYear, viewMonth, daysInMonth);
         inMonth = false;
       } else {
         const day = index - firstWeekday + 1;
@@ -3489,9 +3503,9 @@ function App() {
               <div className="calendar-month-name">{monthLabel}</div>
             </div>
             <div className="calendar-header-actions">
-              <button className="calendar-nav calendar-nav--ghost" type="button" aria-label="Previous">‹</button>
-              <button className="calendar-today-btn" type="button">Today</button>
-              <button className="calendar-nav calendar-nav--ghost" type="button" aria-label="Next">›</button>
+              <button className="calendar-nav calendar-nav--ghost" type="button" aria-label="Previous" onClick={goToPreviousCalendarMonth} disabled={!canViewPreviousCalendarMonth}>‹</button>
+              <button className="calendar-today-btn" type="button" onClick={resetCalendarMonth} disabled={!canViewNextCalendarMonth}>Today</button>
+              <button className="calendar-nav calendar-nav--ghost" type="button" aria-label="Next" onClick={goToNextCalendarMonth} disabled={!canViewNextCalendarMonth}>›</button>
             </div>
           </div>
 
@@ -3508,16 +3522,16 @@ function App() {
                 className={`calendar-cell${cell.inMonth ? '' : ' is-out'}${cell.isToday ? ' is-today' : ''}${cell.weekend ? ' is-weekend' : ''}`}
               >
                 <div className="calendar-cell-head">
-                  <span className="calendar-date">{cell.date.getDate()}</span>
+                  <span className="calendar-date">{cell.inMonth ? cell.date.getDate() : ''}</span>
                 </div>
                 <div className="calendar-events">
-                  {cell.events.map((event) => (
+                  {cell.inMonth && cell.events.map((event) => (
                     <div className={`calendar-event-pill is-${event.color}`} key={event.id} title={event.title}>
                       <span className="calendar-event-title">{event.title}</span>
                       <span className="calendar-event-time">{formatEventTime(event.note)}</span>
                     </div>
                   ))}
-                  {cell.extraCount > 0 ? (
+                  {cell.inMonth && cell.extraCount > 0 ? (
                     <div className="calendar-more">+{cell.extraCount} more</div>
                   ) : null}
                 </div>
@@ -3902,11 +3916,6 @@ function App() {
       return;
     }
 
-    const choiceState = storyState.messenger?.choiceStateByEventId?.[TERMINAL_ADVENTURE_CHOICE_EVENT_ID] || {
-      disabledOptionIds: [],
-      selectedOptionId: '',
-    };
-
     setStoryState((prev) => {
       const existingPrompt = prev.terminal?.prompt;
       if (existingPrompt?.id === TERMINAL_ADVENTURE_PROMPT_ID) {
@@ -3921,7 +3930,7 @@ function App() {
             id: TERMINAL_ADVENTURE_PROMPT_ID,
             active: true,
             stage: 'choice',
-            noDisabled: (choiceState.disabledOptionIds || []).includes('no'),
+            noDisabled: false,
             baseLineCount: (prev.terminal?.lines || []).length,
             chatId: TERMINAL_ADVENTURE_CHAT_ID,
             choiceEventId: TERMINAL_ADVENTURE_CHOICE_EVENT_ID,
@@ -4214,11 +4223,13 @@ function App() {
               <DesktopWindow
                 key={it.id}
                 {...it}
+                img={getAppType(it.id) === 'calendar' ? null : it.img}
                 hideTitle={
                   getAppType(it.id) === 'terminal'
                   || getAppType(it.id) === 'work-conveyor'
                   || getAppType(it.id) === 'notes'
                   || getAppType(it.id) === 'social'
+                  || getAppType(it.id) === 'calendar'
                 }
                 className={getAppType(it.id) === 'terminal'
                   ? 'window--terminal'
@@ -4226,6 +4237,8 @@ function App() {
                     ? 'window--conveyor'
                   : getAppType(it.id) === 'messenger'
                     ? 'window--messenger'
+                    : getAppType(it.id) === 'calendar'
+                      ? 'window--calendar'
                     : ''}
                 visible={!!open[it.id] && !minimized[it.id]}
                 size={winState[it.id].size}

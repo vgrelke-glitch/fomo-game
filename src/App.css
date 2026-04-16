@@ -675,7 +675,10 @@
   position: fixed;
   right: 22px;
   bottom: 22px;
-  min-width: 220px;
+  width: 320px;
+  min-width: 320px;
+  max-width: 320px;
+  min-height: 74px;
   padding: 12px 14px;
   border: none;
   border-radius: 10px;
@@ -728,7 +731,9 @@
 .toast-body {
   margin-top: 4px;
   font-size: 14px;
-  white-space: pre-line;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @keyframes toast-in {
@@ -2906,12 +2911,13 @@
 .calendar--dark .calendar-grid {
   padding: 0;
   gap: 0;
-  grid-auto-rows: minmax(110px, 1fr);
+  grid-auto-rows: 110px;
   border-top: 1px solid rgba(255,255,255,0.04);
 }
 
 .calendar--dark .calendar-cell {
   min-height: 0;
+  height: 110px;
   align-items: stretch;
   padding: 8px 8px 10px;
   border-right: 1px solid rgba(255,255,255,0.06);
@@ -2919,6 +2925,7 @@
   border-radius: 0;
   color: #d8d8dd;
   font-size: 15px;
+  overflow: hidden;
 }
 
 .calendar--dark .calendar-cell.is-out {
@@ -3273,6 +3280,7 @@
   position: absolute;
   top: 6px;
   right: 8px;
+  z-index: 20;
 }
 
 .window-minimize {
@@ -3284,6 +3292,7 @@
   position: absolute;
   top: 4px;
   right: 40px;
+  z-index: 20;
 }
 
 .window-body {
@@ -3384,6 +3393,29 @@
   padding: 0;
   background: #0c0f0f;
   overflow: hidden;
+}
+
+.window--calendar {
+  background: #2f2f31;
+  box-shadow: none;
+}
+
+.window--calendar .window-header {
+  min-height: 34px;
+  padding: 6px 10px;
+  background: #2f2f31;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.window--calendar .window-body {
+  padding: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+.window--calendar .window-close,
+.window--calendar .window-minimize {
+  color: #eef5ff;
 }
 
 .window--terminal .terminal {
