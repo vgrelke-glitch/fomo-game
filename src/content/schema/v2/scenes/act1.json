@@ -55,18 +55,22 @@
         "id": "mom_005",
         "type": "message_other",
         "text": "Я тете Гале рассказывала, что ты на скалодром ходишь! Пришли фотографию, я хочу показать, какой ты молодец))",
-        "typingSpeedMs": 40,
-        "onFocusEffects": [
-          { "id": "mom_fx_2", "type": "pushTerminalLine", "text": "...скалодром. Один раз. Три года назад." },
-          { "id": "mom_fx_3", "type": "pushTerminalLine", "text": "Статус \"молодец\": не подтвержден." }
-        ]
+        "typingSpeedMs": 40
       },
       {
         "id": "mom_006",
         "type": "effect",
         "effects": []
       },
-      { "id": "mom_007", "type": "message_player", "text": "Эээ нет мам давно не ходил" },
+      {
+        "id": "mom_007",
+        "type": "message_player",
+        "text": "Эээ нет мам давно не ходил",
+        "onFocusEffects": [
+          { "id": "mom_fx_2", "type": "pushTerminalLine", "text": "...скалодром. Один раз. Три года назад." },
+          { "id": "mom_fx_3", "type": "pushTerminalLine", "text": "Статус \"молодец\": не подтвержден." }
+        ]
+      },
       { "id": "mom_008", "type": "message_player", "text": "Пойду работать." },
       { "id": "mom_009", "type": "message_other", "text": "Умничка!", "typingSpeedMs": 40 },
       {

@@ -4214,7 +4214,12 @@ function App() {
               <DesktopWindow
                 key={it.id}
                 {...it}
-                hideTitle={getAppType(it.id) === 'terminal' || getAppType(it.id) === 'work-conveyor'}
+                hideTitle={
+                  getAppType(it.id) === 'terminal'
+                  || getAppType(it.id) === 'work-conveyor'
+                  || getAppType(it.id) === 'notes'
+                  || getAppType(it.id) === 'social'
+                }
                 className={getAppType(it.id) === 'terminal'
                   ? 'window--terminal'
                   : getAppType(it.id) === 'work-conveyor'
