@@ -29,6 +29,7 @@ import './App.css';
 
 const INITIAL_EDITOR_CONTENT = normalizeEditorContent(STORY_CONTENT, STORY_CONTENT);
 const INITIAL_EDITOR_CONFIG = normalizeEditorConfig(STORY_EDITOR_CONFIG, STORY_EDITOR_CONFIG);
+const PROLOGUE_AUDIO_SRC = '/files/audio/intro.mp3';
 
 const ICON_IMAGE_BY_ID = {
   app1: iconNotes,
@@ -565,6 +566,8 @@ function App() {
   const terminalPromptTimersRef = useRef([]);
   const persistentNotifTimersRef = useRef([]);
   const screenFlashTimerRef = useRef(null);
+  const prologueAudioRef = useRef(null);
+  const prologueAudioStartedRef = useRef(false);
 
   const bringToFront = useCallback((id) => {
     setWinState((s) => {
@@ -2763,7 +2766,22 @@ function App() {
     clearTerminalPromptTimers();
     persistentNotifTimersRef.current.forEach((entry) => window.clearTimeout(entry.timerId));
     persistentNotifTimersRef.current = [];
+    if (prologueAudioRef.current) {
+      prologueAudioRef.current.pause();
+      prologueAudioRef.current.src = '';
+      prologueAudioRef.current = null;
+    }
   }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (view !== 'prologue') return;
+    if (prologueAudioRef.current) return;
+    const audio = new Audio(PROLOGUE_AUDIO_SRC);
+    audio.preload = 'auto';
+    audio.loop = false;
+    prologueAudioRef.current = audio;
+  }, [view]);
 
   useEffect(() => {
     if (view === 'prologue' || view === 'ending') {
@@ -3472,11 +3490,6 @@ function App() {
               </div>
               <div className="messenger-thread">
                 <div className="thread-title">{active.title}</div>
-                {process.env.NODE_ENV !== 'production' && (
-                  <div className="thread-debug">
-                    chat={active.id} scene={activeScene?.id || 'none'} index={currentEventIndex} next={nextEvent?.id || 'none'} pending={pendingPlayerEvent?.id || 'none'} history={history.length}
-                  </div>
-                )}
                 <div className="thread-messages" ref={messengerThreadRef}>
                   <div className="thread-date">{threadDate}</div>
                   {history.length > 0 ? history.map((msg, i) => (
@@ -3999,6 +4012,15 @@ function App() {
 
   const handlePrologueClick = () => {
     if (view !== 'prologue') return;
+    if (!prologueAudioStartedRef.current && prologueAudioRef.current) {
+      prologueAudioStartedRef.current = true;
+      const playPromise = prologueAudioRef.current.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => {
+          prologueAudioStartedRef.current = false;
+        });
+      }
+    }
     if (prologueDone) {
       openDesktop();
       return;
