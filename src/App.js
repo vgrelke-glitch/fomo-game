@@ -27,6 +27,9 @@ import { normalizeEditorConfig, normalizeEditorContent } from './engine/editorDr
 import { validateStoryContent } from './engine/storyValidation';
 import './App.css';
 
+const INITIAL_EDITOR_CONTENT = normalizeEditorContent(STORY_CONTENT, STORY_CONTENT);
+const INITIAL_EDITOR_CONFIG = normalizeEditorConfig(STORY_EDITOR_CONFIG, STORY_EDITOR_CONFIG);
+
 const ICON_IMAGE_BY_ID = {
   app1: iconNotes,
   app3: iconMessenger,
@@ -139,11 +142,12 @@ const TERMINAL_ADVENTURE_TYPE_INTERVAL_MS = 120;
 const TERMINAL_ADVENTURE_AUTO_REPLY_TEXT = 'Я в деле!';
 const TERMINAL_ADVENTURE_AUTO_REPLY_DELAY_MS = 700;
 const TERMINAL_ADVENTURE_AUTO_REPLY_TYPE_INTERVAL_MS = 85;
-const TERMINAL_ADVENTURE_DECLINE_TEXT = 'Звучит отлично, но я очень занят сейчас.';
+const TERMINAL_ADVENTURE_DECLINE_TEXT = 'Звучит отлично, но я очень занят сейчас';
+const TERMINAL_ADVENTURE_DECLINE_EXTRA_TAPS = 5;
 const TERMINAL_PROTOCOL_ELLIPSIS_TEXT = '...';
-const TERMINAL_PROTOCOL_ELLIPSIS_4_SPEED_MS = 1333;
-const TERMINAL_PROTOCOL_ELLIPSIS_6_SPEED_MS = 2000;
-const TERMINAL_PROTOCOL_ELLIPSIS_7_SPEED_MS = 2333;
+const TERMINAL_PROTOCOL_ELLIPSIS_4_SPEED_MS = 500;
+const TERMINAL_PROTOCOL_ELLIPSIS_6_SPEED_MS = 500;
+const TERMINAL_PROTOCOL_ELLIPSIS_7_SPEED_MS = 500;
 const TERMINAL_PROTOCOL_RETRY_DELAY_MS = 2000;
 const TERMINAL_PROTOCOL_ENDING_TEXT = 'НАЧАЛО: Погоня за звездой';
 const TERMINAL_PROTOCOL_ENDING_DELAY_MS = 2000;
@@ -290,6 +294,12 @@ const getCreditsFromCompletionMessage = (message = '') => {
   return Number.isFinite(parsedValue) ? parsedValue : null;
 };
 
+const normalizeAdventureDraftText = (value = '') => (
+  typeof value === 'string'
+    ? value.trim().replace(/[.!?…]+$/u, '')
+    : ''
+);
+
 const createTerminalProtocolLine = (text, { id, typeSpeedMs, delayMs = 0 } = {}) => ({
   id: id || `terminal-protocol-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
   text,
@@ -338,11 +348,9 @@ function App() {
   const initialPathname = typeof window !== 'undefined' ? window.location.pathname : '/';
   const isDevRoute = isDev && initialPathname.startsWith('/dev');
   const runtimeSlot = isDevRoute ? 'dev' : 'main';
-  const initialEditorContent = normalizeEditorContent(STORY_CONTENT, STORY_CONTENT);
-  const initialEditorConfig = normalizeEditorConfig(STORY_EDITOR_CONFIG, STORY_EDITOR_CONFIG);
-  const [editorContent, setEditorContent] = useState(initialEditorContent);
-  const [editorConfig, setEditorConfig] = useState(initialEditorConfig);
-  const [storyState, setStoryState] = useState(() => loadStoryState(initialEditorContent, runtimeSlot));
+  const [editorContent, setEditorContent] = useState(INITIAL_EDITOR_CONTENT);
+  const [editorConfig, setEditorConfig] = useState(INITIAL_EDITOR_CONFIG);
+  const [storyState, setStoryState] = useState(() => loadStoryState(INITIAL_EDITOR_CONTENT, runtimeSlot));
   const [editorVisible, setEditorVisible] = useState(false);
   const [editorDraftSavedAt, setEditorDraftSavedAt] = useState(null);
   const [editorAutoSavedAt, setEditorAutoSavedAt] = useState(null);
@@ -350,10 +358,16 @@ function App() {
   const [editorSnapshots, setEditorSnapshots] = useState([]);
   const [editorDraftBaseline, setEditorDraftBaseline] = useState(() => (
     JSON.stringify({
-      config: initialEditorConfig,
-      content: initialEditorContent,
+      config: INITIAL_EDITOR_CONFIG,
+      content: INITIAL_EDITOR_CONTENT,
     })
   ));
+
+  useEffect(() => {
+    if (!isDev) return;
+    setEditorContent(INITIAL_EDITOR_CONTENT);
+    setEditorConfig(INITIAL_EDITOR_CONFIG);
+  }, [isDev, INITIAL_EDITOR_CONTENT, INITIAL_EDITOR_CONFIG]);
   const landingInfo = [
     'FoMO (Fear of Missing Out) — это страх упущенных возможностей, ощущение, что где-то прямо сейчас происходит что-то более важное, интересное и ценное, чем то, чем человек занят в данный момент. В цифровую эпоху этот страх усиливается постоянным потоком уведомлений, новостей и образов чужой жизни, превращаясь в фоновую тревогу и хроническое чувство неудовлетворенности. FoMO заставляет нас непрерывно проверять экран, сравнивать себя с другими и терять контакт с собственным опытом, постепенно превращая внимание в главный ресурс современной жизни.Мы живем в мире, где почти невозможно просто быть. Каждый момент сопровождается ощущением, что где-то происходит что-то более важное, интересное, насыщенное и значимое. Чужие жизни мерцают в экране, складываясь в бесконечную ленту событий, достижений, встреч и возможностей. На этом фоне собственная реальность начинает казаться бледной, медленной и недостаточной. Так возникает FoMO — страх упущенных возможностей.',
     'FoMO (Fear of Missing Out) — это не продукт цифровой эпохи. Это древний человеческий страх оказаться вне стаи, вне событий, вне жизни. Однако именно цифровая среда превратила его в постоянный фон существования. Социальные сети, мессенджеры, алгоритмы рекомендаций и бесконечные ленты обновлений создают ощущение непрерывного движения, в котором невозможно сделать паузу, не испытывая тревоги. Каждый пропущенный пост, сторис или сообщение начинает ощущаться как потеря — социальной связи, статуса, значимости, опыта.',
@@ -379,11 +393,21 @@ function App() {
       })),
     [editorConfig.apps],
   );
-  const validationIssues = validateStoryContent(editorContent, editorConfig);
-  const editorDraftSnapshot = JSON.stringify({
-    config: editorConfig,
-    content: editorContent,
-  });
+  const validationIssues = useMemo(
+    () => (isDevRoute ? validateStoryContent(editorContent, editorConfig) : []),
+    [editorConfig, editorContent, isDevRoute],
+  );
+  const editorDraftSnapshot = useMemo(
+    () => (
+      isDevRoute
+        ? JSON.stringify({
+          config: editorConfig,
+          content: editorContent,
+        })
+        : editorDraftBaseline
+    ),
+    [editorConfig, editorContent, editorDraftBaseline, isDevRoute],
+  );
   const hasUnsavedEditorChanges = editorDraftSnapshot !== editorDraftBaseline;
 
   // This beat runner must not depend on the full messenger object:
@@ -526,6 +550,7 @@ function App() {
   const [toastLeaving, setToastLeaving] = useState(false);
   const [screenFlashActive, setScreenFlashActive] = useState(false);
   const [typedByChat, setTypedByChat] = useState({});
+  const [adventureDeclineInputState, setAdventureDeclineInputState] = useState(null);
   const [activeNoteId, setActiveNoteId] = useState('note1');
   const [calendarMonthOffset, setCalendarMonthOffset] = useState(0);
   const [activeChatId, setActiveChatId] = useState(() => (
@@ -983,6 +1008,16 @@ function App() {
       return;
     }
 
+    const remainingText = targetText.slice(currentText.length);
+    if (/^[\p{L}\p{N}]?[.!?…]*$/u.test(remainingText)) {
+      event.preventDefault();
+      setTypedByChat((prev) => ({
+        ...prev,
+        [chatId]: targetText,
+      }));
+      return;
+    }
+
     const nextCharIndex = getNextMessengerCharIndex(targetText, currentText);
     const nextChar = targetText[nextCharIndex] || '';
     if (!nextChar) return;
@@ -1081,6 +1116,26 @@ function App() {
     if (!chatId || !eventId) return;
     const currentText = typedByChat[chatId] || '';
     if (currentText.length < targetText.length) return;
+    const terminalPrompt = storyState.terminal?.prompt;
+
+    if (
+      chatId === TERMINAL_ADVENTURE_CHAT_ID
+      && eventId === TERMINAL_ADVENTURE_PLAYER_EVENT_ID
+      && terminalPrompt?.id === TERMINAL_ADVENTURE_PROMPT_ID
+      && terminalPrompt.stage === 'accept-ready'
+    ) {
+      setTypedByChat((prev) => ({
+        ...prev,
+        [chatId]: '',
+      }));
+      setTerminalPromptState(null);
+      submitMessengerScriptEvent(chatId, eventId, {
+        id: `${eventId}-reply`,
+        direction: 'outgoing',
+        text: TERMINAL_ADVENTURE_AUTO_REPLY_TEXT,
+      });
+      return;
+    }
 
     const sendBehavior = pendingPlayerEvent?.schema?.sendBehavior || '';
     if (sendBehavior === 'blocked_and_wiped') {
@@ -1185,24 +1240,50 @@ function App() {
   };
 
   const resetAdventureTerminalPrompt = useCallback(() => {
-    updateAdventureProtocolPrompt((prompt) => (
-      prompt?.stage === 'choice' ? prompt : { ...prompt, stage: 'choice' }
-    ));
+    updateAdventureProtocolPrompt((prompt) => {
+      if (!prompt) return prompt;
+      if (
+        prompt.stage === 'choice'
+        && prompt.allowMessengerInput === false
+        && prompt.declineSubmitAttempted === false
+        && prompt.noSequenceStarted === false
+      ) {
+        return prompt;
+      }
+      return {
+        ...prompt,
+        stage: 'choice',
+        allowMessengerInput: false,
+        declineSubmitAttempted: false,
+        noSequenceStarted: false,
+      };
+    });
   }, [updateAdventureProtocolPrompt]);
 
-  const reopenAdventureTerminalPrompt = useCallback((yesCount) => {
-    appendTerminalLines([
-      createTerminalProtocolLine('> > запустить_процесс: приключение.ехе?..'),
-    ]);
-    updateAdventureProtocolPrompt((prompt) => ({
-      ...prompt,
-      stage: 'choice',
-      yesCount,
-      allowMessengerInput: false,
-      declineSubmitAttempted: false,
-      noSequenceStarted: false,
+  const startAdventureAcceptanceDraftFlow = useCallback(() => {
+    const isMessengerOpen = !!openRef.current?.app3 && !minimizedRef.current?.app3;
+    if (isMessengerOpen) {
+      bringToFront('app3');
+    } else {
+      openWindow('app3');
+    }
+    setActiveChatId(TERMINAL_ADVENTURE_CHAT_ID);
+    setTypedByChat((prev) => ({
+      ...prev,
+      [TERMINAL_ADVENTURE_CHAT_ID]: '',
     }));
-  }, [appendTerminalLines, updateAdventureProtocolPrompt]);
+    setAdventureDeclineInputState(null);
+    updateAdventureProtocolPrompt((currentPrompt) => ({
+      ...currentPrompt,
+      stage: 'accept-ready',
+      allowMessengerInput: true,
+    }));
+    messengerInputStickyFocusRef.current = true;
+    messengerInputRestorePendingRef.current = false;
+    window.setTimeout(() => {
+      messengerInputFieldRef.current?.focus();
+    }, 0);
+  }, [bringToFront, openWindow, updateAdventureProtocolPrompt]);
 
   const startAdventureAcceptanceFlow = useCallback(() => {
     const isMessengerOpen = !!openRef.current?.app3 && !minimizedRef.current?.app3;
@@ -1275,7 +1356,7 @@ function App() {
     let timelineMs = 13000;
     if (shouldOpenCalendar) {
       scheduleAdventureAction(timelineMs, openCalendarWindowForProtocol);
-      scheduleLine(timelineMs + 1000, '>>  это что, похоже на «есть время?»', 'calendar');
+      scheduleLine(timelineMs + 1000, '>>  это что, похоже на «есть время»?', 'calendar');
       timelineMs += 1000;
     }
 
@@ -1301,25 +1382,68 @@ function App() {
     timelineMs += (22 * '>> ???'.length);
     scheduleLine(timelineMs, '>> окей. неважно. одним днем меньше – у тебя же их бесконечность');
     timelineMs += (22 * '>> окей. неважно. одним днем меньше – у тебя же их бесконечность'.length);
-    scheduleAdventureAction(timelineMs + 600, startAdventureAcceptanceFlow);
-  }, [appendTerminalLines, openCalendarWindowForProtocol, scheduleAdventureAction, startAdventureAcceptanceFlow]);
+    scheduleAdventureAction(timelineMs + 600, startAdventureAcceptanceDraftFlow);
+  }, [appendTerminalLines, openCalendarWindowForProtocol, scheduleAdventureAction, startAdventureAcceptanceDraftFlow]);
 
-  const handleAdventureDeclineSubmitAttempt = useCallback(() => {
+  const handleAdventureDeclineSubmitAttempt = useCallback((chatId) => {
     const prompt = storyState.terminal?.prompt;
-    if (!prompt || prompt.id !== TERMINAL_ADVENTURE_PROMPT_ID || prompt.stage !== 'decline-typing') {
+    if (!chatId || !prompt || prompt.id !== TERMINAL_ADVENTURE_PROMPT_ID || prompt.stage !== 'decline-typing') {
       return;
     }
 
-    updateAdventureProtocolPrompt((currentPrompt) => ({
-      ...currentPrompt,
-      stage: 'decline-erasing',
-      declineSubmitAttempted: true,
+    setStoryState((prev) => {
+      const currentPrompt = prev.terminal?.prompt;
+      if (!currentPrompt || currentPrompt.id !== TERMINAL_ADVENTURE_PROMPT_ID || currentPrompt.stage !== 'decline-typing') {
+        return prev;
+      }
+
+      const currentText = typedByChat[chatId] || '';
+      const nextState = {
+        ...prev,
+        messenger: {
+          ...prev.messenger,
+          historyByChat: {
+            ...(prev.messenger?.historyByChat || {}),
+            [chatId]: [
+              ...(prev.messenger?.historyByChat?.[chatId] || []),
+              {
+                id: `${TERMINAL_ADVENTURE_PLAYER_EVENT_ID}-decline-draft`,
+                direction: 'outgoing',
+                text: currentText,
+              },
+            ],
+          },
+        },
+        terminal: {
+          ...prev.terminal,
+          prompt: {
+            ...currentPrompt,
+            stage: 'processing',
+            allowMessengerInput: false,
+            declineSubmitAttempted: true,
+            noSequenceStarted: true,
+          },
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+
+    setTypedByChat((prev) => ({
+      ...prev,
+      [chatId]: '',
     }));
-  }, [storyState.terminal?.prompt, updateAdventureProtocolPrompt]);
+    runAdventureDeclinePostSequence(prompt.yesCount || 0);
+  }, [persistRuntimeState, runAdventureDeclinePostSequence, setStoryState, storyState.terminal?.prompt, typedByChat]);
 
   const handleAdventureDeclineEraseKey = useCallback((chatId) => {
     const prompt = storyState.terminal?.prompt;
-    if (!chatId || !prompt || prompt.id !== TERMINAL_ADVENTURE_PROMPT_ID || prompt.stage !== 'decline-erasing') {
+    if (
+      !chatId
+      || !prompt
+      || prompt.id !== TERMINAL_ADVENTURE_PROMPT_ID
+      || !['decline-typing', 'decline-erasing'].includes(prompt.stage)
+    ) {
       return;
     }
 
@@ -1329,6 +1453,16 @@ function App() {
       ...prev,
       [chatId]: nextText,
     }));
+
+    if (prompt.stage !== 'decline-erasing') {
+      updateAdventureProtocolPrompt((currentPrompt) => ({
+        ...currentPrompt,
+        stage: 'decline-erasing',
+        allowMessengerInput: true,
+        declineSubmitAttempted: true,
+        noSequenceStarted: false,
+      }));
+    }
 
     if (nextText.length > 0 || prompt.noSequenceStarted) {
       return;
@@ -1373,6 +1507,10 @@ function App() {
       ...prev,
       [TERMINAL_ADVENTURE_CHAT_ID]: '',
     }));
+    setAdventureDeclineInputState({
+      mode: 'typing',
+      extraTapsRemaining: TERMINAL_ADVENTURE_DECLINE_EXTRA_TAPS,
+    });
     return;
 
     setStoryState((prev) => {
@@ -1422,7 +1560,17 @@ function App() {
       persistRuntimeState(nextState);
       return nextState;
     });
-  }, [persistRuntimeState]);
+  }, [
+    appendTerminalLines,
+    bringToFront,
+    clearTerminalPromptTimers,
+    openWindow,
+    persistRuntimeState,
+    runStoryEffects,
+    setActiveChatId,
+    storyState.terminal?.prompt,
+    updateAdventureProtocolPrompt,
+  ]);
 
   const acceptAdventureTerminalPrompt = useCallback(() => {
     clearTerminalPromptTimers();
@@ -1461,9 +1609,7 @@ function App() {
       appendProtocolLines(getTerminalLineDurationMs(ellipsisLine), diagnosticLines);
       const totalDurationMs = getTerminalLineDurationMs(ellipsisLine)
         + diagnosticLines.reduce((sum, line) => sum + getTerminalLineDurationMs(line), 0);
-      scheduleAdventureAction(totalDurationMs + TERMINAL_PROTOCOL_RETRY_DELAY_MS, () => {
-        reopenAdventureTerminalPrompt(nextYesCount);
-      });
+      scheduleAdventureAction(totalDurationMs + TERMINAL_PROTOCOL_RETRY_DELAY_MS, resetAdventureTerminalPrompt);
       return;
     }
 
@@ -1472,7 +1618,7 @@ function App() {
         typeSpeedMs: TERMINAL_PROTOCOL_ELLIPSIS_4_SPEED_MS,
       });
       const calendarLines = [
-        createTerminalProtocolLine('TODO>>  это что, похоже на «есть время?»'),
+        createTerminalProtocolLine('TODO>>  это что, похоже на «есть время»?'),
         createTerminalProtocolLine('РЕКОМЕНДАЦИЯ СИСТЕМЫ: Отклонить запрос'),
       ];
       appendTerminalLines([ellipsisLine]);
@@ -1481,9 +1627,7 @@ function App() {
       const totalDurationMs = getTerminalLineDurationMs(ellipsisLine)
         + 1000
         + calendarLines.reduce((sum, line) => sum + getTerminalLineDurationMs(line), 0);
-      scheduleAdventureAction(totalDurationMs + TERMINAL_PROTOCOL_RETRY_DELAY_MS, () => {
-        reopenAdventureTerminalPrompt(nextYesCount);
-      });
+      scheduleAdventureAction(totalDurationMs + TERMINAL_PROTOCOL_RETRY_DELAY_MS, resetAdventureTerminalPrompt);
       return;
     }
 
@@ -1499,24 +1643,22 @@ function App() {
       appendProtocolLines(getTerminalLineDurationMs(ellipsisLine), momLines);
       const totalDurationMs = getTerminalLineDurationMs(ellipsisLine)
         + momLines.reduce((sum, line) => sum + getTerminalLineDurationMs(line), 0);
-      scheduleAdventureAction(totalDurationMs + TERMINAL_PROTOCOL_RETRY_DELAY_MS, () => {
-        reopenAdventureTerminalPrompt(nextYesCount);
-      });
+      scheduleAdventureAction(totalDurationMs + TERMINAL_PROTOCOL_RETRY_DELAY_MS, resetAdventureTerminalPrompt);
       return;
     }
 
     const ellipsisLine = createTerminalProtocolLine(TERMINAL_PROTOCOL_ELLIPSIS_TEXT, {
-      typeSpeedMs: TERMINAL_PROTOCOL_ELLIPSIS_7_SPEED_MS,
+      typeSpeedMs: TERMINAL_PROTOCOL_ELLIPSIS_6_SPEED_MS,
     });
     const finishLines = [
-      createTerminalProtocolLine('>> деактивация протокола «TODO»'),
-      createTerminalProtocolLine('ЗАПРОС ПРИНЯТ'),
+      createTerminalProtocolLine('>> ???'),
+      createTerminalProtocolLine('>> окей. неважно. одним днем меньше – у тебя же их бесконечность'),
     ];
     appendTerminalLines([ellipsisLine]);
     appendProtocolLines(getTerminalLineDurationMs(ellipsisLine), finishLines);
     const totalDurationMs = getTerminalLineDurationMs(ellipsisLine)
       + finishLines.reduce((sum, line) => sum + getTerminalLineDurationMs(line), 0);
-    scheduleAdventureAction(totalDurationMs + 500, startAdventureAcceptanceFlow);
+    scheduleAdventureAction(totalDurationMs + 600, startAdventureAcceptanceDraftFlow);
     return;
 
     setStoryState((prev) => {
@@ -1587,9 +1729,9 @@ function App() {
     appendTerminalLines,
     clearTerminalPromptTimers,
     openCalendarWindowForProtocol,
-    reopenAdventureTerminalPrompt,
+    resetAdventureTerminalPrompt,
     scheduleAdventureAction,
-    startAdventureAcceptanceFlow,
+    startAdventureAcceptanceDraftFlow,
     storyState.terminal?.prompt,
     updateAdventureProtocolPrompt,
   ]);
@@ -1602,7 +1744,7 @@ function App() {
     });
   }, [persistRuntimeState]);
 
-  const completeTerminalLine = (lineId) => {
+  const completeTerminalLine = useCallback((lineId) => {
     if (!lineId) return;
     setStoryState((prev) => {
       const nextState = {
@@ -1617,7 +1759,7 @@ function App() {
       persistRuntimeState(nextState);
       return nextState;
     });
-  };
+  }, [persistRuntimeState]);
 
   const selectWorkTask = (taskId) => {
     setActiveWorkTaskId(taskId);
@@ -2800,7 +2942,6 @@ function App() {
   }, [editorContent.sequences, storyState.ui?.view]);
 
   const minimizeWindow = (id) => {
-    if (storyState.terminal?.prompt?.active && id === 'app7') return;
     setMinimized((p) => ({ ...p, [id]: true }));
   };
 
@@ -2915,6 +3056,7 @@ function App() {
     setPositions(getDefaultIconPositions(nextStoryState.ui.iconPositions || {}));
     setWinState(getDefaultWindowState(nextStoryState.ui.windowState || {}));
     setTypedByChat({});
+    setAdventureDeclineInputState(null);
     triggeredMessageFocusEffectsRef.current = new Set();
     conveyorVisibilityRef.current = { visible: false, frontmost: false };
     conveyorEngagementGainRef.current = null;
@@ -2922,12 +3064,125 @@ function App() {
     conveyorNotifTimersRef.current = [];
     conveyorTerminalTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
     conveyorTerminalTimersRef.current = [];
+    terminalPromptTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
+    terminalPromptTimersRef.current = [];
   }, [editorContent, getDefaultIconPositions, getDefaultWindowState]);
 
   const launchDevFromStart = () => {
     if (!isDevRoute) return;
     clearStoryState('dev');
-    const nextState = createDefaultStoryState(editorContent);
+    const nextState = createDefaultStoryState(INITIAL_EDITOR_CONTENT);
+    saveStoryState(nextState, 'dev');
+    restoreDefaultRuntimeState(nextState, 'game');
+  };
+  const launchDevAtAdventurePrompt = () => {
+    if (!isDevRoute) return;
+
+    const baseState = createDefaultStoryState(INITIAL_EDITOR_CONTENT);
+    const script = INITIAL_EDITOR_CONTENT.messenger?.scripts?.[TERMINAL_ADVENTURE_CHAT_ID];
+    const startSceneId = script?.startSceneId || script?.scenes?.[0]?.id || '';
+    const scene = (script?.scenes || []).find((item) => item.id === startSceneId) || null;
+
+    if (!scene) {
+      launchDevFromStart();
+      return;
+    }
+
+    const pendingPlayerEventIndex = (scene.events || []).findIndex(
+      (event) => event.id === TERMINAL_ADVENTURE_PLAYER_EVENT_ID,
+    );
+
+    if (pendingPlayerEventIndex < 0) {
+      launchDevFromStart();
+      return;
+    }
+
+    const completedEvents = (scene.events || []).slice(0, pendingPlayerEventIndex);
+    const completedEventIds = new Set(completedEvents.map((event) => event.id));
+    const adventureHistory = completedEvents.reduce((history, event) => {
+      if (event.type === 'message_other') {
+        history.push({
+          id: event.id,
+          direction: 'incoming',
+          text: event.text || '',
+        });
+      } else if (event.type === 'message_player') {
+        history.push({
+          id: event.id,
+          direction: 'outgoing',
+          text: event.text || '',
+        });
+      }
+
+      return history;
+    }, []);
+
+    const nextStateWithUi = applyStoryEffects(baseState, [
+      { type: 'unlockChat', chatId: TERMINAL_ADVENTURE_CHAT_ID },
+      { type: 'openApp', appId: 'app3' },
+      { type: 'openApp', appId: 'app7' },
+      { type: 'focusApp', appId: 'app3' },
+      { type: 'focusApp', appId: 'app7' },
+    ]);
+
+    const nextState = {
+      ...nextStateWithUi,
+      flags: {
+        ...nextStateWithUi.flags,
+        gameProgress: 'desktop',
+      },
+      messenger: {
+        ...nextStateWithUi.messenger,
+        sceneIdByChat: {
+          ...nextStateWithUi.messenger.sceneIdByChat,
+          [TERMINAL_ADVENTURE_CHAT_ID]: startSceneId,
+        },
+        eventIndexByChat: {
+          ...nextStateWithUi.messenger.eventIndexByChat,
+          [TERMINAL_ADVENTURE_CHAT_ID]: pendingPlayerEventIndex,
+        },
+        historyByChat: {
+          ...nextStateWithUi.messenger.historyByChat,
+          [TERMINAL_ADVENTURE_CHAT_ID]: adventureHistory,
+        },
+        completedEventIds: [
+          ...(nextStateWithUi.messenger.completedEventIds || []).filter((eventId) => !completedEventIds.has(eventId)),
+          ...completedEvents.map((event) => event.id),
+        ],
+        processedEventIds: [],
+        focusEffectEventIds: [],
+        typingByChat: {
+          ...nextStateWithUi.messenger.typingByChat,
+          [TERMINAL_ADVENTURE_CHAT_ID]: {
+            active: false,
+            durationMs: 0,
+          },
+        },
+      },
+      terminal: {
+        ...nextStateWithUi.terminal,
+        lines: [
+          ...(nextStateWithUi.terminal?.lines || []),
+          {
+            id: `${TERMINAL_ADVENTURE_PROMPT_ID}-seed-ellipsis`,
+            text: '… …',
+          },
+          {
+            id: `${TERMINAL_ADVENTURE_PROMPT_ID}-seed-prompt`,
+            text: '> > запустить_процесс: приключение.ехе?..',
+          },
+        ],
+        prompt: null,
+      },
+      ui: {
+        ...nextStateWithUi.ui,
+        view: 'desktop',
+        gameScreen: 'game',
+        activeChatId: TERMINAL_ADVENTURE_CHAT_ID,
+      },
+    };
+
+    clearStoryState('dev');
     saveStoryState(nextState, 'dev');
     restoreDefaultRuntimeState(nextState, 'game');
   };
@@ -3101,7 +3356,7 @@ function App() {
               type="button"
             >
               {note.title ? <div className="note-title">{note.title}</div> : null}
-              <div className="note-preview">{note.body || note.preview}</div>
+              <div className="note-preview">{note.preview || note.body}</div>
             </button>
           ))}
         </div>
@@ -3143,7 +3398,13 @@ function App() {
           && active.id === TERMINAL_ADVENTURE_CHAT_ID;
         const isAdventureDeclineTyping = isAdventureTerminalPrompt && terminalPrompt?.stage === 'decline-typing';
         const isAdventureDeclineErasing = isAdventureTerminalPrompt && terminalPrompt?.stage === 'decline-erasing';
+        const isAdventureAcceptanceRetyping = isAdventureTerminalPrompt && terminalPrompt?.stage === 'accept-retyping';
+        const isAdventureAcceptanceReady = isAdventureTerminalPrompt && terminalPrompt?.stage === 'accept-ready';
         const isAdventureDeclineFlow = isAdventureDeclineTyping || isAdventureDeclineErasing;
+        const isAdventureDraftVisibleFlow = isAdventureDeclineFlow || isAdventureAcceptanceRetyping || isAdventureAcceptanceReady;
+        const isAdventureEditableFlow = isAdventureDeclineTyping || isAdventureAcceptanceReady;
+        const adventureDeclineMode = adventureDeclineInputState?.mode || 'typing';
+        const adventureDeclineExtraTapsRemaining = Math.max(0, adventureDeclineInputState?.extraTapsRemaining || 0);
         const pendingChoiceState = pendingChoice
           ? (storyState.messenger?.choiceStateByEventId?.[previousEvent.id] || {
             disabledOptionIds: [],
@@ -3157,12 +3418,16 @@ function App() {
           )) || null
           : null;
         const typedMessengerText = pendingPlayerEvent ? (typedByChat[active.id] || '') : '';
-        const targetText = isAdventureDeclineFlow
+        const isAdventureDeclineTextComplete = typedMessengerText.length >= TERMINAL_ADVENTURE_DECLINE_TEXT.length;
+        const isAdventureDeclineBufferComplete = isAdventureDeclineTextComplete && adventureDeclineExtraTapsRemaining === 0;
+        const targetText = isAdventureAcceptanceRetyping || isAdventureAcceptanceReady
+          ? TERMINAL_ADVENTURE_AUTO_REPLY_TEXT
+          : isAdventureDeclineFlow
           ? TERMINAL_ADVENTURE_DECLINE_TEXT
           : pendingChoice
           ? (selectedChoiceOption?.resultText || selectedChoiceOption?.label || '')
           : (pendingPlayerEvent?.text || '');
-        const isMessengerInputBlockedByTerminalPrompt = isTerminalPromptChoice && !isAdventureDeclineFlow;
+        const isMessengerInputBlockedByTerminalPrompt = isTerminalPromptChoice && !isAdventureEditableFlow;
         const isPendingTapComplete = pendingPlayerEvent
           ? typedMessengerText.length >= targetText.length && targetText.length > 0
           : false;
@@ -3171,7 +3436,9 @@ function App() {
         const isSceneFinished = !!script && !nextEvent;
         const idleInputText = isSceneFinished ? 'пока сказать нечего' : '';
         const inputValue = isMessengerInputBlockedByTerminalPrompt
-          ? ''
+          ? (isAdventureDraftVisibleFlow ? typedMessengerText : '')
+          : isAdventureDraftVisibleFlow
+          ? typedMessengerText
           : pendingChoice && !typedMessengerText
           ? 'напишите ответ...'
           : pendingPlayerEvent
@@ -3179,7 +3446,8 @@ function App() {
             : idleInputText;
         const canSubmitMessage = !!pendingPlayerEvent
           && !isMessengerInputBlockedByTerminalPrompt
-          && (!pendingChoice || !!selectedChoiceOption || isAdventureDeclineFlow)
+          && (!pendingChoice || !!selectedChoiceOption || isAdventureDraftVisibleFlow)
+          && !isAdventureDeclineFlow
           && isPendingTapComplete;
         return (
             <div className="messenger">
@@ -3255,25 +3523,75 @@ function App() {
                         }
                         return;
                       }
-                      if (isAdventureDeclineErasing) {
-                        const isEraseKey = e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter' || e.key === 'Tab' || e.key === ' ';
-                        if (!isEraseKey) return;
-                        e.preventDefault();
-                        handleAdventureDeclineEraseKey(active.id);
-                        return;
-                      }
                       if (isAdventureDeclineTyping) {
-                        if (e.key === 'Enter' && canSubmitMessage) {
-                          e.preventDefault();
-                          handleAdventureDeclineSubmitAttempt();
+                        const isProgressKey = e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter' || e.key === 'Tab' || e.key === ' ';
+                        if (!isProgressKey) return;
+                        e.preventDefault();
+
+                        if (adventureDeclineMode === 'erasing') {
+                          const nextText = typedMessengerText.slice(0, -1);
+                          setTypedByChat((prev) => ({
+                            ...prev,
+                            [active.id]: nextText,
+                          }));
+
+                          if (nextText.length === 0 && !(terminalPrompt?.noSequenceStarted)) {
+                            setAdventureDeclineInputState(null);
+                            updateAdventureProtocolPrompt((currentPrompt) => ({
+                              ...currentPrompt,
+                              stage: 'processing',
+                              allowMessengerInput: false,
+                              noSequenceStarted: true,
+                            }));
+                            runAdventureDeclinePostSequence(terminalPrompt?.yesCount || 0);
+                          }
                           return;
                         }
-                        typeMessengerMessageKey(active.id, pendingPlayerEvent.id, targetText, e);
+
+                        if (!isAdventureDeclineTextComplete) {
+                          typeMessengerMessageKey(active.id, pendingPlayerEvent.id, targetText, e);
+                          return;
+                        }
+
+                        if (adventureDeclineMode === 'typing' && adventureDeclineExtraTapsRemaining > 0) {
+                          setAdventureDeclineInputState((prev) => ({
+                            ...(prev || { mode: 'typing', extraTapsRemaining: TERMINAL_ADVENTURE_DECLINE_EXTRA_TAPS }),
+                            mode: 'typing',
+                            extraTapsRemaining: Math.max(0, (prev?.extraTapsRemaining || 0) - 1),
+                          }));
+                          return;
+                        }
+
+                        if (adventureDeclineMode === 'typing' && isAdventureDeclineBufferComplete) {
+                          setAdventureDeclineInputState((prev) => ({
+                            ...(prev || { mode: 'typing', extraTapsRemaining: 0 }),
+                            mode: 'erasing',
+                            extraTapsRemaining: 0,
+                          }));
+                        }
+
+                        const nextText = typedMessengerText.slice(0, -1);
+                        setTypedByChat((prev) => ({
+                          ...prev,
+                          [active.id]: nextText,
+                        }));
+
+                        if (nextText.length === 0 && !(terminalPrompt?.noSequenceStarted)) {
+                          e.preventDefault();
+                          setAdventureDeclineInputState(null);
+                          updateAdventureProtocolPrompt((currentPrompt) => ({
+                            ...currentPrompt,
+                            stage: 'processing',
+                            allowMessengerInput: false,
+                            noSequenceStarted: true,
+                          }));
+                          runAdventureDeclinePostSequence(terminalPrompt?.yesCount || 0);
+                        }
                         return;
                       }
                       if (e.key === 'Enter' && canSubmitMessage) {
                         e.preventDefault();
-                        if (pendingChoice) {
+                        if (pendingChoice && !isAdventureAcceptanceReady) {
                           submitMessengerChoice({
                             chatId: active.id,
                             choiceEventId: previousEvent.id,
@@ -3285,7 +3603,7 @@ function App() {
                         submitMessengerMessage(active.id, pendingPlayerEvent.id, targetText, pendingPlayerEvent);
                         return;
                       }
-                      if (pendingChoice) {
+                      if (pendingChoice && !isAdventureAcceptanceReady) {
                         typeMessengerChoiceKey(active.id, previousEvent.id, pendingChoice, e);
                         return;
                       }
@@ -3305,17 +3623,17 @@ function App() {
                       {pendingPlayerEvent && !isMessengerInputBlockedByTerminalPrompt && <span className="thread-input-caret" aria-hidden="true" />}
                     </span>
                   </div>
-                  <button
-                    type="button"
-                    disabled={!canSubmitMessage}
-                    onClick={() => {
-                      if (isMessengerInputBlockedByTerminalPrompt) return;
-                      if (!pendingPlayerEvent) return;
+                    <button
+                      type="button"
+                      disabled={!canSubmitMessage}
+                      onClick={() => {
+                        if (isMessengerInputBlockedByTerminalPrompt) return;
+                        if (!pendingPlayerEvent) return;
                       if (isAdventureDeclineTyping) {
-                        handleAdventureDeclineSubmitAttempt();
+                        handleAdventureDeclineSubmitAttempt(active.id);
                         return;
                       }
-                      if (pendingChoice) {
+                      if (pendingChoice && !isAdventureAcceptanceReady) {
                         submitMessengerChoice({
                           chatId: active.id,
                           choiceEventId: previousEvent.id,
@@ -4083,6 +4401,13 @@ function App() {
               onClick={openPlayerViewFromStart}
             >
               Открыть игру с нуля
+            </button>
+            <button
+              type="button"
+              className="dev-launch-btn"
+              onClick={launchDevAtAdventurePrompt}
+            >
+              Dev: к приключению
             </button>
             <button
               type="button"

@@ -1540,7 +1540,9 @@
   --notes-muted: #6f6457;
   --notes-border: rgba(110, 92, 69, 0.18);
   --notes-shadow: 0 10px 24px rgba(86, 67, 45, 0.08);
-  display: block;
+  display: grid;
+  grid-template-columns: minmax(320px, 0.95fr) minmax(0, 1.2fr);
+  gap: 14px;
   height: 100%;
   padding: 16px;
   box-sizing: border-box;
@@ -1551,10 +1553,10 @@
 
 .notes-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   align-content: start;
   align-items: start;
-  gap: 14px;
+  gap: 12px;
   height: 100%;
   overflow: auto;
   padding-right: 8px;
@@ -1567,16 +1569,16 @@
 .note-item {
   width: 100%;
   text-align: left;
-  padding: 16px 18px;
+  padding: 14px 16px;
   border: 1px solid var(--notes-border);
-  border-radius: 18px;
+  border-radius: 16px;
   background: var(--notes-card);
   box-shadow: var(--notes-shadow);
   cursor: pointer;
-  height: 172px;
+  min-height: 160px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   overflow: hidden;
 }
 
@@ -1587,7 +1589,7 @@
 }
 
 .note-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--notes-ink);
   line-height: 1.25;
@@ -1598,18 +1600,26 @@
 }
 
 .note-preview {
-  font-size: 17px;
+  font-size: 15px;
   color: var(--notes-muted);
-  line-height: 1.45;
+  line-height: 1.4;
   white-space: pre-wrap;
   display: -webkit-box;
-  -webkit-line-clamp: 5;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
 .note-view {
-  display: none;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 18px 20px;
+  border: 1px solid var(--notes-border);
+  border-radius: 18px;
+  background: rgba(255, 250, 241, 0.92);
+  box-shadow: var(--notes-shadow);
 }
 
 .note-view-title {
@@ -1633,8 +1643,16 @@
 }
 
 @media (max-width: 900px) {
+  .notes {
+    grid-template-columns: 1fr;
+  }
+
   .notes-list--masonry {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+
+  .note-view {
+    min-height: 220px;
   }
 }
 
