@@ -7,6 +7,9 @@ import iconSocial from './icons/соцсеть 1.png';
 import iconCalendar from './icons/календарь 1.png';
 import iconConveyor from './icons/конвейер.png';
 import iconExit from './icons/выход 2.png';
+import fromKPhoto1 from './fromK/ph1.jpg';
+import fromKPhoto1Alt from './fromK/ph1key.jpg';
+import fromKPhoto2 from './fromK/ph2.jpg';
 import AppWindowContent from './components/AppWindowContent';
 import DesktopIcon from './components/DesktopIcon';
 import DesktopWindow from './components/DesktopWindow';
@@ -30,6 +33,8 @@ import './App.css';
 const INITIAL_EDITOR_CONTENT = normalizeEditorContent(STORY_CONTENT, STORY_CONTENT);
 const INITIAL_EDITOR_CONFIG = normalizeEditorConfig(STORY_EDITOR_CONFIG, STORY_EDITOR_CONFIG);
 const PROLOGUE_AUDIO_SRC = '/files/audio/intro.mp3';
+const CHAPTER1_AUDIO_SRC = '/files/audio/chapter1.mp3';
+const K_HOUSE_VOICE_AUDIO_SRC = '/files/audio/voice.ogg';
 
 const ICON_IMAGE_BY_ID = {
   app1: iconNotes,
@@ -69,6 +74,10 @@ const clearLegacyEditorStorage = () => {
   });
 };
 const DEFAULT_WINDOW_SIZE = { width: 900, height: 620 };
+const SOCIAL_WINDOW_SIZE = { width: 460, height: 760 };
+const getDefaultWindowSize = (id) => (id === 'app4' ? SOCIAL_WINDOW_SIZE : DEFAULT_WINDOW_SIZE);
+const PHOTO_VIEWER_Z_INDEX = 1000;
+const PHOTO_REPLY_TYPING_SPEED_MS = 42;
 const SOCIAL_PEOPLE = [
   { name: 'Лера', handle: 'lera' },
   { name: 'Макс', handle: 'max' },
@@ -91,6 +100,146 @@ const SOCIAL_CAPTIONS = [
   'случайная тень, нужный цвет, мгновенный кадр.',
   'день складывается из мелких деталей, как этот.',
 ];
+const getPhotoReplyQueueFingerprint = (entry) => {
+  const firstOutgoingText = (entry?.conversation || []).find((item) => item?.direction === 'outgoing')?.text || '';
+  return `${entry?.messageId || ''}::${entry?.hotspotId || ''}::${firstOutgoingText}`;
+};
+const dedupePhotoReplyQueue = (entries = []) => {
+  const seen = new Set();
+  return entries.filter((entry) => {
+    const fingerprint = getPhotoReplyQueueFingerprint(entry);
+    if (!fingerprint || seen.has(fingerprint)) return false;
+    seen.add(fingerprint);
+    return true;
+  });
+};
+const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
+  k_071: {
+    image: fromKPhoto1,
+    alt: 'Черешня у забора',
+    hotspots: [
+      {
+        id: 'ladder',
+        label: 'Старый ДК',
+        left: 0.28,
+        top: 0.49,
+        width: 0.13,
+        height: 0.33,
+        conversation: [
+          { direction: 'outgoing', text: 'Оо, какая картина! Там дискотеки проходят?' },
+          { direction: 'incoming', text: 'ага, местный Дом культуры' },
+          { direction: 'incoming', text: 'про дискотеки еще не узнавала) думаю, максимум ярмарки меда' },
+        ],
+        terminalComment: 'тебе не хватает только дискотеки',
+      },
+      {
+        id: 'berries',
+        label: 'Афиша',
+        left: 0.35,
+        top: 0.22,
+        width: 0.24,
+        height: 0.22,
+        conversation: [
+          { direction: 'outgoing', text: 'Что за афиша?' },
+          { direction: 'incoming', text: 'она прошлогодняя' },
+          { direction: 'incoming', text: 'кажется какой-то ансамбль из соседнего района' },
+        ],
+      },
+    ],
+  },
+  k_072: {
+    image: fromKPhoto1Alt,
+    alt: 'Старик и собака у ворот',
+    hotspots: [
+      {
+        id: 'old-man',
+        label: 'Группы людей',
+        left: 0.12,
+        top: 0.42,
+        width: 0.26,
+        height: 0.35,
+        conversation: [
+          { direction: 'outgoing', text: 'Тут всегда так людно?' },
+          { direction: 'incoming', text: 'нет! мне кажется тут примерно весь город собрался' },
+        ],
+      },
+      {
+        id: 'gate',
+        label: 'Обсуждают',
+        left: 0.47,
+        top: 0.38,
+        width: 0.22,
+        height: 0.25,
+        conversation: [
+          { direction: 'outgoing', text: 'На что женщина показывает?' },
+          { direction: 'incoming', text: 'в сторону того дома' },
+        ],
+      },
+      {
+        id: 'dog',
+        label: 'Лавочки',
+        left: 0.38,
+        top: 0.58,
+        width: 0.12,
+        height: 0.15,
+        conversation: [
+          { direction: 'outgoing', text: 'Они даже шахматы бросили?' },
+          { direction: 'incoming', text: 'ну да… тут важнее событие' },
+          { direction: 'outgoing', text: 'Это общее место встречи?' },
+          { direction: 'incoming', text: 'ага, тут по вечерам все поболтать собираются' },
+          { direction: 'outgoing', text: 'Мило…' },
+        ],
+      },
+    ],
+  },
+  k_073: {
+    image: fromKPhoto2,
+    alt: 'Деревенская улица',
+    hotspots: [
+      {
+        id: 'road',
+        label: 'Крыша',
+        left: 0.07,
+        top: 0.53,
+        width: 0.41,
+        height: 0.36,
+        conversation: [
+          { direction: 'outgoing', text: 'Крыша выглядит так, как будто ее и обычный дождь может пробить.' },
+          { direction: 'incoming', text: 'да, это правда…' },
+        ],
+      },
+      {
+        id: 'pointing-hand',
+        label: 'Дом',
+        left: 0.19,
+        top: 0.34,
+        width: 0.16,
+        height: 0.12,
+        conversation: [
+          { direction: 'outgoing', text: 'Подожди, там что, кто-то живет?' },
+          { direction: 'incoming', text: 'я сначала тоже думала, что дом заброшенный' },
+        ],
+      },
+      {
+        id: 'shirt',
+        label: 'Дыра',
+        left: 0.56,
+        top: 0.3,
+        width: 0.11,
+        height: 0.18,
+        conversation: [
+          { direction: 'outgoing', text: 'Это вот дыра от метеорита? Как будто бы небольшая' },
+          { direction: 'incoming', text: 'ага, надо поближе рассмотреть!' },
+          { direction: 'outgoing', text: 'Я думаю, первое что тебе нужно сделать - это поболтать с дедом.' },
+          { direction: 'incoming', text: 'окей! есть поболтать с дедом' },
+        ],
+      },
+    ],
+  },
+};
+const isDynamicMessengerHistoryEntryId = (entryId) => typeof entryId === 'string' && (
+  entryId.startsWith('photo-hotspot-') || entryId.startsWith('dynamic-')
+);
 const getVisibleChatList = (content, unlockedChatIds = []) => {
   const unlockedSet = new Set(unlockedChatIds);
   return (content?.messenger?.chats || []).filter((chat) => unlockedSet.has(chat.id));
@@ -141,18 +290,15 @@ const TERMINAL_ADVENTURE_ACCEPT_TEXT = 'Да';
 const TERMINAL_ADVENTURE_ACCEPT_DELAY_MS = 2000;
 const TERMINAL_ADVENTURE_TYPE_INTERVAL_MS = 120;
 const TERMINAL_ADVENTURE_AUTO_REPLY_TEXT = 'Я в деле!';
-const TERMINAL_ADVENTURE_AUTO_REPLY_DELAY_MS = 700;
-const TERMINAL_ADVENTURE_AUTO_REPLY_TYPE_INTERVAL_MS = 85;
 const TERMINAL_ADVENTURE_DECLINE_TEXT = 'Звучит отлично, но я очень занят сейчас';
 const TERMINAL_ADVENTURE_DECLINE_EXTRA_TAPS = 5;
 const TERMINAL_PROTOCOL_ELLIPSIS_TEXT = '...';
 const TERMINAL_PROTOCOL_ELLIPSIS_4_SPEED_MS = 500;
 const TERMINAL_PROTOCOL_ELLIPSIS_6_SPEED_MS = 500;
-const TERMINAL_PROTOCOL_ELLIPSIS_7_SPEED_MS = 500;
 const TERMINAL_PROTOCOL_RETRY_DELAY_MS = 2000;
 const TERMINAL_PROTOCOL_ENDING_TEXT = 'НАЧАЛО: Погоня за звездой';
 const TERMINAL_PROTOCOL_ENDING_DELAY_MS = 2000;
-const PERSISTENT_NOTIFICATION_LIFETIME_MS = 5000;
+const PERSISTENT_NOTIFICATION_LIFETIME_MS = 7000;
 const SOCIAL_FIRST_OPEN_TERMINAL_TEXT = `Я знаю даже, как сейчас дела у нескольких случайных,
 Совершенно незнакомых мне людей`;
 const SOCIAL_SCROLL_TERMINAL_TEXT = 'да, отдохни немного, расслабь ум';
@@ -295,6 +441,17 @@ const getCreditsFromCompletionMessage = (message = '') => {
   return Number.isFinite(parsedValue) ? parsedValue : null;
 };
 
+const getMessengerPhotoAttachment = (messageId) => (
+  messageId ? MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID[messageId] || null : null
+);
+
+const isPointInsidePhotoHotspot = (hotspot, x, y) => (
+  x >= hotspot.left
+  && x <= hotspot.left + hotspot.width
+  && y >= hotspot.top
+  && y <= hotspot.top + hotspot.height
+);
+
 const normalizeAdventureDraftText = (value = '') => (
   typeof value === 'string'
     ? value.trim().replace(/[.!?…]+$/u, '')
@@ -363,12 +520,14 @@ function App() {
       content: INITIAL_EDITOR_CONTENT,
     })
   ));
+  const [activeMessengerPhotoMessageId, setActiveMessengerPhotoMessageId] = useState('');
+  const [hoveredMessengerPhotoHotspotId, setHoveredMessengerPhotoHotspotId] = useState('');
 
   useEffect(() => {
     if (!isDev) return;
     setEditorContent(INITIAL_EDITOR_CONTENT);
     setEditorConfig(INITIAL_EDITOR_CONFIG);
-  }, [isDev, INITIAL_EDITOR_CONTENT, INITIAL_EDITOR_CONFIG]);
+  }, [isDev]);
   const landingInfo = [
     'FoMO (Fear of Missing Out) — это страх упущенных возможностей, ощущение, что где-то прямо сейчас происходит что-то более важное, интересное и ценное, чем то, чем человек занят в данный момент. В цифровую эпоху этот страх усиливается постоянным потоком уведомлений, новостей и образов чужой жизни, превращаясь в фоновую тревогу и хроническое чувство неудовлетворенности. FoMO заставляет нас непрерывно проверять экран, сравнивать себя с другими и терять контакт с собственным опытом, постепенно превращая внимание в главный ресурс современной жизни.Мы живем в мире, где почти невозможно просто быть. Каждый момент сопровождается ощущением, что где-то происходит что-то более важное, интересное, насыщенное и значимое. Чужие жизни мерцают в экране, складываясь в бесконечную ленту событий, достижений, встреч и возможностей. На этом фоне собственная реальность начинает казаться бледной, медленной и недостаточной. Так возникает FoMO — страх упущенных возможностей.',
     'FoMO (Fear of Missing Out) — это не продукт цифровой эпохи. Это древний человеческий страх оказаться вне стаи, вне событий, вне жизни. Однако именно цифровая среда превратила его в постоянный фон существования. Социальные сети, мессенджеры, алгоритмы рекомендаций и бесконечные ленты обновлений создают ощущение непрерывного движения, в котором невозможно сделать паузу, не испытывая тревоги. Каждый пропущенный пост, сторис или сообщение начинает ощущаться как потеря — социальной связи, статуса, значимости, опыта.',
@@ -410,6 +569,12 @@ function App() {
     [editorConfig, editorContent, editorDraftBaseline, isDevRoute],
   );
   const hasUnsavedEditorChanges = editorDraftSnapshot !== editorDraftBaseline;
+  const activeMessengerPhoto = useMemo(
+    () => getMessengerPhotoAttachment(activeMessengerPhotoMessageId),
+    [activeMessengerPhotoMessageId],
+  );
+  const inspectedPhotoHotspotsByMessage = storyState.messenger?.inspectedPhotoHotspotsByMessage || {};
+  const inspectedActiveMessengerPhotoHotspots = inspectedPhotoHotspotsByMessage[activeMessengerPhotoMessageId] || [];
 
   // This beat runner must not depend on the full messenger object:
   // typing state updates would cancel scheduled deliveries before the message arrives.
@@ -421,6 +586,20 @@ function App() {
   useEffect(() => {
     clearLegacyEditorStorage();
   }, []);
+
+  useEffect(() => {
+    if (!activeMessengerPhoto) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setActiveMessengerPhotoMessageId('');
+        setHoveredMessengerPhotoHotspotId('');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeMessengerPhoto]);
 
   const persistEditorSnapshot = ({ reason = 'autosave', markAsLastGood = false } = {}) => {
     const savedAt = Date.now();
@@ -475,6 +654,7 @@ function App() {
   const beatRevealTimersRef = useRef([]);
   const typingTimersRef = useRef({});
   const workSubmitTimersRef = useRef([]);
+  const kHouseSequenceTimersRef = useRef([]);
   const conveyorNotifTimersRef = useRef([]);
   const conveyorTerminalTimersRef = useRef([]);
   const terminalLineCountRef = useRef(null);
@@ -485,7 +665,6 @@ function App() {
   const messengerInputRestorePendingRef = useRef(false);
   const conveyorVisibilityRef = useRef({ visible: false, frontmost: false });
   const socialVisibilityRef = useRef(false);
-  const calendarVisibilityRef = useRef(false);
   const conveyorEngagementGainRef = useRef(null);
   const getDefaultIconPositions = useCallback((savedPositions = {}) => {
     const map = {};
@@ -515,7 +694,7 @@ function App() {
     const map = {};
     icons.forEach((it) => {
       map[it.id] = {
-        size: DEFAULT_WINDOW_SIZE,
+        size: getDefaultWindowSize(it.id),
         pos: { x: 120 + Math.random() * 80, y: 80 + Math.random() * 60 },
         z: 1,
       };
@@ -525,7 +704,9 @@ function App() {
       if (!map[key] || !item) return;
       map[key] = {
         ...map[key],
-        size: item.size && typeof item.size.width === 'number' && typeof item.size.height === 'number'
+        size: key === 'app4'
+          ? getDefaultWindowSize(key)
+          : item.size && typeof item.size.width === 'number' && typeof item.size.height === 'number'
           ? item.size
           : map[key].size,
         pos: item.pos && typeof item.pos.x === 'number' && typeof item.pos.y === 'number'
@@ -561,6 +742,7 @@ function App() {
   const [workSubmitFeedback, setWorkSubmitFeedback] = useState(null);
   const [socialPosts, setSocialPosts] = useState([]);
   const [persistentNotifs, setPersistentNotifs] = useState([]);
+  const photoReplyTimersRef = useRef([]);
   const openRef = useRef({});
   const minimizedRef = useRef({});
   const terminalPromptTimersRef = useRef([]);
@@ -568,19 +750,22 @@ function App() {
   const screenFlashTimerRef = useRef(null);
   const prologueAudioRef = useRef(null);
   const prologueAudioStartedRef = useRef(false);
+  const chapter1AudioRef = useRef(null);
+  const chapter1AudioStartedRef = useRef(false);
 
   const bringToFront = useCallback((id) => {
     setWinState((s) => {
       const maxZ = Math.max(...Object.values(s).map((w) => w.z || 1));
-      return { ...s, [id]: { ...s[id], z: maxZ + 1 } };
+      const overlayBaseZ = activeMessengerPhotoMessageId ? PHOTO_VIEWER_Z_INDEX : 0;
+      return { ...s, [id]: { ...s[id], z: Math.max(maxZ, overlayBaseZ) + 1 } };
     });
-  }, []);
+  }, [activeMessengerPhotoMessageId]);
 
   const openWindow = useCallback((id) => {
     bringToFront(id);
     setWinState((s) => ({
       ...s,
-      [id]: { ...s[id], size: DEFAULT_WINDOW_SIZE },
+      [id]: { ...s[id], size: getDefaultWindowSize(id) },
     }));
     setOpen((p) => ({ ...p, [id]: true }));
     setMinimized((p) => ({ ...p, [id]: false }));
@@ -958,16 +1143,6 @@ function App() {
     });
   }, [setTerminalPromptState]);
 
-  const dismissPersistentNotifLegacy = useCallback((notifId) => {
-    if (!notifId) return;
-    setPersistentNotifs((prev) => prev.filter((notif) => notif.id !== notifId));
-    const timerEntry = persistentNotifTimersRef.current.find((entry) => entry.id === notifId);
-    if (timerEntry) {
-      window.clearTimeout(timerEntry.timerId);
-      persistentNotifTimersRef.current = persistentNotifTimersRef.current.filter((entry) => entry.id !== notifId);
-    }
-  }, []);
-
   const pushPersistentNotifLegacy = useCallback(({ title, text, appId = 'app3', chatId = null }) => {
     const notifId = `notif-${appId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     setPersistentNotifs((prev) => ([
@@ -1118,7 +1293,6 @@ function App() {
   const submitMessengerMessage = (chatId, eventId, targetText, pendingPlayerEvent = null) => {
     if (!chatId || !eventId) return;
     const currentText = typedByChat[chatId] || '';
-    if (currentText.length < targetText.length) return;
     const terminalPrompt = storyState.terminal?.prompt;
 
     if (
@@ -1139,6 +1313,8 @@ function App() {
       });
       return;
     }
+
+    if (currentText.length < targetText.length) return;
 
     const sendBehavior = pendingPlayerEvent?.schema?.sendBehavior || '';
     if (sendBehavior === 'blocked_and_wiped') {
@@ -1161,7 +1337,7 @@ function App() {
     });
   };
 
-  const updateMessengerChoiceState = (eventId, updater) => {
+  const updateMessengerChoiceState = useCallback((eventId, updater) => {
     if (!eventId) return;
     setStoryState((prev) => {
       const current = prev.messenger?.choiceStateByEventId?.[eventId] || {
@@ -1182,7 +1358,7 @@ function App() {
       persistRuntimeState(nextState);
       return nextState;
     });
-  };
+  }, [persistRuntimeState]);
 
   const clearTerminalPromptTimers = useCallback(() => {
     terminalPromptTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
@@ -1288,59 +1464,6 @@ function App() {
     }, 0);
   }, [bringToFront, openWindow, updateAdventureProtocolPrompt]);
 
-  const startAdventureAcceptanceFlow = useCallback(() => {
-    const isMessengerOpen = !!openRef.current?.app3 && !minimizedRef.current?.app3;
-    if (isMessengerOpen) {
-      bringToFront('app3');
-    } else {
-      openWindow('app3');
-    }
-    setActiveChatId(TERMINAL_ADVENTURE_CHAT_ID);
-    setTerminalPromptState(null);
-    updateMessengerChoiceState(TERMINAL_ADVENTURE_CHOICE_EVENT_ID, (prev) => ({
-      ...prev,
-      selectedOptionId: 'yes',
-    }));
-
-    let typedLength = 0;
-    const typeTimerId = window.setInterval(() => {
-      typedLength += 1;
-      const nextText = TERMINAL_ADVENTURE_AUTO_REPLY_TEXT.slice(0, typedLength);
-      setTypedByChat((prev) => ({
-        ...prev,
-        [TERMINAL_ADVENTURE_CHAT_ID]: nextText,
-      }));
-
-      if (typedLength < TERMINAL_ADVENTURE_AUTO_REPLY_TEXT.length) {
-        return;
-      }
-
-      window.clearInterval(typeTimerId);
-      terminalPromptTimersRef.current = terminalPromptTimersRef.current.filter((timerId) => timerId !== typeTimerId);
-
-      scheduleAdventureAction(TERMINAL_ADVENTURE_AUTO_REPLY_DELAY_MS, () => {
-        setTypedByChat((prev) => ({
-          ...prev,
-          [TERMINAL_ADVENTURE_CHAT_ID]: '',
-        }));
-        submitMessengerScriptEvent(TERMINAL_ADVENTURE_CHAT_ID, TERMINAL_ADVENTURE_PLAYER_EVENT_ID, {
-          id: `${TERMINAL_ADVENTURE_PLAYER_EVENT_ID}-reply`,
-          direction: 'outgoing',
-          text: TERMINAL_ADVENTURE_AUTO_REPLY_TEXT,
-        });
-      });
-    }, TERMINAL_ADVENTURE_AUTO_REPLY_TYPE_INTERVAL_MS);
-
-    terminalPromptTimersRef.current.push(typeTimerId);
-  }, [
-    bringToFront,
-    openWindow,
-    scheduleAdventureAction,
-    setTerminalPromptState,
-    submitMessengerScriptEvent,
-    updateMessengerChoiceState,
-  ]);
-
   const runAdventureDeclinePostSequence = useCallback((yesCount = 0) => {
     const shownKeys = new Set(getAdventureShownDiagnosticKeys(yesCount));
     const scheduleLine = (delayMs, text, key = '') => {
@@ -1438,47 +1561,6 @@ function App() {
     }));
     runAdventureDeclinePostSequence(prompt.yesCount || 0);
   }, [persistRuntimeState, runAdventureDeclinePostSequence, setStoryState, storyState.terminal?.prompt, typedByChat]);
-
-  const handleAdventureDeclineEraseKey = useCallback((chatId) => {
-    const prompt = storyState.terminal?.prompt;
-    if (
-      !chatId
-      || !prompt
-      || prompt.id !== TERMINAL_ADVENTURE_PROMPT_ID
-      || !['decline-typing', 'decline-erasing'].includes(prompt.stage)
-    ) {
-      return;
-    }
-
-    const currentText = typedByChat[chatId] || '';
-    const nextText = currentText.slice(0, -1);
-    setTypedByChat((prev) => ({
-      ...prev,
-      [chatId]: nextText,
-    }));
-
-    if (prompt.stage !== 'decline-erasing') {
-      updateAdventureProtocolPrompt((currentPrompt) => ({
-        ...currentPrompt,
-        stage: 'decline-erasing',
-        allowMessengerInput: true,
-        declineSubmitAttempted: true,
-        noSequenceStarted: false,
-      }));
-    }
-
-    if (nextText.length > 0 || prompt.noSequenceStarted) {
-      return;
-    }
-
-    updateAdventureProtocolPrompt((currentPrompt) => ({
-      ...currentPrompt,
-      stage: 'processing',
-      allowMessengerInput: false,
-      noSequenceStarted: true,
-    }));
-    runAdventureDeclinePostSequence(prompt.yesCount || 0);
-  }, [runAdventureDeclinePostSequence, storyState.terminal?.prompt, typedByChat, updateAdventureProtocolPrompt]);
 
   const rejectAdventureTerminalPrompt = useCallback(() => {
     const prompt = storyState.terminal?.prompt;
@@ -1763,6 +1845,312 @@ function App() {
       return nextState;
     });
   }, [persistRuntimeState]);
+
+  const closeMessengerPhotoViewer = useCallback(() => {
+    setActiveMessengerPhotoMessageId('');
+    setHoveredMessengerPhotoHotspotId('');
+  }, []);
+
+  const openMessengerPhotoViewer = useCallback((messageId) => {
+    if (!getMessengerPhotoAttachment(messageId)) return;
+    setActiveMessengerPhotoMessageId(messageId);
+    setHoveredMessengerPhotoHotspotId('');
+  }, []);
+
+  const getMessengerPhotoHotspotAtPoint = useCallback((attachment, clientX, clientY, frameRect) => {
+    if (!attachment || !frameRect || !frameRect.width || !frameRect.height) return null;
+    const normalizedX = (clientX - frameRect.left) / frameRect.width;
+    const normalizedY = (clientY - frameRect.top) / frameRect.height;
+    return (attachment.hotspots || []).find((hotspot) => (
+      isPointInsidePhotoHotspot(hotspot, normalizedX, normalizedY)
+    )) || null;
+  }, []);
+
+  const inspectMessengerPhotoHotspot = useCallback((messageId, hotspot) => {
+    if (!messageId || !hotspot?.id || !hotspot.terminalComment) return;
+
+    const alreadyInspected = (storyState.messenger?.inspectedPhotoHotspotsByMessage?.[messageId] || []).includes(hotspot.id);
+    if (alreadyInspected) return;
+
+    setStoryState((prev) => {
+      const nextInspectedHotspotsByMessage = {
+        ...(prev.messenger?.inspectedPhotoHotspotsByMessage || {}),
+        [messageId]: [...(prev.messenger?.inspectedPhotoHotspotsByMessage?.[messageId] || []), hotspot.id],
+      };
+      const nextState = {
+        ...prev,
+        messenger: {
+          ...prev.messenger,
+          inspectedPhotoHotspotsByMessage: nextInspectedHotspotsByMessage,
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+  }, [persistRuntimeState, storyState.messenger?.inspectedPhotoHotspotsByMessage]);
+
+  const queueMessengerPhotoReply = useCallback((messageId, hotspot) => {
+    if (!messageId || !hotspot?.id || !Array.isArray(hotspot.conversation) || hotspot.conversation.length === 0) return;
+
+    const chatId = TERMINAL_ADVENTURE_CHAT_ID;
+    const normalizedConversation = hotspot.conversation
+      .filter((entry) => entry?.direction && typeof entry?.text === 'string' && entry.text.length > 0);
+    const firstEntry = normalizedConversation[0];
+    if (!firstEntry || firstEntry.direction !== 'outgoing') return;
+
+    const queueEntry = {
+      id: `photo-hotspot-${messageId}-${hotspot.id}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      messageId,
+      hotspotId: hotspot.id,
+      label: hotspot.label || '',
+      conversation: normalizedConversation,
+      terminalComment: hotspot.terminalComment || '',
+    };
+
+    setStoryState((prev) => {
+      const existingQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+      const nextUnreadChatIds = activeChatId === chatId
+        ? (prev.messenger?.unreadChatIds || []).filter((id) => id !== chatId)
+        : Array.from(new Set([...(prev.messenger?.unreadChatIds || []), chatId]));
+      const nextState = {
+        ...prev,
+        messenger: {
+          ...prev.messenger,
+          queuedPhotoRepliesByChat: {
+            ...(prev.messenger?.queuedPhotoRepliesByChat || {}),
+            [chatId]: dedupePhotoReplyQueue([...existingQueue, queueEntry]),
+          },
+          unreadChatIds: nextUnreadChatIds,
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+  }, [activeChatId, persistRuntimeState]);
+
+  const submitQueuedPhotoReply = useCallback((chatId, queuedReply) => {
+    if (!chatId || !queuedReply?.id) return;
+
+    const delayMs = Number(editorConfig.timings.messageGapMs ?? 0);
+    const conversation = Array.isArray(queuedReply.conversation) ? queuedReply.conversation : [];
+    const [firstEntry, ...remainingEntries] = conversation;
+    if (!firstEntry || firstEntry.direction !== 'outgoing' || !firstEntry.text) return;
+
+    setTypedByChat((prev) => ({
+      ...prev,
+      [chatId]: '',
+    }));
+
+    setStoryState((prev) => {
+      const existingQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+      const nextState = {
+        ...prev,
+        messenger: {
+          ...prev.messenger,
+          historyByChat: {
+            ...(prev.messenger?.historyByChat || {}),
+            [chatId]: [
+              ...(prev.messenger?.historyByChat?.[chatId] || []),
+              {
+                id: `${queuedReply.id}-reply`,
+                direction: 'outgoing',
+                text: firstEntry.text,
+              },
+            ],
+          },
+          queuedPhotoRepliesByChat: {
+            ...(prev.messenger?.queuedPhotoRepliesByChat || {}),
+            [chatId]: existingQueue.filter((item) => item.id !== queuedReply.id),
+          },
+          photoReplyInFlightByChat: {
+            ...(prev.messenger?.photoReplyInFlightByChat || {}),
+            [chatId]: true,
+          },
+          typingByChat: {
+            ...(prev.messenger?.typingByChat || {}),
+            [chatId]: {
+              active: false,
+              durationMs: 0,
+            },
+          },
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+
+    const nextOutgoingIndex = remainingEntries.findIndex((entry) => entry.direction === 'outgoing');
+    const autoIncomingEntries = nextOutgoingIndex === -1
+      ? remainingEntries
+      : remainingEntries.slice(0, nextOutgoingIndex);
+    const deferredConversation = nextOutgoingIndex === -1
+      ? []
+      : remainingEntries.slice(nextOutgoingIndex);
+
+    if (autoIncomingEntries.length === 0 && deferredConversation.length === 0) {
+      if (queuedReply.terminalComment) {
+        appendTerminalLines([createTerminalProtocolLine(queuedReply.terminalComment)]);
+      }
+      setStoryState((prev) => {
+        const nextState = {
+          ...prev,
+          messenger: {
+            ...prev.messenger,
+            photoReplyInFlightByChat: {
+              ...(prev.messenger?.photoReplyInFlightByChat || {}),
+              [chatId]: false,
+            },
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
+      return;
+    }
+
+    let timelineOffsetMs = 0;
+
+    autoIncomingEntries.forEach((entry, index) => {
+      const typingDurationMs = Math.max(0, Math.ceil((entry.text || '').length * PHOTO_REPLY_TYPING_SPEED_MS));
+      const typingTimerId = window.setTimeout(() => {
+        setStoryState((prev) => ({
+          ...prev,
+          messenger: {
+            ...prev.messenger,
+            typingByChat: {
+              ...(prev.messenger?.typingByChat || {}),
+              [chatId]: {
+                active: true,
+                durationMs: typingDurationMs,
+              },
+            },
+          },
+        }));
+      }, timelineOffsetMs + delayMs);
+      photoReplyTimersRef.current.push(typingTimerId);
+
+      const messageTimerId = window.setTimeout(() => {
+        const isLastAutoIncoming = index === autoIncomingEntries.length - 1;
+        const shouldDeferToNextOutgoing = isLastAutoIncoming && deferredConversation.length > 0;
+        setStoryState((prev) => {
+          const nextUnreadChatIds = activeChatId === chatId
+            ? (prev.messenger?.unreadChatIds || []).filter((id) => id !== chatId)
+            : Array.from(new Set([...(prev.messenger?.unreadChatIds || []), chatId]));
+          const existingQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+          const nextState = {
+            ...prev,
+            messenger: {
+              ...prev.messenger,
+              historyByChat: {
+                ...(prev.messenger?.historyByChat || {}),
+                [chatId]: [
+                  ...(prev.messenger?.historyByChat?.[chatId] || []),
+                  {
+                    id: `${queuedReply.id}-step-${index}`,
+                    direction: 'incoming',
+                    text: entry.text,
+                  },
+                ],
+              },
+              queuedPhotoRepliesByChat: shouldDeferToNextOutgoing
+                ? {
+                  ...(prev.messenger?.queuedPhotoRepliesByChat || {}),
+                  [chatId]: dedupePhotoReplyQueue([
+                    {
+                      ...queuedReply,
+                      conversation: deferredConversation,
+                    },
+                    ...existingQueue,
+                  ]),
+                }
+                : (prev.messenger?.queuedPhotoRepliesByChat || {}),
+              photoReplyInFlightByChat: {
+                ...(prev.messenger?.photoReplyInFlightByChat || {}),
+                [chatId]: shouldDeferToNextOutgoing ? false : !(isLastAutoIncoming && deferredConversation.length === 0),
+              },
+              typingByChat: {
+                ...(prev.messenger?.typingByChat || {}),
+                [chatId]: {
+                  active: false,
+                  durationMs: 0,
+                },
+              },
+              unreadChatIds: nextUnreadChatIds,
+            },
+          };
+          persistRuntimeState(nextState);
+          return nextState;
+        });
+        if (queuedReply.terminalComment && isLastAutoIncoming) {
+          appendTerminalLines([createTerminalProtocolLine(queuedReply.terminalComment)]);
+        }
+      }, timelineOffsetMs + delayMs + typingDurationMs);
+      photoReplyTimersRef.current.push(messageTimerId);
+      timelineOffsetMs += delayMs + typingDurationMs;
+    });
+
+    if (autoIncomingEntries.length === 0 && deferredConversation.length > 0) {
+      setStoryState((prev) => {
+        const existingQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+        const nextState = {
+          ...prev,
+          messenger: {
+            ...prev.messenger,
+            queuedPhotoRepliesByChat: {
+              ...(prev.messenger?.queuedPhotoRepliesByChat || {}),
+              [chatId]: dedupePhotoReplyQueue([
+                {
+                  ...queuedReply,
+                  conversation: deferredConversation,
+                },
+                ...existingQueue,
+              ]),
+            },
+            photoReplyInFlightByChat: {
+              ...(prev.messenger?.photoReplyInFlightByChat || {}),
+              [chatId]: false,
+            },
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
+    }
+  }, [activeChatId, appendTerminalLines, editorConfig.timings.messageGapMs, persistRuntimeState]);
+
+  const handleMessengerPhotoPointerMove = useCallback((event) => {
+    if (!activeMessengerPhoto) return;
+    const hotspot = getMessengerPhotoHotspotAtPoint(
+      activeMessengerPhoto,
+      event.clientX,
+      event.clientY,
+      event.currentTarget.getBoundingClientRect(),
+    );
+    setHoveredMessengerPhotoHotspotId(hotspot?.id || '');
+  }, [activeMessengerPhoto, getMessengerPhotoHotspotAtPoint]);
+
+  const handleMessengerPhotoPointerLeave = useCallback(() => {
+    setHoveredMessengerPhotoHotspotId('');
+  }, []);
+
+  const handleMessengerPhotoClick = useCallback((event) => {
+    if (!activeMessengerPhoto || !activeMessengerPhotoMessageId) return;
+    const hotspot = getMessengerPhotoHotspotAtPoint(
+      activeMessengerPhoto,
+      event.clientX,
+      event.clientY,
+      event.currentTarget.getBoundingClientRect(),
+    );
+    if (!hotspot) return;
+    inspectMessengerPhotoHotspot(activeMessengerPhotoMessageId, hotspot);
+    queueMessengerPhotoReply(activeMessengerPhotoMessageId, hotspot);
+  }, [
+    activeMessengerPhoto,
+    activeMessengerPhotoMessageId,
+    getMessengerPhotoHotspotAtPoint,
+    inspectMessengerPhotoHotspot,
+    queueMessengerPhotoReply,
+  ]);
 
   const selectWorkTask = (taskId) => {
     setActiveWorkTaskId(taskId);
@@ -2436,6 +2824,7 @@ function App() {
     activeChatId,
     open,
     minimized,
+    view,
     storyState.messenger?.historyByChat,
     storyState.messenger?.typingByChat,
   ]);
@@ -2537,7 +2926,7 @@ function App() {
           const validIds = validHistoryIdsByChat.get(chatId);
           const nextHistory = (history || []).filter((entry) => {
             if (!validIds || !entry?.id) return true;
-            const shouldKeep = validIds.has(entry.id);
+            const shouldKeep = validIds.has(entry.id) || isDynamicMessengerHistoryEntryId(entry.id);
             if (!shouldKeep) {
               hasChanges = true;
             }
@@ -2763,6 +3152,10 @@ function App() {
     }
     Object.values(typingTimersRef.current).forEach((id) => clearTimeout(id));
     typingTimersRef.current = {};
+    kHouseSequenceTimersRef.current.forEach((id) => window.clearTimeout(id));
+    kHouseSequenceTimersRef.current = [];
+    photoReplyTimersRef.current.forEach((id) => window.clearTimeout(id));
+    photoReplyTimersRef.current = [];
     clearTerminalPromptTimers();
     persistentNotifTimersRef.current.forEach((entry) => window.clearTimeout(entry.timerId));
     persistentNotifTimersRef.current = [];
@@ -2771,7 +3164,12 @@ function App() {
       prologueAudioRef.current.src = '';
       prologueAudioRef.current = null;
     }
-  }, []);
+    if (chapter1AudioRef.current) {
+      chapter1AudioRef.current.pause();
+      chapter1AudioRef.current.src = '';
+      chapter1AudioRef.current = null;
+    }
+  }, [clearTerminalPromptTimers]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -2781,6 +3179,25 @@ function App() {
     audio.preload = 'auto';
     audio.loop = false;
     prologueAudioRef.current = audio;
+  }, [view]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (view !== 'ending') return;
+    if (!chapter1AudioRef.current) {
+      const audio = new Audio(CHAPTER1_AUDIO_SRC);
+      audio.preload = 'auto';
+      audio.loop = false;
+      chapter1AudioRef.current = audio;
+    }
+    if (chapter1AudioStartedRef.current) return;
+    chapter1AudioStartedRef.current = true;
+    const playPromise = chapter1AudioRef.current.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(() => {
+        chapter1AudioStartedRef.current = false;
+      });
+    }
   }, [view]);
 
   useEffect(() => {
@@ -3075,6 +3492,8 @@ function App() {
     setWinState(getDefaultWindowState(nextStoryState.ui.windowState || {}));
     setTypedByChat({});
     setAdventureDeclineInputState(null);
+    setActiveMessengerPhotoMessageId('');
+    setHoveredMessengerPhotoHotspotId('');
     triggeredMessageFocusEffectsRef.current = new Set();
     conveyorVisibilityRef.current = { visible: false, frontmost: false };
     conveyorEngagementGainRef.current = null;
@@ -3082,6 +3501,10 @@ function App() {
     conveyorNotifTimersRef.current = [];
     conveyorTerminalTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
     conveyorTerminalTimersRef.current = [];
+    kHouseSequenceTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
+    kHouseSequenceTimersRef.current = [];
+    photoReplyTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
+    photoReplyTimersRef.current = [];
     terminalPromptTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
     terminalPromptTimersRef.current = [];
   }, [editorContent, getDefaultIconPositions, getDefaultWindowState]);
@@ -3093,7 +3516,7 @@ function App() {
     saveStoryState(nextState, 'dev');
     restoreDefaultRuntimeState(nextState, 'game');
   };
-  const launchDevAtAdventurePrompt = () => {
+  const launchDevSecondAct = () => {
     if (!isDevRoute) return;
 
     const baseState = createDefaultStoryState(INITIAL_EDITOR_CONTENT);
@@ -3107,7 +3530,7 @@ function App() {
     }
 
     const pendingPlayerEventIndex = (scene.events || []).findIndex(
-      (event) => event.id === TERMINAL_ADVENTURE_PLAYER_EVENT_ID,
+      (event) => event.id === 'k_070',
     );
 
     if (pendingPlayerEventIndex < 0) {
@@ -3115,7 +3538,7 @@ function App() {
       return;
     }
 
-    const completedEvents = (scene.events || []).slice(0, pendingPlayerEventIndex);
+    const completedEvents = (scene.events || []).slice(0, pendingPlayerEventIndex + 1);
     const completedEventIds = new Set(completedEvents.map((event) => event.id));
     const adventureHistory = completedEvents.reduce((history, event) => {
       if (event.type === 'message_other') {
@@ -3148,6 +3571,8 @@ function App() {
       flags: {
         ...nextStateWithUi.flags,
         gameProgress: 'desktop',
+        acceptedAdventure: true,
+        chapter1Shown: true,
       },
       messenger: {
         ...nextStateWithUi.messenger,
@@ -3157,7 +3582,7 @@ function App() {
         },
         eventIndexByChat: {
           ...nextStateWithUi.messenger.eventIndexByChat,
-          [TERMINAL_ADVENTURE_CHAT_ID]: pendingPlayerEventIndex,
+          [TERMINAL_ADVENTURE_CHAT_ID]: pendingPlayerEventIndex + 1,
         },
         historyByChat: {
           ...nextStateWithUi.messenger.historyByChat,
@@ -3198,22 +3623,18 @@ function App() {
         gameScreen: 'game',
         activeChatId: TERMINAL_ADVENTURE_CHAT_ID,
       },
+      autoStartedSequenceIds: (INITIAL_EDITOR_CONTENT.sequences || [])
+        .filter((sequence) => sequence.trigger === 'desktop:start')
+        .map((sequence) => sequence.id),
     };
 
     clearStoryState('dev');
     saveStoryState(nextState, 'dev');
     restoreDefaultRuntimeState(nextState, 'game');
   };
-  const resetPlayerProgress = () => {
-    clearStoryState('main');
-  };
   const openPlayerViewFromStart = () => {
     if (typeof window === 'undefined') return;
     clearStoryState('main');
-    window.open(`${window.location.origin}/`, '_blank', 'noopener,noreferrer');
-  };
-  const openPlayerView = () => {
-    if (typeof window === 'undefined') return;
     window.open(`${window.location.origin}/`, '_blank', 'noopener,noreferrer');
   };
   useEffect(() => {
@@ -3403,6 +3824,12 @@ function App() {
         const completedEventIds = storyState.messenger.completedEventIds || [];
         const isWaitingForDependency = !!nextEvent?.waitForEventId && !completedEventIds.includes(nextEvent.waitForEventId);
         const pendingPlayerEvent = nextEvent?.type === 'message_player' && !isWaitingForDependency ? nextEvent : null;
+        const queuedPhotoReplies = storyState.messenger?.queuedPhotoRepliesByChat?.[active.id] || [];
+        const isPhotoReplyInFlight = !!storyState.messenger?.photoReplyInFlightByChat?.[active.id];
+        const prioritizedQueuedPhotoReply = activeMessengerPhotoMessageId
+          ? queuedPhotoReplies.find((entry) => entry?.messageId === activeMessengerPhotoMessageId) || queuedPhotoReplies[0] || null
+          : queuedPhotoReplies[0] || null;
+        const pendingQueuedPhotoReply = !pendingPlayerEvent && !isPhotoReplyInFlight ? prioritizedQueuedPhotoReply : null;
         const previousEvent = currentEventIndex > 0
           ? activeScene?.events?.[currentEventIndex - 1] || null
           : null;
@@ -3435,7 +3862,7 @@ function App() {
             && !(pendingChoiceState?.disabledOptionIds || []).includes(option.id)
           )) || null
           : null;
-        const typedMessengerText = pendingPlayerEvent ? (typedByChat[active.id] || '') : '';
+        const typedMessengerText = pendingPlayerEvent || pendingQueuedPhotoReply ? (typedByChat[active.id] || '') : '';
         const isAdventureDeclineTextComplete = typedMessengerText.length >= TERMINAL_ADVENTURE_DECLINE_TEXT.length;
         const isAdventureDeclineBufferComplete = isAdventureDeclineTextComplete && adventureDeclineExtraTapsRemaining === 0;
         const targetText = isAdventureAcceptanceRetyping || isAdventureAcceptanceReady
@@ -3444,25 +3871,28 @@ function App() {
           ? TERMINAL_ADVENTURE_DECLINE_TEXT
           : pendingChoice
           ? (selectedChoiceOption?.resultText || selectedChoiceOption?.label || '')
-          : (pendingPlayerEvent?.text || '');
+          : pendingPlayerEvent
+          ? (pendingPlayerEvent.text || '')
+          : (pendingQueuedPhotoReply?.conversation?.[0]?.text || '');
         const isMessengerInputBlockedByTerminalPrompt = isTerminalPromptChoice && !isAdventureEditableFlow;
-        const isPendingTapComplete = pendingPlayerEvent
+        const hasPendingPlayerInput = !!pendingPlayerEvent || !!pendingQueuedPhotoReply;
+        const isPendingTapComplete = hasPendingPlayerInput
           ? typedMessengerText.length >= targetText.length && targetText.length > 0
           : false;
         const threadDate = activeScene?.dateLabel || threadDateLabel;
         const typingState = storyState.messenger?.typingByChat?.[active.id];
-        const isSceneFinished = !!script && !nextEvent;
-        const idleInputText = isSceneFinished ? 'пока сказать нечего' : '';
+        const isSceneFinished = !!script && !nextEvent && !pendingQueuedPhotoReply && !isPhotoReplyInFlight;
+        const idleInputText = isPhotoReplyInFlight ? '' : (isSceneFinished ? 'пока сказать нечего' : '');
         const inputValue = isMessengerInputBlockedByTerminalPrompt
           ? (isAdventureDraftVisibleFlow ? typedMessengerText : '')
           : isAdventureDraftVisibleFlow
           ? typedMessengerText
           : pendingChoice && !typedMessengerText
           ? 'напишите ответ...'
-          : pendingPlayerEvent
+          : hasPendingPlayerInput
             ? typedMessengerText
             : idleInputText;
-        const canSubmitMessage = !!pendingPlayerEvent
+        const canSubmitMessage = hasPendingPlayerInput
           && !isMessengerInputBlockedByTerminalPrompt
           && (!pendingChoice || !!selectedChoiceOption || isAdventureDraftVisibleFlow)
           && !isAdventureDeclineFlow
@@ -3492,14 +3922,32 @@ function App() {
                 <div className="thread-title">{active.title}</div>
                 <div className="thread-messages" ref={messengerThreadRef}>
                   <div className="thread-date">{threadDate}</div>
-                  {history.length > 0 ? history.map((msg, i) => (
-                    <div
-                      key={msg.id || `${active.id}-${i}`}
-                      className={`thread-message ${msg.direction === 'outgoing' ? 'outgoing' : 'incoming'}`}
-                    >
-                      {msg.text}
-                    </div>
-                  )) : null}
+                  {history.length > 0 ? history.map((msg, i) => {
+                    const attachment = getMessengerPhotoAttachment(msg.id);
+                    return (
+                      <div
+                        key={msg.id || `${active.id}-${i}`}
+                        className={`thread-message ${msg.direction === 'outgoing' ? 'outgoing' : 'incoming'}${attachment ? ' thread-message--photo' : ''}${msg.audioSrc ? ' thread-message--audio' : ''}`}
+                      >
+                        {msg.text ? <div className="thread-message-text">{msg.text}</div> : null}
+                        {msg.audioSrc ? (
+                          <div className="thread-audio-card">
+                            <div className="thread-audio-label">{msg.audioLabel || 'Голосовое сообщение'}</div>
+                            <audio className="thread-audio-player" controls preload="metadata" src={msg.audioSrc} />
+                          </div>
+                        ) : null}
+                        {attachment ? (
+                          <button
+                            type="button"
+                            className="thread-photo-card"
+                            onClick={() => openMessengerPhotoViewer(msg.id)}
+                          >
+                            <img src={attachment.image} alt={attachment.alt} className="thread-photo-card-image" />
+                          </button>
+                        ) : null}
+                      </div>
+                    );
+                  }) : null}
                   {typingState?.active && (
                     <div className="thread-message incoming thread-typing" aria-label="typing">
                       <span className="typing-dots">
@@ -3510,15 +3958,15 @@ function App() {
                     </div>
                   )}
                 </div>
-                <div className={`thread-input${pendingPlayerEvent || pendingChoice ? '' : ' thread-input--disabled'}`}>
+                <div className={`thread-input${hasPendingPlayerInput || pendingChoice ? '' : ' thread-input--disabled'}`}>
                   <div
                     ref={messengerInputFieldRef}
-                    className={`thread-input-field${pendingPlayerEvent && !isMessengerInputBlockedByTerminalPrompt ? ' is-active' : ''}${!pendingPlayerEvent && inputValue ? ' is-idle' : ''}${isMessengerInputBlockedByTerminalPrompt ? ' is-locked' : ''}`}
+                    className={`thread-input-field${hasPendingPlayerInput && !isMessengerInputBlockedByTerminalPrompt ? ' is-active' : ''}${!hasPendingPlayerInput && inputValue ? ' is-idle' : ''}${isMessengerInputBlockedByTerminalPrompt ? ' is-locked' : ''}`}
                     role="textbox"
                     aria-readonly="true"
                     tabIndex={isMessengerInputBlockedByTerminalPrompt ? -1 : 0}
                     onFocus={() => {
-                      if (isMessengerInputBlockedByTerminalPrompt || !pendingPlayerEvent) return;
+                      if (isMessengerInputBlockedByTerminalPrompt || !hasPendingPlayerInput) return;
                       messengerInputStickyFocusRef.current = true;
                     }}
                     onBlur={() => {
@@ -3530,7 +3978,7 @@ function App() {
                         e.preventDefault();
                         return;
                       }
-                      if (!pendingPlayerEvent) {
+                      if (!hasPendingPlayerInput) {
                         if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter' || e.key === 'Tab' || e.key === ' ') {
                           e.preventDefault();
                         }
@@ -3561,7 +4009,7 @@ function App() {
                           return;
                         }
 
-                        if (!isAdventureDeclineTextComplete) {
+                        if (!isAdventureDeclineTextComplete && pendingPlayerEvent) {
                           typeMessengerMessageKey(active.id, pendingPlayerEvent.id, targetText, e);
                           return;
                         }
@@ -3613,6 +4061,10 @@ function App() {
                           });
                           return;
                         }
+                        if (pendingQueuedPhotoReply) {
+                          submitQueuedPhotoReply(active.id, pendingQueuedPhotoReply);
+                          return;
+                        }
                         submitMessengerMessage(active.id, pendingPlayerEvent.id, targetText, pendingPlayerEvent);
                         return;
                       }
@@ -3620,20 +4072,22 @@ function App() {
                         typeMessengerChoiceKey(active.id, previousEvent.id, pendingChoice, e);
                         return;
                       }
-                      typeMessengerMessageKey(active.id, pendingPlayerEvent.id, targetText, e);
+                      typeMessengerMessageKey(active.id, pendingPlayerEvent?.id || pendingQueuedPhotoReply?.id, targetText, e);
                     }}
                     onMouseDown={() => {
                       if (isMessengerInputBlockedByTerminalPrompt) return;
-                      if (!pendingPlayerEvent) return;
+                      if (!hasPendingPlayerInput) return;
                       messengerInputStickyFocusRef.current = true;
                       messengerInputRestorePendingRef.current = false;
                       messengerInputFieldRef.current?.focus();
-                      triggerMessengerMessageFocusEffects(active.id, pendingPlayerEvent);
+                      if (pendingPlayerEvent) {
+                        triggerMessengerMessageFocusEffects(active.id, pendingPlayerEvent);
+                      }
                     }}
                   >
                     <span className="thread-input-content">
                       <span className="thread-input-text">{inputValue}</span>
-                      {pendingPlayerEvent && !isMessengerInputBlockedByTerminalPrompt && <span className="thread-input-caret" aria-hidden="true" />}
+                      {hasPendingPlayerInput && !isMessengerInputBlockedByTerminalPrompt && <span className="thread-input-caret" aria-hidden="true" />}
                     </span>
                   </div>
                     <button
@@ -3641,7 +4095,7 @@ function App() {
                       disabled={!canSubmitMessage}
                       onClick={() => {
                         if (isMessengerInputBlockedByTerminalPrompt) return;
-                        if (!pendingPlayerEvent) return;
+                        if (!hasPendingPlayerInput) return;
                       if (isAdventureDeclineTyping) {
                         handleAdventureDeclineSubmitAttempt(active.id);
                         return;
@@ -3653,6 +4107,10 @@ function App() {
                           choice: pendingChoice,
                           pendingPlayerEvent,
                         });
+                        return;
+                      }
+                      if (pendingQueuedPhotoReply) {
+                        submitQueuedPhotoReply(active.id, pendingQueuedPhotoReply);
                         return;
                       }
                       submitMessengerMessage(active.id, pendingPlayerEvent.id, targetText, pendingPlayerEvent);
@@ -3766,7 +4224,6 @@ function App() {
     const firstDay = new Date(viewYear, viewMonth, 1);
     const firstWeekday = (firstDay.getDay() + 6) % 7;
     const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-    const daysInPrevMonth = new Date(viewYear, viewMonth, 0).getDate();
     const eventColors = ['green', 'yellow', 'red', 'blue', 'purple', 'gray'];
     const isSameDay = (a, b) => (
       a.getFullYear() === b.getFullYear()
@@ -3975,11 +4432,14 @@ function App() {
     editorConfig.apps.find((app) => app.id === appId)?.type || null
   );
 
-  const openDesktop = () => {
+  const openDesktop = ({ skipStartupSequences = false } = {}) => {
     if (view === 'desktop') return;
     setPrologueStarted(false);
     setPrologueIndex(0);
     setPrologueDone(false);
+    setEndingStarted(false);
+    setEndingIndex(0);
+    setEndingDone(false);
     setView('desktop');
     setShowNotif(false);
     setPersistentNotifs([]);
@@ -3989,18 +4449,70 @@ function App() {
       const startupSequenceIds = (editorContent.sequences || [])
         .filter((sequence) => sequence.trigger === 'desktop:start')
         .map((sequence) => sequence.id);
-      const startedIds = new Set(prev.autoStartedSequenceIds || []);
-      const queuedIds = new Set(prev.queuedSequences || []);
+      const nextStateBase = {
+        ...prev,
+        ui: {
+          ...prev.ui,
+          view: 'desktop',
+        },
+      };
+      if (skipStartupSequences) {
+        let nextState = nextStateBase;
+        if (view === 'ending') {
+          const activeScene = getActiveMessengerScene(editorContent, nextState.messenger, TERMINAL_ADVENTURE_CHAT_ID);
+          const pendingAct2Events = (activeScene?.events || [])
+            .filter((event) => ['k_069', 'k_070'].includes(event.id) && event.type === 'message_other');
+          if (pendingAct2Events.length > 0) {
+            const completedEventIds = new Set(nextState.messenger?.completedEventIds || []);
+            const nextHistory = [...(nextState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [])];
+            let nextEventIndex = nextState.messenger?.eventIndexByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || 0;
+
+            pendingAct2Events.forEach((event) => {
+              if (completedEventIds.has(event.id)) return;
+              nextHistory.push({
+                id: event.id,
+                direction: 'incoming',
+                text: event.text || '',
+              });
+              completedEventIds.add(event.id);
+              nextEventIndex += 1;
+            });
+
+            nextState = {
+              ...nextState,
+              autoStartedSequenceIds: [...new Set([...(nextState.autoStartedSequenceIds || []), ...startupSequenceIds])],
+              queuedSequences: (nextState.queuedSequences || []).filter((sequenceId) => !startupSequenceIds.includes(sequenceId)),
+              messenger: {
+                ...nextState.messenger,
+                historyByChat: {
+                  ...(nextState.messenger?.historyByChat || {}),
+                  [TERMINAL_ADVENTURE_CHAT_ID]: nextHistory,
+                },
+                completedEventIds: Array.from(completedEventIds),
+                eventIndexByChat: {
+                  ...(nextState.messenger?.eventIndexByChat || {}),
+                  [TERMINAL_ADVENTURE_CHAT_ID]: nextEventIndex,
+                },
+              },
+            };
+          }
+        }
+        persistRuntimeState(nextState);
+        return nextState;
+      }
+      const startedIds = new Set(nextStateBase.autoStartedSequenceIds || []);
+      const queuedIds = new Set(nextStateBase.queuedSequences || []);
       const nextSequenceIds = startupSequenceIds.filter((sequenceId) => !startedIds.has(sequenceId) && !queuedIds.has(sequenceId));
 
       if (nextSequenceIds.length === 0) {
-        return prev;
+        persistRuntimeState(nextStateBase);
+        return nextStateBase;
       }
 
       const nextState = {
-        ...prev,
-        autoStartedSequenceIds: [...(prev.autoStartedSequenceIds || []), ...nextSequenceIds],
-        queuedSequences: [...(prev.queuedSequences || []), ...nextSequenceIds],
+        ...nextStateBase,
+        autoStartedSequenceIds: [...(nextStateBase.autoStartedSequenceIds || []), ...nextSequenceIds],
+        queuedSequences: [...(nextStateBase.queuedSequences || []), ...nextSequenceIds],
       };
       persistRuntimeState(nextState);
       return nextState;
@@ -4027,6 +4539,25 @@ function App() {
     }
     setPrologueIndex(PROLOGUE_TEXT.length);
     setPrologueDone(true);
+  };
+
+  const handleEndingClick = () => {
+    if (view !== 'ending') return;
+    if (!chapter1AudioStartedRef.current && chapter1AudioRef.current) {
+      chapter1AudioStartedRef.current = true;
+      const playPromise = chapter1AudioRef.current.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => {
+          chapter1AudioStartedRef.current = false;
+        });
+      }
+    }
+    if (endingDone) {
+      openDesktop({ skipStartupSequences: true });
+      return;
+    }
+    setEndingIndex(TERMINAL_PROTOCOL_ENDING_TEXT.length);
+    setEndingDone(true);
   };
 
   const renderExitBody = () => (
@@ -4305,14 +4836,26 @@ function App() {
     const completedEventIds = storyState.messenger?.completedEventIds || [];
     if (!storyState.flags?.acceptedAdventure) return;
     if (!completedEventIds.includes('k_068')) return;
+    if (storyState.flags?.chapter1Shown) return;
     if (view === 'ending') return;
 
     const timerId = window.setTimeout(() => {
+      setStoryState((prev) => {
+        const nextState = {
+          ...prev,
+          flags: {
+            ...prev.flags,
+            chapter1Shown: true,
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
       setView('ending');
     }, TERMINAL_PROTOCOL_ENDING_DELAY_MS);
 
     return () => window.clearTimeout(timerId);
-  }, [storyState.flags?.acceptedAdventure, storyState.messenger?.completedEventIds, view]);
+  }, [persistRuntimeState, storyState.flags?.acceptedAdventure, storyState.flags?.chapter1Shown, storyState.messenger?.completedEventIds, view]);
 
   useEffect(() => {
     const completedEventIds = storyState.messenger?.completedEventIds || [];
@@ -4337,6 +4880,93 @@ function App() {
       return nextState;
     });
   }, [persistRuntimeState, pushPersistentNotif, storyState.flags, storyState.messenger?.completedEventIds]);
+
+  useEffect(() => {
+    if (storyState.flags?.kHouseVoiceSequenceScheduled) return;
+    const kHistory = storyState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [];
+    const hasDedMessage = kHistory.some((entry) => (
+      entry?.direction === 'incoming' && entry?.text === 'окей! есть поболтать с дедом'
+    ));
+    if (!hasDedMessage) return;
+
+    const appendKHistoryEntry = (historyEntry) => {
+      setStoryState((prev) => {
+        const nextHistory = prev.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [];
+        if (nextHistory.some((entry) => entry?.id === historyEntry.id)) {
+          return prev;
+        }
+        const nextUnreadChatIds = activeChatId === TERMINAL_ADVENTURE_CHAT_ID
+          ? (prev.messenger?.unreadChatIds || []).filter((id) => id !== TERMINAL_ADVENTURE_CHAT_ID)
+          : Array.from(new Set([...(prev.messenger?.unreadChatIds || []), TERMINAL_ADVENTURE_CHAT_ID]));
+        const nextState = {
+          ...prev,
+          messenger: {
+            ...prev.messenger,
+            historyByChat: {
+              ...(prev.messenger?.historyByChat || {}),
+              [TERMINAL_ADVENTURE_CHAT_ID]: [
+                ...nextHistory,
+                historyEntry,
+              ],
+            },
+            unreadChatIds: nextUnreadChatIds,
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
+    };
+
+    appendKHistoryEntry({
+      id: 'dynamic-k-house-departing',
+      direction: 'incoming',
+      text: 'выхожу к домику',
+    });
+
+    const voiceTimerId = window.setTimeout(() => {
+      appendKHistoryEntry({
+        id: 'dynamic-k-house-voice',
+        direction: 'incoming',
+        text: '',
+        audioSrc: K_HOUSE_VOICE_AUDIO_SRC,
+        audioLabel: 'Голосовое сообщение',
+      });
+    }, 120000);
+
+    kHouseSequenceTimersRef.current.push(voiceTimerId);
+
+    appendTerminalLines([
+      createTerminalProtocolLine('развлекайся, но не забывай про работу'),
+    ]);
+
+    pushPersistentNotif({
+      title: 'Конвейер',
+      text: 'Задача',
+      appId: 'app5',
+    });
+
+    setStoryState((prev) => {
+      if (prev.flags?.kHouseVoiceSequenceScheduled) return prev;
+      const nextState = {
+        ...prev,
+        flags: {
+          ...prev.flags,
+          kHouseVoiceSequenceScheduled: true,
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+
+    return () => {};
+  }, [
+    activeChatId,
+    appendTerminalLines,
+    persistRuntimeState,
+    pushPersistentNotif,
+    storyState.flags?.kHouseVoiceSequenceScheduled,
+    storyState.messenger?.historyByChat,
+  ]);
 
   useEffect(() => {
     if (!messengerInputStickyFocusRef.current && !messengerInputRestorePendingRef.current) return;
@@ -4413,13 +5043,6 @@ function App() {
             <button
               type="button"
               className="dev-launch-btn"
-              onClick={launchDevFromStart}
-            >
-              Dev: запустить сначала
-            </button>
-            <button
-              type="button"
-              className="dev-launch-btn"
               onClick={openPlayerViewFromStart}
             >
               Открыть игру с нуля
@@ -4427,23 +5050,9 @@ function App() {
             <button
               type="button"
               className="dev-launch-btn"
-              onClick={launchDevAtAdventurePrompt}
+              onClick={launchDevSecondAct}
             >
-              Dev: к приключению
-            </button>
-            <button
-              type="button"
-              className="dev-launch-btn dev-launch-btn--ghost"
-              onClick={openPlayerView}
-            >
-              Открыть чистую игру
-            </button>
-            <button
-              type="button"
-              className="dev-launch-btn dev-launch-btn--ghost"
-              onClick={resetPlayerProgress}
-            >
-              Сбросить прогресс игрока
+              Второй акт
             </button>
           </div>
           <DevEditorPanel
@@ -4491,7 +5100,7 @@ function App() {
           </div>
         </div>
       ) : view === 'ending' ? (
-        <div className="prologue-screen" key="ending" role="presentation">
+        <div className="prologue-screen" key="ending" onClick={handleEndingClick} role="presentation">
           <div className="prologue-box">
             <div className="prologue-text">
               {endingStarted ? TERMINAL_PROTOCOL_ENDING_TEXT.slice(0, endingIndex) : ''}
@@ -4650,6 +5259,65 @@ function App() {
                       {tab.title}
                     </button>
                   ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      {activeMessengerPhoto && (
+        <div
+          className="photo-viewer"
+          role="presentation"
+          onClick={closeMessengerPhotoViewer}
+        >
+          <div
+            className="photo-viewer-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Просмотр фотографии"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="photo-viewer-close"
+              onClick={closeMessengerPhotoViewer}
+              aria-label="Закрыть фотографию"
+            >
+              ×
+            </button>
+            <div
+              className={`photo-viewer-stage${hoveredMessengerPhotoHotspotId ? ' is-hovering-hotspot' : ''}`}
+              onMouseMove={handleMessengerPhotoPointerMove}
+              onMouseLeave={handleMessengerPhotoPointerLeave}
+              onClick={handleMessengerPhotoClick}
+              role="presentation"
+            >
+              <img
+                src={activeMessengerPhoto.image}
+                alt={activeMessengerPhoto.alt}
+                className="photo-viewer-image"
+              />
+              {(activeMessengerPhoto.hotspots || []).map((hotspot) => {
+                const isHovered = hoveredMessengerPhotoHotspotId === hotspot.id;
+                const isInspected = inspectedActiveMessengerPhotoHotspots.includes(hotspot.id);
+                return (
+                  <div
+                    key={hotspot.id}
+                    className={`photo-viewer-hotspot${isHovered ? ' is-hovered' : ''}${isInspected ? ' is-inspected' : ''}`}
+                    style={{
+                      left: `${hotspot.left * 100}%`,
+                      top: `${hotspot.top * 100}%`,
+                      width: `${hotspot.width * 100}%`,
+                      height: `${hotspot.height * 100}%`,
+                    }}
+                    aria-hidden="true"
+                  />
+                );
+              })}
+              {hoveredMessengerPhotoHotspotId && (
+                <div className="photo-viewer-tooltip">
+                  {(activeMessengerPhoto.hotspots || []).find((hotspot) => hotspot.id === hoveredMessengerPhotoHotspotId)?.label || 'Деталь'}
+                </div>
               )}
             </div>
           </div>

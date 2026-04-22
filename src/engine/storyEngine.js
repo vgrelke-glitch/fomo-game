@@ -116,6 +116,8 @@ export const createDefaultStoryState = (content) => {
     focusEffectEventIds: [],
     typingByChat: {},
     choiceStateByEventId: {},
+    queuedPhotoRepliesByChat: {},
+    photoReplyInFlightByChat: {},
     unreadChatIds: [],
   },
   unlockedChats: content.messenger.chats
@@ -325,7 +327,7 @@ export const applyStoryEffects = (state, effects = []) => {
       case 'startWorkTask': {
         const nextTask = {
           id: effect.taskId || `task-${Date.now()}`,
-          title: effect.title || 'РќРѕРІР°СЏ Р·Р°РґР°С‡Р°',
+          title: effect.title || 'Новая задача',
           prompt: effect.prompt || '',
           targetText: effect.targetText || '',
         };
@@ -357,22 +359,6 @@ export const applyStoryEffects = (state, effects = []) => {
           },
         };
       }
-      case 'startWorkTask':
-        return {
-          ...nextState,
-          work: {
-            ...nextState.work,
-            tasks: [
-              ...(nextState.work?.tasks || []),
-              {
-                id: effect.taskId || `task-${Date.now()}`,
-                title: effect.title || 'Новая задача',
-                prompt: effect.prompt || '',
-                targetText: effect.targetText || '',
-              },
-            ],
-          },
-        };
       default:
         return nextState;
     }
