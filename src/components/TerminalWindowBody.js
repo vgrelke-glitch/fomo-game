@@ -3,12 +3,13 @@ import React, { useEffect, useRef, useState } from 'react';
 const TERMINAL_PROMPT = '> > C:\\Users\\G>';
 const TYPE_SPEED_MS = 22;
 const ADVENTURE_PROMPT_LINE_TEXT = 'запустить_процесс: приключение.ехе?..';
+const TERMINAL_PRINT_AUDIO_SRC = '/files/audio/terminal_print.mp3';
 
 function TerminalStaticLine({ text }) {
   return (
     <div className="terminal-line">
       <span className="terminal-prompt">{TERMINAL_PROMPT} </span>
-      <span>{text}</span>
+      <span className="terminal-line-text">{text}</span>
     </div>
   );
 }
@@ -42,7 +43,7 @@ function TerminalAnimatedLine({ lineId, text, onComplete, typeSpeedMs = TYPE_SPE
   return (
     <div className="terminal-line">
       <span className="terminal-prompt">{TERMINAL_PROMPT} </span>
-      <span>{text.slice(0, visibleLength)}</span>
+      <span className="terminal-line-text">{text.slice(0, visibleLength)}</span>
     </div>
   );
 }
@@ -90,6 +91,7 @@ export default function TerminalWindowBody({
   const lines = [...seedLines, ...runtimeLines];
   const firstPendingLineId = runtimeLines.find((line) => line.status === 'pending')?.id || null;
   const bodyRef = useRef(null);
+  const terminalPrintAudioRef = useRef(null);
   const adventurePromptLine = [...lines]
     .reverse()
     .find((line) => typeof line?.text === 'string' && line.text.includes(ADVENTURE_PROMPT_LINE_TEXT)) || null;
@@ -111,6 +113,40 @@ export default function TerminalWindowBody({
     if (!el) return;
     el.scrollTop = el.scrollHeight;
   }, [lines.length, firstPendingLineId, prompt?.active, prompt?.stage]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+
+    if (!terminalPrintAudioRef.current) {
+      const audio = new Audio(TERMINAL_PRINT_AUDIO_SRC);
+      audio.preload = 'auto';
+      audio.loop = true;
+      audio.volume = 0.34;
+      terminalPrintAudioRef.current = audio;
+    }
+
+    const audio = terminalPrintAudioRef.current;
+
+    if (firstPendingLineId) {
+      const playPromise = audio.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => {});
+      }
+    } else {
+      audio.pause();
+    }
+
+    return () => {
+      audio.pause();
+    };
+  }, [firstPendingLineId]);
+
+  useEffect(() => () => {
+    if (!terminalPrintAudioRef.current) return;
+    terminalPrintAudioRef.current.pause();
+    terminalPrintAudioRef.current.src = '';
+    terminalPrintAudioRef.current = null;
+  }, []);
 
   return (
     <div className="terminal">

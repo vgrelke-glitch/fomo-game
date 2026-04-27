@@ -3,6 +3,7 @@ import TerminalWindowBody from './TerminalWindowBody';
 import WorkConveyorBody from './WorkConveyorBody';
 
 export default function AppWindowContent({
+  activeAppId,
   appType,
   editorContent,
   storyState,
@@ -17,12 +18,14 @@ export default function AppWindowContent({
   onTypeWorkTaskKey,
   onSubmitWorkTask,
   renderNotesBody,
+  renderTextFileBody,
   renderMessengerBody,
   renderCalendarBody,
   renderSocialBody,
   renderExitBody,
 }) {
   if (appType === 'notes') return renderNotesBody();
+  if (appType === 'text-file') return renderTextFileBody(activeAppId);
   if (appType === 'messenger') return renderMessengerBody();
   if (appType === 'work-conveyor') {
     return (

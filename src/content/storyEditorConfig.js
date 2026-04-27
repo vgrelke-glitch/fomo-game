@@ -6,6 +6,9 @@ export const STORY_EDITOR_CONFIG = {
     { id: 'app4', type: 'social', title: 'Соцсеть', window: { width: 900, height: 620 } },
     { id: 'app5', type: 'work-conveyor', title: 'Конвейер', window: { width: 980, height: 680 } },
     { id: 'app6', type: 'calendar', title: 'Календарь', window: { width: 900, height: 620 } },
+    { id: 'app8', type: 'text-file', title: 'финал', window: { width: 760, height: 560 } },
+    { id: 'app9', type: 'text-file', title: 'финал 1', window: { width: 760, height: 560 } },
+    { id: 'app10', type: 'text-file', title: 'финал финал', window: { width: 760, height: 560 } },
     { id: 'exit', type: 'exit', title: 'Выход', window: { width: 900, height: 620 } },
   ],
   timings: {

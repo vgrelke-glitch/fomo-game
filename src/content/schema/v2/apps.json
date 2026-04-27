@@ -5,5 +5,8 @@
   { "id": "app4", "type": "social", "title": "Соцсеть" },
   { "id": "app5", "type": "work-conveyor", "title": "Конвейер" },
   { "id": "app6", "type": "calendar", "title": "Календарь" },
+  { "id": "app8", "type": "text-file", "title": "финал" },
+  { "id": "app9", "type": "text-file", "title": "финал 1" },
+  { "id": "app10", "type": "text-file", "title": "финал финал" },
   { "id": "exit", "type": "exit", "title": "Выход" }
 ]

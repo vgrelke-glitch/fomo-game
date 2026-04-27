@@ -1,16 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import logo from './logo.svg';
 import { useMemo, useCallback } from 'react';
-import iconNotes from './icons/заметки.png';
+import iconNotes from './icons/заметки1.png';
+import iconTextFile from './icons/тексты.png';
 import iconMessenger from './icons/мессенджер 3.png';
-import iconSocial from './icons/соцсеть 1.png';
-import iconCalendar from './icons/календарь 1.png';
+import iconSocial from './icons/соцсеть2.png';
+import iconCalendar from './icons/календарь2.png';
 import iconConveyor from './icons/конвейер.png';
 import iconExit from './icons/выход 2.png';
 import fromKPhoto1 from './fromK/ph1.jpg';
 import fromKPhoto1Alt from './fromK/ph1key.jpg';
 import fromKPhoto2 from './fromK/ph2.jpg';
 import AppWindowContent from './components/AppWindowContent';
+import ChatAudioMessage from './components/ChatAudioMessage';
 import DesktopIcon from './components/DesktopIcon';
 import DesktopWindow from './components/DesktopWindow';
 import DevEditorPanel from './components/DevEditorPanel';
@@ -35,6 +37,17 @@ const INITIAL_EDITOR_CONFIG = normalizeEditorConfig(STORY_EDITOR_CONFIG, STORY_E
 const PROLOGUE_AUDIO_SRC = '/files/audio/intro.mp3';
 const CHAPTER1_AUDIO_SRC = '/files/audio/chapter1.mp3';
 const K_HOUSE_VOICE_AUDIO_SRC = '/files/audio/voice.ogg';
+const MAMA_NOTIFICATION_AUDIO_SRC = '/files/audio/M_not.mp3';
+const K_FIRST_NOTIFICATION_AUDIO_SRC = '/files/audio/K_first_not.mp3';
+const K_NOTIFICATION_AUDIO_SRC = '/files/audio/K_not.mp3';
+const MESSAGE_SEND_AUDIO_SRC = '/files/audio/sendmessage.mp3';
+const PRINT_KEY_SOUND_SRCS = [
+  '/files/audio/print1.mp3',
+  '/files/audio/prin2.mp3',
+  '/files/audio/prin3.mp3',
+  '/files/audio/prin4.mp3',
+];
+const PRINT_KEY_SOUND_POOL_SIZE = 2;
 
 const ICON_IMAGE_BY_ID = {
   app1: iconNotes,
@@ -42,10 +55,14 @@ const ICON_IMAGE_BY_ID = {
   app4: iconSocial,
   app5: iconConveyor,
   app6: iconCalendar,
+  app8: iconTextFile,
+  app9: iconTextFile,
+  app10: iconTextFile,
   exit: iconExit,
 };
 const ICON_IMAGE_BY_TYPE = {
   notes: iconNotes,
+  'text-file': iconNotes,
   messenger: iconMessenger,
   social: iconSocial,
   'work-conveyor': iconConveyor,
@@ -78,6 +95,13 @@ const SOCIAL_WINDOW_SIZE = { width: 460, height: 760 };
 const getDefaultWindowSize = (id) => (id === 'app4' ? SOCIAL_WINDOW_SIZE : DEFAULT_WINDOW_SIZE);
 const PHOTO_VIEWER_Z_INDEX = 1000;
 const PHOTO_REPLY_TYPING_SPEED_MS = 42;
+const getPrologueTypingDelay = (char) => {
+  const baseDelay = 46 + Math.random() * 78;
+  if (/[.!?…]/.test(char)) return baseDelay + 220 + Math.random() * 260;
+  if (/[,;:—-]/.test(char)) return baseDelay + 90 + Math.random() * 150;
+  if (char === ' ') return baseDelay + Math.random() * 35;
+  return baseDelay;
+};
 const SOCIAL_PEOPLE = [
   { name: 'Лера', handle: 'lera' },
   { name: 'Макс', handle: 'max' },
@@ -100,6 +124,24 @@ const SOCIAL_CAPTIONS = [
   'случайная тень, нужный цвет, мгновенный кадр.',
   'день складывается из мелких деталей, как этот.',
 ];
+const SOCIAL_AVATAR_PALETTE = [
+  '#fdf335',
+  '#36c5e8',
+  '#1f73b7',
+  '#e82788',
+  '#ec29f2',
+  '#ff1730',
+  '#47b84d',
+  '#1d9845',
+  '#6b3a98',
+];
+const getPaletteColorBySeed = (seed = '') => {
+  const normalizedSeed = String(seed || '');
+  const hash = normalizedSeed.split('').reduce((acc, char, index) => (
+    acc + (char.charCodeAt(0) * (index + 1))
+  ), 0);
+  return SOCIAL_AVATAR_PALETTE[hash % SOCIAL_AVATAR_PALETTE.length];
+};
 const getPhotoReplyQueueFingerprint = (entry) => {
   const firstOutgoingText = (entry?.conversation || []).find((item) => item?.direction === 'outgoing')?.text || '';
   return `${entry?.messageId || ''}::${entry?.hotspotId || ''}::${firstOutgoingText}`;
@@ -237,9 +279,21 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
     ],
   },
 };
+const areAllKPhotoHotspotsInspected = (inspectedByMessage = {}) => (
+  Object.entries(MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID).every(([messageId, attachment]) => {
+    const inspectedHotspots = inspectedByMessage[messageId] || [];
+    return (attachment?.hotspots || []).every((hotspot) => inspectedHotspots.includes(hotspot.id));
+  })
+);
 const isDynamicMessengerHistoryEntryId = (entryId) => typeof entryId === 'string' && (
   entryId.startsWith('photo-hotspot-') || entryId.startsWith('dynamic-')
 );
+const getMessengerChatThemeClass = (chatId = '') => {
+  if (chatId === 'chat-druk') return 'theme-friend';
+  if (chatId === 'chat3') return 'theme-mama';
+  if (chatId === 'chat-k') return 'theme-k';
+  return 'theme-default';
+};
 const getVisibleChatList = (content, unlockedChatIds = []) => {
   const unlockedSet = new Set(unlockedChatIds);
   return (content?.messenger?.chats || []).filter((chat) => unlockedSet.has(chat.id));
@@ -542,6 +596,10 @@ function App() {
   const PROLOGUE_TEXT = `Это было самое жаркое лето за последние 11 лет. Мы почти не были знакомы, но они почему-то тогда решили позвать меня с собой. Каждую ночь мы спали в разных местах — на каменном склоне горы, в широком поле среди облаков и в густом кедровом лесу.
 Ночью, когда становилось тихо, я выбирался из палатки посидеть в одиночестве, в темноте, под звездами, чтобы убедиться, что это и вправду происходит именно со мной.
 `;
+  const PROLOGUE_PARAGRAPHS = useMemo(
+    () => PROLOGUE_TEXT.trim().split(/\n+/),
+    [PROLOGUE_TEXT],
+  );
   const icons = useMemo(
     () => editorConfig.apps
       .filter((app) => app.id !== 'exit')
@@ -674,6 +732,9 @@ function App() {
       app4: { x: 1615, y: 760 },
       app5: { x: 870, y: 430 },
       app6: { x: 1720, y: 120 },
+      app8: { x: 128, y: 608 },
+      app9: { x: 128, y: 772 },
+      app10: { x: 128, y: 936 },
       exit: { x: 640, y: 930 },
       app7: { x: 220, y: 56 },
     };
@@ -722,6 +783,7 @@ function App() {
   const [gameScreen, setGameScreen] = useState(() => storyState.ui.gameScreen || 'game');
   const [view, setView] = useState(() => storyState.ui.view || 'desktop');
   const [prologueStarted, setPrologueStarted] = useState(false);
+  const [prologueParagraphIndex, setPrologueParagraphIndex] = useState(0);
   const [prologueIndex, setPrologueIndex] = useState(0);
   const [prologueDone, setPrologueDone] = useState(false);
   const [endingStarted, setEndingStarted] = useState(false);
@@ -750,8 +812,122 @@ function App() {
   const screenFlashTimerRef = useRef(null);
   const prologueAudioRef = useRef(null);
   const prologueAudioStartedRef = useRef(false);
+  const prologueTypingTimerRef = useRef(null);
   const chapter1AudioRef = useRef(null);
   const chapter1AudioStartedRef = useRef(false);
+  const mamaNotificationAudioRef = useRef(null);
+  const kFirstNotificationAudioRef = useRef(null);
+  const kNotificationAudioRef = useRef(null);
+  const messageSendAudioRef = useRef(null);
+  const printKeyAudioPoolRef = useRef([]);
+  const lastPrintKeySoundAtRef = useRef(0);
+  const lastPrintKeySoundSrcRef = useRef('');
+  const playPrintKeySound = useCallback((char = '') => {
+    if (typeof window === 'undefined' || PRINT_KEY_SOUND_SRCS.length === 0) return;
+
+    const isWhitespace = /\s/.test(char);
+    const isPunctuation = /[.,!?;:…]/.test(char);
+    const now = window.performance?.now?.() || Date.now();
+    const minimumGapMs = isWhitespace ? 52 : isPunctuation ? 44 : 30;
+
+    if (now - lastPrintKeySoundAtRef.current < minimumGapMs) {
+      return;
+    }
+
+    if (isWhitespace && Math.random() < 0.4) {
+      return;
+    }
+
+    if (printKeyAudioPoolRef.current.length === 0) {
+      printKeyAudioPoolRef.current = PRINT_KEY_SOUND_SRCS.flatMap((src) => (
+        Array.from({ length: PRINT_KEY_SOUND_POOL_SIZE }, () => {
+          const audio = new Audio(src);
+          audio.preload = 'auto';
+          return { src, audio };
+        })
+      ));
+    }
+
+    const candidatePool = printKeyAudioPoolRef.current.filter((entry) => (
+      entry.src !== lastPrintKeySoundSrcRef.current
+      || PRINT_KEY_SOUND_SRCS.length === 1
+    ));
+    const pool = candidatePool.length > 0 ? candidatePool : printKeyAudioPoolRef.current;
+    const preferredEntry = pool.find((entry) => (
+      entry.audio.paused || entry.audio.ended || entry.audio.currentTime < 0.01
+    )) || pool[Math.floor(Math.random() * pool.length)];
+
+    if (!preferredEntry) return;
+
+    preferredEntry.audio.pause();
+    preferredEntry.audio.currentTime = 0;
+    preferredEntry.audio.volume = isWhitespace
+      ? 0.13 + Math.random() * 0.08
+      : isPunctuation
+        ? 0.2 + Math.random() * 0.1
+        : 0.24 + Math.random() * 0.12;
+    preferredEntry.audio.playbackRate = 0.94 + Math.random() * 0.14;
+
+    lastPrintKeySoundAtRef.current = now;
+    lastPrintKeySoundSrcRef.current = preferredEntry.src;
+
+    const playPromise = preferredEntry.audio.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(() => {});
+    }
+  }, []);
+  const playMamaNotificationSound = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    if (!mamaNotificationAudioRef.current) {
+      const audio = new Audio(MAMA_NOTIFICATION_AUDIO_SRC);
+      audio.preload = 'auto';
+      mamaNotificationAudioRef.current = audio;
+    }
+    const audio = mamaNotificationAudioRef.current;
+    audio.pause();
+    audio.currentTime = 0;
+    audio.volume = 0.72;
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(() => {});
+    }
+  }, []);
+  const playKNotificationSound = useCallback((isFirstMessage = false) => {
+    if (typeof window === 'undefined') return;
+    const targetRef = isFirstMessage ? kFirstNotificationAudioRef : kNotificationAudioRef;
+    const targetSrc = isFirstMessage ? K_FIRST_NOTIFICATION_AUDIO_SRC : K_NOTIFICATION_AUDIO_SRC;
+
+    if (!targetRef.current) {
+      const audio = new Audio(targetSrc);
+      audio.preload = 'auto';
+      targetRef.current = audio;
+    }
+
+    const audio = targetRef.current;
+    audio.pause();
+    audio.currentTime = 0;
+    audio.volume = isFirstMessage ? 0.76 : 0.68;
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(() => {});
+    }
+  }, []);
+  const playMessageSendSound = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    if (!messageSendAudioRef.current) {
+      const audio = new Audio(MESSAGE_SEND_AUDIO_SRC);
+      audio.preload = 'auto';
+      messageSendAudioRef.current = audio;
+    }
+    const audio = messageSendAudioRef.current;
+    audio.pause();
+    audio.currentTime = 0;
+    audio.volume = 0.64;
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(() => {});
+    }
+  }, []);
 
   const bringToFront = useCallback((id) => {
     setWinState((s) => {
@@ -1068,6 +1244,12 @@ function App() {
     });
 
     if (isIncomingMessage && !shouldSuppressAttention) {
+      if (chatId === 'chat3') {
+        playMamaNotificationSound();
+      }
+      if (chatId === 'chat-k') {
+        playKNotificationSound(eventId === 'k_001');
+      }
       const chatTitle = editorContent.messenger.chats.find((chat) => chat.id === chatId)?.title || 'Мессенджер';
       pushPersistentNotif({
         title: chatTitle,
@@ -1077,7 +1259,15 @@ function App() {
         autoDismiss: !(chatId === 'chat-k' && eventId === 'k_001'),
       });
     }
-  }, [editorContent, findScriptEventById, isMessengerWindowFrontmost, persistRuntimeState, pushPersistentNotif]);
+  }, [
+    editorContent,
+    findScriptEventById,
+    isMessengerWindowFrontmost,
+    persistRuntimeState,
+    playKNotificationSound,
+    playMamaNotificationSound,
+    pushPersistentNotif,
+  ]);
 
   const setTerminalPromptState = useCallback((updater) => {
     setStoryState((prev) => {
@@ -1189,6 +1379,7 @@ function App() {
     const remainingText = targetText.slice(currentText.length);
     if (/^[\p{L}\p{N}]?[.!?…]*$/u.test(remainingText)) {
       event.preventDefault();
+      playPrintKeySound(targetText[targetText.length - 1] || '');
       setTypedByChat((prev) => ({
         ...prev,
         [chatId]: targetText,
@@ -1204,6 +1395,7 @@ function App() {
     if (!isProgressKey || event.key === ' ') return;
 
     event.preventDefault();
+    playPrintKeySound(nextChar);
     setTypedByChat((prev) => ({
       ...prev,
       [chatId]: appendNextMessengerChar(prev[chatId] || '', targetText),
@@ -1284,6 +1476,7 @@ function App() {
     }
 
     event.preventDefault();
+    playPrintKeySound(nextChar);
     setTypedByChat((prev) => ({
       ...prev,
       [chatId]: appendNextMessengerChar(prev[chatId] || '', targetText),
@@ -1301,6 +1494,7 @@ function App() {
       && terminalPrompt?.id === TERMINAL_ADVENTURE_PROMPT_ID
       && terminalPrompt.stage === 'accept-ready'
     ) {
+      playMessageSendSound();
       setTypedByChat((prev) => ({
         ...prev,
         [chatId]: '',
@@ -1315,6 +1509,7 @@ function App() {
     }
 
     if (currentText.length < targetText.length) return;
+    playMessageSendSound();
 
     const sendBehavior = pendingPlayerEvent?.schema?.sendBehavior || '';
     if (sendBehavior === 'blocked_and_wiped') {
@@ -1377,6 +1572,7 @@ function App() {
     const targetText = option.resultText || option.label || '';
     const currentText = typedByChat[chatId] || '';
     if (!targetText || currentText.length < targetText.length) return;
+    playMessageSendSound();
 
     if (option.id === 'yes' && pendingPlayerEvent) {
       setTypedByChat((prev) => ({
@@ -1867,7 +2063,7 @@ function App() {
   }, []);
 
   const inspectMessengerPhotoHotspot = useCallback((messageId, hotspot) => {
-    if (!messageId || !hotspot?.id || !hotspot.terminalComment) return;
+    if (!messageId || !hotspot?.id) return;
 
     const alreadyInspected = (storyState.messenger?.inspectedPhotoHotspotsByMessage?.[messageId] || []).includes(hotspot.id);
     if (alreadyInspected) return;
@@ -1935,6 +2131,7 @@ function App() {
     const conversation = Array.isArray(queuedReply.conversation) ? queuedReply.conversation : [];
     const [firstEntry, ...remainingEntries] = conversation;
     if (!firstEntry || firstEntry.direction !== 'outgoing' || !firstEntry.text) return;
+    playMessageSendSound();
 
     setTypedByChat((prev) => ({
       ...prev,
@@ -2116,7 +2313,7 @@ function App() {
         return nextState;
       });
     }
-  }, [activeChatId, appendTerminalLines, editorConfig.timings.messageGapMs, persistRuntimeState]);
+  }, [activeChatId, appendTerminalLines, editorConfig.timings.messageGapMs, persistRuntimeState, playMessageSendSound]);
 
   const handleMessengerPhotoPointerMove = useCallback((event) => {
     if (!activeMessengerPhoto) return;
@@ -2217,6 +2414,7 @@ function App() {
     event.preventDefault();
     const nextChar = targetText[currentText.length] || '';
     const now = Date.now();
+    playPrintKeySound(nextChar);
 
     setStoryState((prev) => {
       const previousTyped = prev.work?.typedTextByTask?.[taskId] || '';
@@ -3164,11 +3362,40 @@ function App() {
       prologueAudioRef.current.src = '';
       prologueAudioRef.current = null;
     }
+    if (prologueTypingTimerRef.current) {
+      clearTimeout(prologueTypingTimerRef.current);
+      prologueTypingTimerRef.current = null;
+    }
     if (chapter1AudioRef.current) {
       chapter1AudioRef.current.pause();
       chapter1AudioRef.current.src = '';
       chapter1AudioRef.current = null;
     }
+    if (mamaNotificationAudioRef.current) {
+      mamaNotificationAudioRef.current.pause();
+      mamaNotificationAudioRef.current.src = '';
+      mamaNotificationAudioRef.current = null;
+    }
+    if (kFirstNotificationAudioRef.current) {
+      kFirstNotificationAudioRef.current.pause();
+      kFirstNotificationAudioRef.current.src = '';
+      kFirstNotificationAudioRef.current = null;
+    }
+    if (kNotificationAudioRef.current) {
+      kNotificationAudioRef.current.pause();
+      kNotificationAudioRef.current.src = '';
+      kNotificationAudioRef.current = null;
+    }
+    if (messageSendAudioRef.current) {
+      messageSendAudioRef.current.pause();
+      messageSendAudioRef.current.src = '';
+      messageSendAudioRef.current = null;
+    }
+    printKeyAudioPoolRef.current.forEach(({ audio }) => {
+      audio.pause();
+      audio.src = '';
+    });
+    printKeyAudioPoolRef.current = [];
   }, [clearTerminalPromptTimers]);
 
   useEffect(() => {
@@ -3206,6 +3433,7 @@ function App() {
       setToastLeaving(false);
       if (view === 'prologue' && !prologueStarted) {
         setPrologueStarted(true);
+        setPrologueParagraphIndex(0);
         setPrologueIndex(0);
         setPrologueDone(false);
       }
@@ -3252,18 +3480,47 @@ function App() {
   useEffect(() => {
     if (view !== 'prologue') return;
     if (!prologueStarted || prologueDone) return;
-    const intervalId = setInterval(() => {
-      setPrologueIndex((prev) => {
-        if (prev >= PROLOGUE_TEXT.length) {
-          clearInterval(intervalId);
-          setPrologueDone(true);
-          return prev;
-        }
-        return prev + 1;
-      });
-    }, 28);
-    return () => clearInterval(intervalId);
-  }, [view, prologueStarted, prologueDone, PROLOGUE_TEXT.length]);
+    if (prologueParagraphIndex >= PROLOGUE_PARAGRAPHS.length) {
+      setPrologueDone(true);
+      return undefined;
+    }
+
+    const paragraph = PROLOGUE_PARAGRAPHS[prologueParagraphIndex] || '';
+
+    if (prologueIndex >= paragraph.length) {
+      if (prologueParagraphIndex >= PROLOGUE_PARAGRAPHS.length - 1) {
+        setPrologueDone(true);
+        return undefined;
+      }
+
+      prologueTypingTimerRef.current = setTimeout(() => {
+        setPrologueParagraphIndex((prev) => Math.min(prev + 1, PROLOGUE_PARAGRAPHS.length - 1));
+        setPrologueIndex(0);
+      }, 700 + Math.random() * 520);
+
+      return () => {
+        clearTimeout(prologueTypingTimerRef.current);
+        prologueTypingTimerRef.current = null;
+      };
+    }
+
+    const nextChar = paragraph[prologueIndex] || '';
+    prologueTypingTimerRef.current = setTimeout(() => {
+      setPrologueIndex((prev) => Math.min(prev + 1, paragraph.length));
+    }, getPrologueTypingDelay(nextChar));
+
+    return () => {
+      clearTimeout(prologueTypingTimerRef.current);
+      prologueTypingTimerRef.current = null;
+    };
+  }, [
+    view,
+    prologueStarted,
+    prologueDone,
+    prologueParagraphIndex,
+    prologueIndex,
+    PROLOGUE_PARAGRAPHS,
+  ]);
 
   useEffect(() => {
     if (view !== 'ending') return;
@@ -3658,6 +3915,12 @@ function App() {
     () => editorContent.appData?.notes?.seedNotes || [],
     [editorContent.appData?.notes?.seedNotes],
   );
+  const textFilesByAppId = useMemo(
+    () => Object.fromEntries(
+      (editorContent.appData?.textFiles || []).map((file) => [file.appId, file]),
+    ),
+    [editorContent.appData?.textFiles],
+  );
   const calendarWeekdays = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
   const calendarMonthNames = [
     'Январь',
@@ -3813,8 +4076,19 @@ function App() {
     );
   };
 
+  const renderTextFileBody = (appId) => {
+    const file = textFilesByAppId[appId] || null;
+    return (
+      <div className="text-file-view">
+        {file?.title ? <div className="text-file-title">{file.title}</div> : null}
+        <div className="text-file-body">{file?.body || ''}</div>
+      </div>
+    );
+  };
+
   const renderMessengerBody = () => {
     const active = messengerChats.find((c) => c.id === activeChatId) || messengerChats[0];
+    const activeChatThemeClass = getMessengerChatThemeClass(active?.id);
     const threadDateLabel = 'Сегодня';
     const script = editorContent.messenger.scripts?.[active.id] || null;
         const activeScene = getActiveMessengerScene(editorContent, storyState.messenger, active.id);
@@ -3898,12 +4172,13 @@ function App() {
           && !isAdventureDeclineFlow
           && isPendingTapComplete;
         return (
-            <div className="messenger">
+            <div className={`messenger ${activeChatThemeClass}`}>
+              <div className="messenger-main">
               <div className="messenger-list">
                 {messengerChats.map((chat) => (
                   <button
                     key={chat.id}
-                    className={`chat-item${chat.id === active.id ? ' active' : ''}${chat.isUnread ? ' is-unread' : ''}`}
+                    className={`chat-item ${getMessengerChatThemeClass(chat.id)}${chat.id === active.id ? ' active' : ''}${chat.isUnread ? ' is-unread' : ''}`}
                     onMouseDown={() => {
                       messengerInputRestorePendingRef.current = messengerInputStickyFocusRef.current && isMessengerWindowFrontmost();
                     }}
@@ -3913,13 +4188,19 @@ function App() {
                     }}
                     type="button"
                   >
+                    <div className="chat-avatar" aria-hidden="true" />
                     <div className="chat-title">{chat.title}</div>
                     <div className="chat-preview">{chat.preview}</div>
                   </button>
                 ))}
               </div>
-              <div className="messenger-thread">
-                <div className="thread-title">{active.title}</div>
+              <div className={`messenger-thread ${activeChatThemeClass}`}>
+                <div className="thread-title">
+                  <div className="thread-title-avatar" aria-hidden="true" />
+                  <div className="thread-title-meta">
+                    <div className="thread-title-name">{active.title}</div>
+                  </div>
+                </div>
                 <div className="thread-messages" ref={messengerThreadRef}>
                   <div className="thread-date">{threadDate}</div>
                   {history.length > 0 ? history.map((msg, i) => {
@@ -3927,14 +4208,11 @@ function App() {
                     return (
                       <div
                         key={msg.id || `${active.id}-${i}`}
-                        className={`thread-message ${msg.direction === 'outgoing' ? 'outgoing' : 'incoming'}${attachment ? ' thread-message--photo' : ''}${msg.audioSrc ? ' thread-message--audio' : ''}`}
+                        className={`thread-message ${msg.direction === 'outgoing' ? 'outgoing' : 'incoming'} ${activeChatThemeClass}${attachment ? ' thread-message--photo' : ''}${msg.audioSrc ? ' thread-message--audio' : ''}`}
                       >
                         {msg.text ? <div className="thread-message-text">{msg.text}</div> : null}
                         {msg.audioSrc ? (
-                          <div className="thread-audio-card">
-                            <div className="thread-audio-label">{msg.audioLabel || 'Голосовое сообщение'}</div>
-                            <audio className="thread-audio-player" controls preload="metadata" src={msg.audioSrc} />
-                          </div>
+                          <ChatAudioMessage src={msg.audioSrc} />
                         ) : null}
                         {attachment ? (
                           <button
@@ -4119,6 +4397,7 @@ function App() {
                     Отправить
                   </button>
                 </div>
+              </div>
               </div>
             </div>
         );
@@ -4393,7 +4672,11 @@ function App() {
         <div className="social-stories">
           {SOCIAL_PEOPLE.map((person) => (
             <div className="social-story" key={person.handle}>
-              <div className="social-story-avatar">{person.name.slice(0, 1)}</div>
+              <div
+                className="social-story-avatar"
+                style={{ background: getPaletteColorBySeed(person.handle) }}
+                aria-hidden="true"
+              />
               <div className="social-story-name">{person.name}</div>
             </div>
           ))}
@@ -4402,7 +4685,11 @@ function App() {
           {socialPosts.map((post) => (
             <div className="social-post" key={post.id}>
               <div className="social-post-head">
-                <div className="social-avatar">{post.user.slice(0, 1)}</div>
+                <div
+                  className="social-avatar"
+                  style={{ background: getPaletteColorBySeed(post.handle) }}
+                  aria-hidden="true"
+                />
                 <div className="social-user-meta">
                   <div className="social-user">{post.user}</div>
                   <div className="social-handle">@{post.handle} · {post.time}</div>
@@ -4537,7 +4824,35 @@ function App() {
       openDesktop();
       return;
     }
-    setPrologueIndex(PROLOGUE_TEXT.length);
+
+    if (!prologueStarted) {
+      setPrologueStarted(true);
+      setPrologueParagraphIndex(0);
+      setPrologueIndex(0);
+      return;
+    }
+
+    const paragraph = PROLOGUE_PARAGRAPHS[prologueParagraphIndex] || '';
+    if (prologueIndex < paragraph.length) {
+      setPrologueIndex(paragraph.length);
+      return;
+    }
+
+    if (prologueParagraphIndex >= PROLOGUE_PARAGRAPHS.length - 1) {
+      openDesktop();
+      return;
+    }
+
+    const nextParagraphIndex = prologueParagraphIndex + 1;
+    if (nextParagraphIndex < PROLOGUE_PARAGRAPHS.length) {
+      setPrologueParagraphIndex(nextParagraphIndex);
+      setPrologueIndex(PROLOGUE_PARAGRAPHS[nextParagraphIndex].length);
+      if (nextParagraphIndex >= PROLOGUE_PARAGRAPHS.length - 1) {
+        setPrologueDone(true);
+      }
+      return;
+    }
+
     setPrologueDone(true);
   };
 
@@ -4883,11 +5198,22 @@ function App() {
 
   useEffect(() => {
     if (storyState.flags?.kHouseVoiceSequenceScheduled) return;
-    const kHistory = storyState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [];
-    const hasDedMessage = kHistory.some((entry) => (
-      entry?.direction === 'incoming' && entry?.text === 'окей! есть поболтать с дедом'
-    ));
-    if (!hasDedMessage) return;
+    const inspectedByMessage = storyState.messenger?.inspectedPhotoHotspotsByMessage || {};
+    if (!areAllKPhotoHotspotsInspected(inspectedByMessage)) return;
+
+    const queuedPhotoReplies = storyState.messenger?.queuedPhotoRepliesByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [];
+    const isPhotoReplyInFlight = !!storyState.messenger?.photoReplyInFlightByChat?.[TERMINAL_ADVENTURE_CHAT_ID];
+    const typedKText = typedByChat[TERMINAL_ADVENTURE_CHAT_ID] || '';
+    const activeScene = getActiveMessengerScene(editorContent, storyState.messenger, TERMINAL_ADVENTURE_CHAT_ID);
+    const currentEventIndex = storyState.messenger?.eventIndexByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || 0;
+    const nextEvent = activeScene?.events?.[currentEventIndex] || null;
+    const isWaitingForDependency = !!nextEvent?.waitForEventId
+      && !(storyState.messenger?.completedEventIds || []).includes(nextEvent.waitForEventId);
+    const pendingPlayerEvent = nextEvent?.type === 'message_player' && !isWaitingForDependency ? nextEvent : null;
+
+    if (queuedPhotoReplies.length > 0 || isPhotoReplyInFlight || pendingPlayerEvent || typedKText.length > 0) {
+      return;
+    }
 
     const appendKHistoryEntry = (historyEntry) => {
       setStoryState((prev) => {
@@ -4895,7 +5221,9 @@ function App() {
         if (nextHistory.some((entry) => entry?.id === historyEntry.id)) {
           return prev;
         }
-        const nextUnreadChatIds = activeChatId === TERMINAL_ADVENTURE_CHAT_ID
+        const shouldSuppressAttention = isMessengerWindowFrontmost()
+          && activeChatId === TERMINAL_ADVENTURE_CHAT_ID;
+        const nextUnreadChatIds = shouldSuppressAttention
           ? (prev.messenger?.unreadChatIds || []).filter((id) => id !== TERMINAL_ADVENTURE_CHAT_ID)
           : Array.from(new Set([...(prev.messenger?.unreadChatIds || []), TERMINAL_ADVENTURE_CHAT_ID]));
         const nextState = {
@@ -4917,11 +5245,37 @@ function App() {
       });
     };
 
-    appendKHistoryEntry({
-      id: 'dynamic-k-house-departing',
-      direction: 'incoming',
-      text: 'выхожу к домику',
+    const departingText = 'выхожу к домику';
+    const departingTypingDurationMs = Math.max(
+      0,
+      Math.ceil(departingText.length * PHOTO_REPLY_TYPING_SPEED_MS),
+    );
+
+    setStoryState((prev) => {
+      const nextState = {
+        ...prev,
+        messenger: {
+          ...prev.messenger,
+          typingByChat: {
+            ...(prev.messenger?.typingByChat || {}),
+            [TERMINAL_ADVENTURE_CHAT_ID]: {
+              active: true,
+              durationMs: departingTypingDurationMs,
+            },
+          },
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
     });
+
+    const departingTimerId = window.setTimeout(() => {
+      appendKHistoryEntry({
+        id: 'dynamic-k-house-departing',
+        direction: 'incoming',
+        text: departingText,
+      });
+    }, departingTypingDurationMs);
 
     const voiceTimerId = window.setTimeout(() => {
       appendKHistoryEntry({
@@ -4931,19 +5285,53 @@ function App() {
         audioSrc: K_HOUSE_VOICE_AUDIO_SRC,
         audioLabel: 'Голосовое сообщение',
       });
+      if (!(isMessengerWindowFrontmost() && activeChatId === TERMINAL_ADVENTURE_CHAT_ID)) {
+        playKNotificationSound(false);
+        pushPersistentNotif({
+          title: 'К.',
+          text: 'Голосовое сообщение',
+          appId: 'app3',
+          chatId: TERMINAL_ADVENTURE_CHAT_ID,
+        });
+      }
     }, 120000);
 
+    const followupTimerId = window.setTimeout(() => {
+      appendKHistoryEntry({
+        id: 'dynamic-k-house-followup',
+        direction: 'incoming',
+        text: 'я пошла на разведку! Убираю пока телефон',
+      });
+      if (!(isMessengerWindowFrontmost() && activeChatId === TERMINAL_ADVENTURE_CHAT_ID)) {
+        playKNotificationSound(false);
+        pushPersistentNotif({
+          title: 'К.',
+          text: 'я пошла на разведку! Убираю пока телефон',
+          appId: 'app3',
+          chatId: TERMINAL_ADVENTURE_CHAT_ID,
+        });
+      }
+    }, 132000);
+
+    const conveyorNotifTimerId = window.setTimeout(() => {
+      pushPersistentNotif({
+        title: 'Конвейер',
+        text: 'Задача',
+        appId: 'app5',
+      });
+    }, departingTypingDurationMs + 1000);
+
+    const terminalMessageTimerId = window.setTimeout(() => {
+      appendTerminalLines([
+        createTerminalProtocolLine('развлекайся, но не забывай про работу'),
+      ]);
+    }, departingTypingDurationMs + 1500);
+
+    kHouseSequenceTimersRef.current.push(departingTimerId);
     kHouseSequenceTimersRef.current.push(voiceTimerId);
-
-    appendTerminalLines([
-      createTerminalProtocolLine('развлекайся, но не забывай про работу'),
-    ]);
-
-    pushPersistentNotif({
-      title: 'Конвейер',
-      text: 'Задача',
-      appId: 'app5',
-    });
+    kHouseSequenceTimersRef.current.push(followupTimerId);
+    kHouseSequenceTimersRef.current.push(conveyorNotifTimerId);
+    kHouseSequenceTimersRef.current.push(terminalMessageTimerId);
 
     setStoryState((prev) => {
       if (prev.flags?.kHouseVoiceSequenceScheduled) return prev;
@@ -4962,10 +5350,14 @@ function App() {
   }, [
     activeChatId,
     appendTerminalLines,
+    editorContent,
+    isMessengerWindowFrontmost,
     persistRuntimeState,
+    playKNotificationSound,
     pushPersistentNotif,
     storyState.flags?.kHouseVoiceSequenceScheduled,
-    storyState.messenger?.historyByChat,
+    storyState.messenger,
+    typedByChat,
   ]);
 
   useEffect(() => {
@@ -5094,8 +5486,17 @@ function App() {
         <div className="prologue-screen" key="prologue" onClick={handlePrologueClick} role="presentation">
           <div className="prologue-box">
             <div className="prologue-text">
-              {prologueStarted ? PROLOGUE_TEXT.slice(0, prologueIndex) : ''}
-              {prologueStarted && !prologueDone && <span className="prologue-caret" aria-hidden="true" />}
+              {PROLOGUE_PARAGRAPHS.slice(0, prologueParagraphIndex).map((paragraph, index) => (
+                <p key={`prologue-paragraph-${index}`}>{paragraph}</p>
+              ))}
+              {prologueParagraphIndex < PROLOGUE_PARAGRAPHS.length && (
+                <p>
+                  {prologueStarted
+                    ? PROLOGUE_PARAGRAPHS[prologueParagraphIndex].slice(0, prologueIndex)
+                    : ''}
+                  {prologueStarted && !prologueDone && <span className="prologue-caret" aria-hidden="true" />}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -5195,6 +5596,8 @@ function App() {
                     ? 'window--messenger'
                     : getAppType(it.id) === 'calendar'
                       ? 'window--calendar'
+                      : getAppType(it.id) === 'text-file'
+                        ? 'window--text-file'
                     : ''}
                 visible={!!open[it.id] && !minimized[it.id]}
                 size={winState[it.id].size}
@@ -5213,6 +5616,7 @@ function App() {
                 onFocus={bringToFront}
                 body={
                   <AppWindowContent
+                    activeAppId={it.id}
                     appType={getAppType(it.id)}
                     editorContent={editorContent}
                     storyState={storyState}
@@ -5227,6 +5631,7 @@ function App() {
                     onTypeWorkTaskKey={typeWorkTaskKey}
                     onSubmitWorkTask={submitWorkTaskWithFeedback}
                     renderNotesBody={renderNotesBody}
+                    renderTextFileBody={renderTextFileBody}
                     renderMessengerBody={renderMessengerBody}
                     renderCalendarBody={renderCalendarBodyDesktop}
                     renderSocialBody={renderSocialBody}

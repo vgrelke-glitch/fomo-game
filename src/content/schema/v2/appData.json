@@ -183,6 +183,23 @@
       }
     ]
   },
+  "textFiles": [
+    {
+      "appId": "app8",
+      "title": "финал",
+      "body": "финал"
+    },
+    {
+      "appId": "app9",
+      "title": "финал 1",
+      "body": "финал 1"
+    },
+    {
+      "appId": "app10",
+      "title": "финал финал",
+      "body": "финал финал"
+    }
+  ],
   "calendar": {
     "seedEvents": [
       {
