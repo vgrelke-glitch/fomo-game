@@ -92,11 +92,12 @@ export default function TerminalWindowBody({
   const firstPendingLineId = runtimeLines.find((line) => line.status === 'pending')?.id || null;
   const bodyRef = useRef(null);
   const terminalPrintAudioRef = useRef(null);
-  const adventurePromptLine = [...lines]
-    .reverse()
-    .find((line) => typeof line?.text === 'string' && line.text.includes(ADVENTURE_PROMPT_LINE_TEXT)) || null;
+  const adventurePromptLine = prompt?.promptLineId
+    ? lines.find((line) => line?.id === prompt.promptLineId) || null
+    : [...lines]
+      .reverse()
+      .find((line) => typeof line?.text === 'string' && line.text.includes(ADVENTURE_PROMPT_LINE_TEXT)) || null;
   const isAdventurePromptLinePending = !!adventurePromptLine
-    && adventurePromptLine.id === firstPendingLineId
     && adventurePromptLine.status === 'pending';
   const canShowAdventurePromptActions = (
     prompt?.id !== 'terminal-adventure-confirm'
@@ -179,6 +180,7 @@ export default function TerminalWindowBody({
                 />
                 {shouldRenderActionsAfterLine ? (
                   <TerminalPromptActions
+                    key={`${prompt?.id || 'terminal-prompt'}-${prompt?.cycle || 0}-${line.id}`}
                     prompt={prompt}
                     onAcceptPrompt={onAcceptPrompt}
                     onRejectPrompt={onRejectPrompt}
@@ -193,6 +195,7 @@ export default function TerminalWindowBody({
               <TerminalStaticLine text={line.text || ''} />
               {shouldRenderActionsAfterLine ? (
                 <TerminalPromptActions
+                  key={`${prompt?.id || 'terminal-prompt'}-${prompt?.cycle || 0}-${line.id}`}
                   prompt={prompt}
                   onAcceptPrompt={onAcceptPrompt}
                   onRejectPrompt={onRejectPrompt}
@@ -204,6 +207,7 @@ export default function TerminalWindowBody({
 
         {!shouldRenderAdventurePromptInline && canShowAdventurePromptActions ? (
           <TerminalPromptActions
+            key={`${prompt?.id || 'terminal-prompt'}-${prompt?.cycle || 0}-fallback`}
             prompt={prompt}
             onAcceptPrompt={onAcceptPrompt}
             onRejectPrompt={onRejectPrompt}
