@@ -227,10 +227,112 @@
         "offset": -10
       },
       {
+        "id": "act1-cal-mail",
+        "title": "Ответить на письма",
+        "note": "утром",
+        "offset": -12
+      },
+      {
+        "id": "act1-cal-plans",
+        "title": "Свериться с планом",
+        "note": "до обеда",
+        "offset": -25
+      },
+      {
+        "id": "act1-cal-window",
+        "title": "Помыть окно",
+        "note": "если будет солнце",
+        "offset": -24
+      },
+      {
+        "id": "act1-cal-essay",
+        "title": "Дописать эссе",
+        "note": "черновик",
+        "offset": -23
+      },
+      {
+        "id": "act1-cal-cousin",
+        "title": "Написать двоюродной сестре",
+        "note": "давно обещал",
+        "offset": -22
+      },
+      {
+        "id": "act1-cal-jacket",
+        "title": "Отнести куртку в ремонт",
+        "note": "молния",
+        "offset": -21
+      },
+      {
+        "id": "act1-cal-meeting-note",
+        "title": "Записать мысли после встречи",
+        "note": "пока помню",
+        "offset": -20
+      },
+      {
+        "id": "act1-cal-market-flowers",
+        "title": "Купить цветы",
+        "note": "если останутся деньги",
+        "offset": -19
+      },
+      {
+        "id": "act1-cal-haircut",
+        "title": "Подстричься",
+        "note": "16:30",
+        "offset": -18
+      },
+      {
+        "id": "act1-cal-bathroom",
+        "title": "Разобрать ванную",
+        "note": "полка и баночки",
+        "offset": -17
+      },
+      {
+        "id": "act1-cal-receipts",
+        "title": "Выкинуть чеки",
+        "note": "из карманов",
+        "offset": -16
+      },
+      {
+        "id": "act1-cal-shoes",
+        "title": "Почистить обувь",
+        "note": "на завтра",
+        "offset": -15
+      },
+      {
+        "id": "act1-cal-return-book",
+        "title": "Вернуть книгу",
+        "note": "не просрочить",
+        "offset": -14
+      },
+      {
+        "id": "act1-cal-call-landlord",
+        "title": "Позвонить арендодателю",
+        "note": "по крану",
+        "offset": -13
+      },
+      {
+        "id": "act1-cal-pharmacy",
+        "title": "Зайти в аптеку",
+        "note": "таблетки закончились",
+        "offset": -9
+      },
+      {
+        "id": "act1-cal-clean-desk",
+        "title": "Разгрести стол",
+        "note": "хотя бы верхний слой",
+        "offset": -8
+      },
+      {
         "id": "act1-cal-coffee",
         "title": "Кофе с Ирой",
         "note": "18:30",
         "offset": -5
+      },
+      {
+        "id": "act1-cal-archive",
+        "title": "Скачать архив",
+        "note": "до ночи",
+        "offset": -6
       },
       {
         "id": "act1-cal-laundry",
@@ -239,9 +341,27 @@
         "offset": -3
       },
       {
+        "id": "act1-cal-shower",
+        "title": "Помыть голову",
+        "note": "вечер",
+        "offset": -4
+      },
+      {
+        "id": "act1-cal-stretch",
+        "title": "Растяжка",
+        "note": "15 минут",
+        "offset": -2
+      },
+      {
         "id": "act1-cal-call-mom",
         "title": "Позвонить маме",
         "note": "вечером",
+        "offset": 1
+      },
+      {
+        "id": "act1-cal-meds",
+        "title": "Купить таблетки",
+        "note": "после созвона",
         "offset": 1
       },
       {
@@ -251,9 +371,21 @@
         "offset": 2
       },
       {
+        "id": "act1-cal-friend-checkin",
+        "title": "Написать Тане",
+        "note": "а то опять забуду",
+        "offset": 2
+      },
+      {
         "id": "act1-cal-therapy",
         "title": "Психотерапия",
         "note": "19:00",
+        "offset": 3
+      },
+      {
+        "id": "act1-cal-dishes",
+        "title": "Помыть посуду",
+        "note": "сразу после еды",
         "offset": 3
       },
       {
@@ -263,9 +395,21 @@
         "offset": 4
       },
       {
+        "id": "act1-cal-wardrobe",
+        "title": "Разобрать одежду",
+        "note": "зимнее отдельно",
+        "offset": 4
+      },
+      {
         "id": "act1-cal-dentist",
         "title": "Запись к стоматологу",
         "note": "позвонить в клинику",
+        "offset": 5
+      },
+      {
+        "id": "act1-cal-museum",
+        "title": "Выставка",
+        "note": "17:00",
         "offset": 5
       },
       {
@@ -275,10 +419,28 @@
         "offset": 6
       },
       {
+        "id": "act1-cal-print",
+        "title": "Распечатать документы",
+        "note": "по дороге",
+        "offset": 6
+      },
+      {
         "id": "act1-cal-market",
         "title": "Сходить на рынок",
         "note": "овощи, яйца, лимоны",
         "offset": 7
+      },
+      {
+        "id": "act1-cal-breakfast",
+        "title": "Завтрак с Сашей",
+        "note": "10:30",
+        "offset": 7
+      },
+      {
+        "id": "act1-cal-sheet",
+        "title": "Сменить постельное",
+        "note": "вечер",
+        "offset": 8
       },
       {
         "id": "act1-cal-docs",
@@ -293,9 +455,27 @@
         "offset": 10
       },
       {
+        "id": "act1-cal-walk",
+        "title": "Прогулка",
+        "note": "30 минут",
+        "offset": 10
+      },
+      {
+        "id": "act1-cal-lab",
+        "title": "Анализы",
+        "note": "08:15",
+        "offset": 11
+      },
+      {
         "id": "act1-cal-curtain",
         "title": "Постирать штору",
         "note": "та, которая уже подозрительно смотрит",
+        "offset": 12
+      },
+      {
+        "id": "act1-cal-call",
+        "title": "Созвон с куратором",
+        "note": "14:00",
         "offset": 12
       },
       {
@@ -305,10 +485,232 @@
         "offset": 13
       },
       {
+        "id": "act1-cal-library",
+        "title": "Забежать в библиотеку",
+        "note": "вернуть книгу",
+        "offset": 13
+      },
+      {
+        "id": "act1-cal-floor",
+        "title": "Помыть пол",
+        "note": "кухня и коридор",
+        "offset": 14
+      },
+      {
         "id": "act1-cal-bills",
         "title": "Оплатить интернет",
         "note": "до отключения",
         "offset": 15
+      },
+      {
+        "id": "act1-cal-train",
+        "title": "Купить билет",
+        "note": "если еще есть",
+        "offset": 15
+      },
+      {
+        "id": "act1-cal-box",
+        "title": "Разобрать коробку",
+        "note": "у двери",
+        "offset": 16
+      },
+      {
+        "id": "act1-cal-docscan",
+        "title": "Отсканировать паспорт",
+        "note": "для анкеты",
+        "offset": 17
+      },
+      {
+        "id": "act1-cal-research",
+        "title": "Посмотреть домик",
+        "note": "вечером",
+        "offset": 18
+      },
+      {
+        "id": "act1-cal-alarm",
+        "title": "Поставить будильник",
+        "note": "на завтра",
+        "offset": -11
+      },
+      {
+        "id": "act1-cal-wrap",
+        "title": "Забрать пленку",
+        "note": "из фотолаба",
+        "offset": -8
+      },
+      {
+        "id": "act1-cal-reply",
+        "title": "Ответить куратору",
+        "note": "до 16:00",
+        "offset": -6
+      },
+      {
+        "id": "act1-cal-kitchen",
+        "title": "Убрать кухню",
+        "note": "стол и раковина",
+        "offset": -5
+      },
+      {
+        "id": "act1-cal-sheets-dry",
+        "title": "Снять белье",
+        "note": "с сушилки",
+        "offset": -3
+      },
+      {
+        "id": "act1-cal-journal",
+        "title": "Записать сон",
+        "note": "пока не забылся",
+        "offset": -2
+      },
+      {
+        "id": "act1-cal-bank",
+        "title": "Проверить банк",
+        "note": "карта и баланс",
+        "offset": 0
+      },
+      {
+        "id": "act1-cal-route",
+        "title": "Продумать маршрут",
+        "note": "до вечера",
+        "offset": 4
+      },
+      {
+        "id": "act1-cal-lamp",
+        "title": "Купить лампочку",
+        "note": "в коридор",
+        "offset": 8
+      },
+      {
+        "id": "act1-cal-forms",
+        "title": "Заполнить анкету",
+        "note": "черновик",
+        "offset": 9
+      },
+      {
+        "id": "act1-cal-draft",
+        "title": "Дописать абзац",
+        "note": "хотя бы один",
+        "offset": 11
+      },
+      {
+        "id": "act1-cal-nails",
+        "title": "Подстричь ногти",
+        "note": "вечером",
+        "offset": 14
+      },
+      {
+        "id": "act1-cal-pickup",
+        "title": "Забрать заказ",
+        "note": "из пункта выдачи",
+        "offset": 16
+      },
+      {
+        "id": "act1-cal-mop",
+        "title": "Купить швабру",
+        "note": "если хватит сил",
+        "offset": 17
+      },
+      {
+        "id": "act1-cal-bedtime",
+        "title": "Лечь пораньше",
+        "note": "хотя бы сегодня",
+        "offset": 19
+      },
+      {
+        "id": "act1-cal-hall",
+        "title": "Разобрать прихожую",
+        "note": "обувь и пакеты",
+        "offset": 20
+      },
+      {
+        "id": "act1-cal-cook",
+        "title": "Сварить суп",
+        "note": "на два дня",
+        "offset": 21
+      },
+      {
+        "id": "act1-cal-call-grandma",
+        "title": "Позвонить бабушке",
+        "note": "днем",
+        "offset": 22
+      },
+      {
+        "id": "act1-cal-keys",
+        "title": "Найти запасные ключи",
+        "note": "до выхода",
+        "offset": 23
+      },
+      {
+        "id": "act1-cal-frame",
+        "title": "Купить рамку",
+        "note": "если увижу",
+        "offset": 24
+      },
+      {
+        "id": "act1-cal-lists",
+        "title": "Разобрать списки",
+        "note": "и старые заметки",
+        "offset": 25
+      },
+      {
+        "id": "act1-cal-tea",
+        "title": "Купить чай",
+        "note": "зеленый",
+        "offset": 26
+      },
+      {
+        "id": "act1-cal-visit",
+        "title": "Зайти к маме",
+        "note": "если получится",
+        "offset": 27
+      },
+      {
+        "id": "act1-cal-print-photo",
+        "title": "Распечатать фото",
+        "note": "одно хотя бы",
+        "offset": 28
+      },
+      {
+        "id": "act1-cal-journal-2",
+        "title": "Купить новый блокнот",
+        "note": "толстый",
+        "offset": 29
+      },
+      {
+        "id": "act1-cal-course",
+        "title": "Посмотреть лекцию",
+        "note": "хотя бы половину",
+        "offset": 30
+      },
+      {
+        "id": "act1-cal-drawer",
+        "title": "Разобрать ящик",
+        "note": "с проводами",
+        "offset": 31
+      },
+      {
+        "id": "act1-cal-post",
+        "title": "Отправить посылку",
+        "note": "до вечера",
+        "offset": 32
+      },
+      {
+        "id": "act1-cal-cook-rice",
+        "title": "Сварить рис",
+        "note": "на завтра",
+        "offset": 33
+      },
+      {
+        "id": "act1-cal-hospital",
+        "title": "Записаться к врачу",
+        "note": "снова",
+        "offset": 34
+      },
+      {
+        "id": "act1-cal-balcony",
+        "title": "Разобрать балкон",
+        "note": "коробки и банки",
+        "offset": 35
       }
     ]
   },

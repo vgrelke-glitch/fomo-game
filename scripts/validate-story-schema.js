@@ -69,6 +69,7 @@ const supportedSequenceTypes = new Set([
 const supportedEffectTypes = new Set([
   'openApp',
   'focusApp',
+  'flashScreen',
   'showNotification',
   'pushTerminalLine',
   'setFlag',

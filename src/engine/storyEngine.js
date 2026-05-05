@@ -1,6 +1,6 @@
 export const STORY_SAVE_SLOTS = {
   main: 'fomo_player_save_main_v1',
-  dev: 'fomo_dev_session_v1',
+  dev: 'fomo_dev_session_v2',
 };
 const LEGACY_STORY_SAVE_KEY = 'story_state_v1';
 

@@ -349,22 +349,9 @@
         "typingSpeedMs": 42
       },
       {
-        "id": "k_017c",
-        "type": "effect",
-        "delayMs": 4000,
-        "effects": [
-          {
-            "id": "k_fx_10c",
-            "type": "pushTerminalLine",
-            "text": "скажи что-нибудь"
-          }
-        ]
-      },
-      {
         "id": "k_018",
         "type": "message_player",
-        "text": "О чем книжка?",
-        "waitForEventId": "k_017c"
+        "text": "О чем книжка?"
       },
       {
         "id": "k_019",
@@ -733,17 +720,6 @@
         "type": "message_other",
         "text": "если получится - напечатаем книгу с твоим текстом!",
         "typingSpeedMs": 42
-      },
-      {
-        "id": "k_060da",
-        "type": "effect",
-        "effects": [
-          {
-            "id": "k_fx_flash_2",
-            "type": "flashScreen",
-            "durationMs": 1000
-          }
-        ]
       },
       {
         "id": "k_062",

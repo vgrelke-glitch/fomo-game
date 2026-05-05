@@ -45,6 +45,7 @@ function JsonBlock({ value }) {
 export default function DevEditorPanel({
   visible,
   onToggle,
+  showToggle = true,
   config,
   content,
   onConfigChange,
@@ -385,13 +386,15 @@ export default function DevEditorPanel({
 
   return (
     <>
-      <button
-        type="button"
-        className="editor-toggle"
-        onClick={onToggle}
-      >
-        {visible ? 'Скрыть редактор' : 'Показать редактор'}
-      </button>
+      {showToggle ? (
+        <button
+          type="button"
+          className="editor-toggle"
+          onClick={onToggle}
+        >
+          {visible ? 'Скрыть редактор' : 'Показать редактор'}
+        </button>
+      ) : null}
       <aside
         className={`editor-panel${visible ? '' : ' is-hidden'}`}
         style={{

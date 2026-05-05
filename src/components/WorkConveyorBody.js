@@ -51,6 +51,7 @@ export default function WorkConveyorBody({
       { id: 'sys-empty-1', tone: 'neutral', time: 'Система', text: 'Конвейер готов к приему текста.' },
       { id: 'sys-empty-2', tone: 'neutral', time: 'Статус', text: `Выполнено задач: ${submittedCount}.` },
     ];
+  const visibleRecentMessages = recentMessages.slice(0, 2);
 
   return (
     <div className="conveyor">
@@ -80,24 +81,59 @@ export default function WorkConveyorBody({
           </div>
         )}
         <div className="conveyor-header">
-          <div>
+          <div className="conveyor-header-copy">
             <div className="conveyor-app-title">Конвейер</div>
             <div className="conveyor-app-subtitle">Динамическая чек-таск машина</div>
+          </div>
+          <div className="conveyor-header-chip">
+            <span className="conveyor-header-chip-label">Активная задача</span>
+            <span className="conveyor-header-chip-value">{activeTask ? `#${activeTaskNumber}` : 'ожидание'}</span>
           </div>
         </div>
 
         <div className="conveyor-status-bar">
-          <div className="conveyor-status-card">
+          <div className="conveyor-status-card conveyor-status-card--efficiency">
             <div className="conveyor-status-label">Эффективность</div>
+            <div className="conveyor-status-head">
+              <div className="conveyor-status-value">{displayEfficiency}%</div>
+              <div className="conveyor-status-meta">рабочий темп</div>
+            </div>
             <div className="conveyor-status-meter">
               <div className="conveyor-status-fill" style={{ width: `${displayEfficiency}%` }} />
             </div>
-            <div className="conveyor-status-value">{displayEfficiency}%</div>
           </div>
-          <div className="conveyor-status-card conveyor-status-card--balance">
-            <div className="conveyor-status-label">Баланс</div>
-            <div className="conveyor-balance-value">{displayBalance}</div>
+          <div className="conveyor-status-card-wrap conveyor-status-card-wrap--balance">
+            <div className="conveyor-status-label conveyor-status-label--balance">Баланс</div>
+            <div className="conveyor-status-card conveyor-status-card--balance">
+              <div className="conveyor-balance-value">{displayBalance}</div>
+            </div>
           </div>
+          <div className="conveyor-status-card conveyor-status-card--tasks">
+            <div className="conveyor-status-label">Выполнено задач</div>
+            <div className="conveyor-status-tally">{submittedCount}</div>
+          </div>
+        </div>
+
+        <div className="conveyor-insights">
+          <section className="conveyor-side-panel conveyor-side-panel--messages">
+            <div className="conveyor-side-title">Последние сообщения</div>
+            <div className="conveyor-message-list">
+              {visibleRecentMessages.map((message) => (
+                <div key={message.id} className={`conveyor-message-item is-${message.tone || 'neutral'}`}>
+                  <div className="conveyor-message-time">{message.time}</div>
+                  <div className="conveyor-message-text">{message.text}</div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="conveyor-side-panel conveyor-side-panel--activity">
+            <div className="conveyor-side-title">Активность</div>
+            <div className="conveyor-metric-card">
+              <div className="conveyor-metric-label">Активный поток</div>
+              <div className="conveyor-metric-state">Высокая загрузка</div>
+            </div>
+          </section>
         </div>
 
         <div className="conveyor-main">
@@ -123,56 +159,32 @@ export default function WorkConveyorBody({
             <section className="conveyor-editor-card">
               <div className="conveyor-editor-head">
                 <div className="conveyor-editor-label">Ваш текст</div>
-                <div className="conveyor-editor-count">({progressCurrent} / {progressTotal})</div>
               </div>
-              <textarea
-                className="conveyor-textarea"
-                placeholder="Начните писать здесь..."
-                value={typedText}
-                onKeyDown={(event) => onTypeTaskKey(activeTask?.id, event)}
-                onChange={() => {}}
-                readOnly
-              />
-              <div className="conveyor-actions">
-                <button
-                  type="button"
-                  className={`conveyor-btn${isTaskSubmitted ? ' is-complete' : ''}${isSubmitting ? ' is-busy' : ''}`}
-                  disabled={!isTaskComplete || isTaskSubmitted || isSubmitting}
-                  onClick={() => onSubmitTask(activeTask?.id)}
-                >
-                  {isSubmitting
-                    ? (submitFeedback?.stage === 'checking' ? 'Проверка' : 'Отправка')
-                    : (submitLabel || 'Отправить текст')}
-                </button>
+              <div className="conveyor-editor-body">
+                <textarea
+                  className="conveyor-textarea"
+                  placeholder="Начните писать здесь..."
+                  value={typedText}
+                  onKeyDown={(event) => onTypeTaskKey(activeTask?.id, event)}
+                  onChange={() => {}}
+                  readOnly
+                />
+                <div className="conveyor-actions">
+                  <div className="conveyor-editor-count">({progressCurrent} / {progressTotal})</div>
+                  <button
+                    type="button"
+                    className={`conveyor-btn${isTaskSubmitted ? ' is-complete' : ''}${isSubmitting ? ' is-busy' : ''}`}
+                    disabled={!isTaskComplete || isTaskSubmitted || isSubmitting}
+                    onClick={() => onSubmitTask(activeTask?.id)}
+                  >
+                    {isSubmitting
+                      ? (submitFeedback?.stage === 'checking' ? 'Проверка' : 'Отправка')
+                      : (submitLabel || 'Отправить текст')}
+                  </button>
+                </div>
               </div>
             </section>
           </div>
-
-          <aside className="conveyor-sidebar">
-            <section className="conveyor-side-panel">
-              <div className="conveyor-side-title">Панель показателей</div>
-              <div className="conveyor-metric-card">
-                <div className="conveyor-metric-label">Выполнено задач</div>
-                <div className="conveyor-metric-value">{submittedCount}</div>
-              </div>
-              <div className="conveyor-metric-card">
-                <div className="conveyor-metric-label">Активный поток</div>
-                <div className="conveyor-metric-state">Высокая загрузка</div>
-              </div>
-            </section>
-
-            <section className="conveyor-side-panel">
-              <div className="conveyor-side-title">Последние сообщения</div>
-              <div className="conveyor-message-list">
-                {recentMessages.map((message) => (
-                  <div key={message.id} className={`conveyor-message-item is-${message.tone || 'neutral'}`}>
-                    <div className="conveyor-message-time">{message.time}</div>
-                    <div className="conveyor-message-text">{message.text}</div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          </aside>
         </div>
 
         <div className="conveyor-footer">

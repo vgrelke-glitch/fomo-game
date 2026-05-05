@@ -1,5 +1,6 @@
 import React from 'react';
 import TerminalWindowBody from './TerminalWindowBody';
+import SnakeGame from './SnakeGame';
 import WorkConveyorBody from './WorkConveyorBody';
 
 export default function AppWindowContent({
@@ -26,6 +27,7 @@ export default function AppWindowContent({
 }) {
   if (appType === 'notes') return renderNotesBody();
   if (appType === 'text-file') return renderTextFileBody(activeAppId);
+  if (appType === 'snake') return <SnakeGame />;
   if (appType === 'messenger') return renderMessengerBody();
   if (appType === 'work-conveyor') {
     return (

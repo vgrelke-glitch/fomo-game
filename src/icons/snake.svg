@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff8b8"/>
+      <stop offset="100%" stop-color="#ffd34d"/>
+    </linearGradient>
+    <linearGradient id="snake" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#31d158"/>
+      <stop offset="100%" stop-color="#11843a"/>
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="116" height="116" rx="24" fill="url(#bg)"/>
+  <path d="M84 26c-13.807 0-25 11.193-25 25v3h-6c-12.703 0-23 10.297-23 23s10.297 23 23 23h14c6.627 0 12 5.373 12 12h12c0-13.255-10.745-24-24-24H53c-6.075 0-11-4.925-11-11s4.925-11 11-11h23c8.837 0 16-7.163 16-16v-4h12c0-11.046-8.954-20-20-20z" fill="url(#snake)"/>
+  <circle cx="88" cy="36" r="4.5" fill="#ffffff"/>
+  <circle cx="89" cy="36" r="2.2" fill="#142414"/>
+  <path d="M99 33l11-7" stroke="#ff4d57" stroke-width="4" stroke-linecap="round"/>
+  <path d="M38 34h12v12H38z" fill="#ffffff" opacity=".55"/>
+  <path d="M38 50h12v12H38z" fill="#ffffff" opacity=".35"/>
+  <path d="M54 34h12v12H54z" fill="#ffffff" opacity=".35"/>
+</svg>
