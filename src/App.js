@@ -3,7 +3,6 @@ import logo from './logo.svg';
 import { useMemo, useCallback } from 'react';
 import iconNotes from './icons/заметки1.png';
 import iconTextFile from './icons/тексты.png';
-import iconSnake from './icons/snake.svg';
 import iconMessenger from './icons/мессенджер4.png';
 import iconSocial from './icons/соцсеть2.png';
 import iconCalendar from './icons/календарь2.png';
@@ -61,13 +60,13 @@ const ICON_IMAGE_BY_ID = {
   app8: iconTextFile,
   app9: iconTextFile,
   app10: iconTextFile,
-  app11: iconSnake,
+  app11: logo,
   exit: iconExit,
 };
 const ICON_IMAGE_BY_TYPE = {
   notes: iconNotes,
   'text-file': iconNotes,
-  snake: iconSnake,
+  snake: logo,
   messenger: iconMessenger,
   social: iconSocial,
   'work-conveyor': iconConveyor,
