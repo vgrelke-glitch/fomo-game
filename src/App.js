@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { Suspense, useState, useRef, useEffect } from 'react';
 import logo from './logo.svg';
 import { useMemo, useCallback } from 'react';
 import iconNotes from './icons/заметки1.png';
@@ -11,12 +11,14 @@ import iconExit from './icons/выход 2.png';
 import fromKPhoto1 from './fromK/ph1.png';
 import fromKPhoto1Alt from './fromK/ph2.png';
 import fromKPhoto2 from './fromK/ph3.png';
+import fromKDedHousePhoto from './fromK/дед1.png';
+import fromKRoofClosePhoto from './fromK/дед2.png';
+import fromKShedGardenPhoto from './fromK/дед3.png';
 import fromMPhoto2 from './fromM/картинка2.jpeg';
 import AppWindowContent from './components/AppWindowContent';
 import ChatAudioMessage from './components/ChatAudioMessage';
 import DesktopIcon from './components/DesktopIcon';
 import DesktopWindow from './components/DesktopWindow';
-import DevEditorPanel from './components/DevEditorPanel';
 import { STORY_CONTENT } from './content/storyContent';
 import { getEditorAppConfig, STORY_EDITOR_CONFIG } from './content/storyEditorConfig';
 import {
@@ -32,6 +34,8 @@ import {
 import { normalizeEditorConfig, normalizeEditorContent } from './engine/editorDraft';
 import { validateStoryContent } from './engine/storyValidation';
 import './App.css';
+
+const DevEditorPanel = React.lazy(() => import('./components/DevEditorPanel'));
 
 const INITIAL_EDITOR_CONTENT = normalizeEditorContent(STORY_CONTENT, STORY_CONTENT);
 const INITIAL_EDITOR_CONFIG = normalizeEditorConfig(STORY_EDITOR_CONFIG, STORY_EDITOR_CONFIG);
@@ -60,13 +64,11 @@ const ICON_IMAGE_BY_ID = {
   app8: iconTextFile,
   app9: iconTextFile,
   app10: iconTextFile,
-  app11: logo,
   exit: iconExit,
 };
 const ICON_IMAGE_BY_TYPE = {
   notes: iconNotes,
   'text-file': iconNotes,
-  snake: logo,
   messenger: iconMessenger,
   social: iconSocial,
   'work-conveyor': iconConveyor,
@@ -95,13 +97,11 @@ const clearLegacyEditorStorage = () => {
   });
 };
 const DEFAULT_WINDOW_SIZE = { width: 900, height: 620 };
-const SNAKE_WINDOW_SIZE = { width: 860, height: 640 };
 const CALENDAR_WINDOW_SIZE = { width: 980, height: 760 };
 const SOCIAL_WINDOW_SIZE = { width: 460, height: 760 };
 const getDefaultWindowSize = (id) => {
   if (id === 'app4') return SOCIAL_WINDOW_SIZE;
   if (id === 'app6') return CALENDAR_WINDOW_SIZE;
-  if (id === 'app11') return SNAKE_WINDOW_SIZE;
   return DEFAULT_WINDOW_SIZE;
 };
 const PHOTO_VIEWER_Z_INDEX = 1000;
@@ -165,6 +165,16 @@ const dedupePhotoReplyQueue = (entries = []) => {
     seen.add(fingerprint);
     return true;
   });
+};
+const createUniqueHistoryEntryId = (history = [], baseId = 'message') => {
+  const existingIds = new Set(history.map((entry) => entry?.id).filter(Boolean));
+  let candidate = baseId;
+  let suffix = 2;
+  while (existingIds.has(candidate)) {
+    candidate = `${baseId}-${suffix}`;
+    suffix += 1;
+  }
+  return candidate;
 };
 const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
   k_071: {
@@ -289,17 +299,195 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
       },
     ],
   },
+  'dynamic-k-house-photo-1': {
+    image: fromKDedHousePhoto,
+    alt: 'Дед у дома',
+    hotspots: [
+      {
+        id: 'ded',
+        label: 'Дед',
+        left: 0.35,
+        top: 0.32,
+        width: 0.16,
+        height: 0.60,
+        conversation: [
+          { direction: 'outgoing', text: 'Это он?' },
+          { direction: 'incoming', text: 'ага' },
+          { direction: 'incoming', text: 'он так рад вниманию' },
+          { direction: 'outgoing', text: 'Выглядит добрым' },
+          { direction: 'incoming', text: 'очень' },
+        ],
+      },
+      {
+        id: 'roof',
+        label: 'Крыша',
+        left: 0.08,
+        top: 0.06,
+        width: 0.73,
+        height: 0.24,
+        conversation: [
+          { direction: 'outgoing', text: 'Отсюда дырку не видно.' },
+          { direction: 'incoming', text: 'сейчас сниму поближе' },
+        ],
+      },
+      {
+        id: 'porch-wall',
+        label: 'Крыльцо / стена дома',
+        left: 0.33,
+        top: 0.22,
+        width: 0.43,
+        height: 0.47,
+        conversation: [
+          { direction: 'outgoing', text: 'У него дом как из сказки. Или из воспоминания...' },
+          { direction: 'incoming', text: 'да' },
+          { direction: 'incoming', text: 'он очень старый' },
+          { direction: 'outgoing', text: 'Внутри тоже?' },
+          { direction: 'incoming', text: 'ага. Он его я думаю непереставая чинит' },
+          { direction: 'incoming', text: 'тут и молодой бы устал чинить' },
+          { direction: 'incoming', text: 'сейчас, секунду' },
+        ],
+        postConversationEntries: [
+          {
+            id: 'dynamic-k-roof-close-photo-1',
+            direction: 'incoming',
+            text: '',
+            delayMs: 10000,
+          },
+        ],
+      },
+    ],
+  },
+  'dynamic-k-roof-close-photo-1': {
+    image: fromKRoofClosePhoto,
+    alt: 'Дыра в крыше поближе',
+    hotspots: [
+      {
+        id: 'roof-hole',
+        label: 'Дыра в крыше',
+        left: 0.33,
+        top: 0.34,
+        width: 0.24,
+        height: 0.22,
+        conversation: [
+          { direction: 'outgoing', text: 'С земли она выглядит больше.' },
+          { direction: 'incoming', text: 'да' },
+          { direction: 'incoming', text: 'какая-то она странная' },
+          { direction: 'outgoing', text: 'В смысле?' },
+          { direction: 'incoming', text: 'ну… как будто не очень метеоритная' },
+          { direction: 'outgoing', text: 'Почему?' },
+          { direction: 'incoming', text: 'не знаю, наверно представляла себе по-другому' },
+        ],
+      },
+      {
+        id: 'rusted-sheets',
+        label: 'Ржавые листы',
+        left: 0.53,
+        top: 0.36,
+        width: 0.34,
+        height: 0.22,
+        conversation: [
+          { direction: 'outgoing', text: 'Мда, ну тут и до метеорита нужен был ремонт' },
+          { direction: 'incoming', text: 'ага, это точно' },
+        ],
+      },
+      {
+        id: 'impact-direction',
+        label: 'Направление пробоины / скат',
+        left: 0.16,
+        top: 0.25,
+        width: 0.38,
+        height: 0.26,
+        conversation: [
+          { direction: 'incoming', text: 'сложно понять, откуда прилетело.' },
+          { direction: 'outgoing', text: 'Сверху?' },
+          { direction: 'incoming', text: 'ага, но дед как будто путается в показаниях' },
+        ],
+      },
+    ],
+  },
+  'dynamic-k-shed-garden-photo-1': {
+    image: fromKShedGardenPhoto,
+    alt: 'Сарай, грядки и велосипед',
+    hotspots: [
+      {
+        id: 'garden-beds',
+        label: 'Грядка',
+        left: 0.04,
+        top: 0.62,
+        width: 0.58,
+        height: 0.34,
+        conversation: [
+          { direction: 'outgoing', text: 'Грядки?' },
+          { direction: 'incoming', text: 'да, загляденье' },
+          { direction: 'incoming', text: 'боже я бы так хотела растить свой сад' },
+          {
+            direction: 'outgoing',
+            text: 'Я бы не смог, такая однообразная работа',
+            terminalComment: '> > C:\\Users\\G> ...а твоя работа очень разнообразная',
+          },
+        ],
+      },
+      {
+        id: 'bike',
+        label: 'Велосипед',
+        left: 0.60,
+        top: 0.56,
+        width: 0.21,
+        height: 0.21,
+        conversation: [
+          { direction: 'outgoing', text: 'у деда есть внуки?' },
+          { direction: 'incoming', text: 'нет, говорю же, он совсем один.' },
+          { direction: 'outgoing', text: 'Странно, а велик как будто детский.' },
+          { direction: 'incoming', text: 'может он там много лет валяется' },
+          { direction: 'outgoing', text: 'Не бывает бесхозных великов в деревне' },
+        ],
+      },
+      {
+        id: 'shed',
+        label: 'Сарай',
+        left: 0.44,
+        top: 0.20,
+        width: 0.42,
+        height: 0.46,
+        conversation: [
+          { direction: 'outgoing', text: 'Это его сарай?' },
+          { direction: 'incoming', text: 'он сказал он заброшенный' },
+          { direction: 'outgoing', text: 'Сходи туда?' },
+          { direction: 'incoming', text: 'он тебе кажется примечательным?' },
+          { direction: 'outgoing', text: 'ну, у нас же прогулка' },
+          { direction: 'incoming', text: 'окей!' },
+        ],
+      },
+    ],
+  },
   'dynamic-mama-photo-1': {
     image: fromMPhoto2,
     alt: 'Фото от мамы',
     hotspots: [],
   },
 };
+const REQUIRED_K_PHOTO_MESSAGE_IDS = ['k_071', 'k_072', 'k_073'];
 const areAllKPhotoHotspotsInspected = (inspectedByMessage = {}) => (
-  Object.entries(MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID).every(([messageId, attachment]) => {
+  REQUIRED_K_PHOTO_MESSAGE_IDS.every((messageId) => {
+    const attachment = MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID[messageId];
     const inspectedHotspots = inspectedByMessage[messageId] || [];
     return (attachment?.hotspots || []).every((hotspot) => inspectedHotspots.includes(hotspot.id));
   })
+);
+const areAllMessageHotspotsInspected = (messageId, inspectedByMessage = {}) => {
+  const attachment = MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID[messageId];
+  const hotspots = attachment?.hotspots || [];
+  if (hotspots.length === 0) return false;
+  const inspectedHotspots = inspectedByMessage[messageId] || [];
+  return hotspots.every((hotspot) => inspectedHotspots.includes(hotspot.id));
+};
+const createAllKPhotoHotspotsInspectedState = () => (
+  Object.fromEntries(
+    REQUIRED_K_PHOTO_MESSAGE_IDS.map((messageId) => [
+      messageId,
+      (MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID[messageId]?.hotspots || []).map((hotspot) => hotspot.id),
+    ]),
+  )
 );
 const isDynamicMessengerHistoryEntryId = (entryId) => typeof entryId === 'string' && (
   entryId.startsWith('photo-hotspot-') || entryId.startsWith('dynamic-')
@@ -372,10 +560,13 @@ const PERSISTENT_NOTIFICATION_LIFETIME_MS = 7000;
 const K_HOUSE_VOICE_DELAY_MS = 12000;
 const K_HOUSE_FOLLOWUP_DELAY_MS = 24000;
 const K_HOUSE_FRIEND_RECON_DELAY_MS = 30000;
+const K_SHED_STATUS_DELAY_MS = 60000;
 const SOCIAL_FIRST_OPEN_TERMINAL_TEXT = `Я знаю даже, как сейчас дела у нескольких случайных,
 Совершенно незнакомых мне людей`;
 const SOCIAL_SCROLL_TERMINAL_TEXT = 'да, отдохни немного, расслабь ум';
 const SOCIAL_SCROLL_TERMINAL_DELAY_MS = 10000;
+const SOCIAL_LOAD_THROTTLE_MS = 500;
+const SOCIAL_RENDER_WINDOW_SIZE = 60;
 
 const CONVEYOR_AMBIENT_NOTIFICATION_INTERVAL_MS = 30000;
 const CONVEYOR_AMBIENT_NOTIFICATION_COOLDOWN_MS = 60000;
@@ -758,6 +949,26 @@ const createFriendReconQueueEntry = () => ({
       blockedTerminalComment: '> > C:\\Users\\G> >> …',
       blockedFollowupDelayMs: 3000,
       blockedFinalTerminalComment: 'ну и ладно',
+      blockedPostConversationEntries: [
+        {
+          chatId: 'chat-k',
+          notificationTitle: 'К.',
+          entry: {
+            id: 'dynamic-k-house-return-1',
+            direction: 'incoming',
+            text: 'чай допит. Очень милый дед. Мне кажется, очень одинокий.',
+          },
+        },
+        {
+          chatId: 'chat-k',
+          notificationTitle: 'К.',
+          entry: {
+            id: 'dynamic-k-house-photo-1',
+            direction: 'incoming',
+            text: '',
+          },
+        },
+      ],
       blockedFollowupEntries: [
         {
           id: 'dynamic-friend-recon-followup-2',
@@ -802,6 +1013,7 @@ const createFriendReconQueueEntry = () => ({
 });
 const createDevCheckpointState = ({
   kTargetEventId,
+  friendConflictMode = 'queued',
 }) => {
   const baseState = createDefaultStoryState(INITIAL_EDITOR_CONTENT);
   let nextState = applyStoryEffects(baseState, [
@@ -826,13 +1038,15 @@ const createDevCheckpointState = ({
     },
   ]);
 
-  nextState = appendChatHistoryEntries(nextState, 'chat-druk', [
-    {
-      id: 'dynamic-friend-recon-start',
-      direction: 'incoming',
-      text: 'ты даже ничего не скажешь, серьезно?',
-    },
-  ]);
+  if (friendConflictMode === 'queued') {
+    nextState = appendChatHistoryEntries(nextState, 'chat-druk', [
+      {
+        id: 'dynamic-friend-recon-start',
+        direction: 'incoming',
+        text: 'ты даже ничего не скажешь, серьезно?',
+      },
+    ]);
+  }
 
   const checkpointWorkState = buildDevCheckpointWorkState(INITIAL_EDITOR_CONTENT, 3);
   const desktopStartSequenceIds = (INITIAL_EDITOR_CONTENT.sequences || [])
@@ -855,9 +1069,17 @@ const createDevCheckpointState = ({
       focusEffectEventIds: [],
       unreadChatIds: [],
       queuedPhotoRepliesByChat: {
-        'chat-druk': [createFriendReconQueueEntry()],
+        ...(friendConflictMode === 'queued'
+          ? { 'chat-druk': [createFriendReconQueueEntry()] }
+          : {}),
       },
       photoReplyInFlightByChat: {},
+      inspectedPhotoHotspotsByMessage: {
+        ...(nextState.messenger?.inspectedPhotoHotspotsByMessage || {}),
+        ...(friendConflictMode === 'after-k'
+          ? createAllKPhotoHotspotsInspectedState()
+          : {}),
+      },
       typingByChat: {
         ...(nextState.messenger?.typingByChat || {}),
         [TERMINAL_ADVENTURE_CHAT_ID]: {
@@ -1084,6 +1306,7 @@ function App() {
   const socialFeedRef = useRef(null);
   const socialPostIndexRef = useRef(0);
   const socialLoadingRef = useRef(false);
+  const socialLastLoadAtRef = useRef(0);
   const socialScrollPromptTimerRef = useRef(null);
   const runningSequencesRef = useRef(new Set());
   const sequenceTimersRef = useRef([]);
@@ -1095,6 +1318,7 @@ function App() {
   const friendReconTimersRef = useRef([]);
   const conveyorNotifTimersRef = useRef([]);
   const conveyorTerminalTimersRef = useRef([]);
+  const scheduledIncomingEntryIdsRef = useRef(new Set());
   const terminalLineCountRef = useRef(null);
   const messengerThreadRef = useRef(null);
   const messengerInputFieldRef = useRef(null);
@@ -1102,6 +1326,8 @@ function App() {
   const messengerInputStickyFocusRef = useRef(false);
   const messengerInputRestorePendingRef = useRef(false);
   const friendReconInputTerminalPendingRef = useRef(false);
+  const friendIgnoreTimerScheduledRef = useRef(false);
+  const friendBlockedRecoveryScheduledRef = useRef(false);
   const conveyorVisibilityRef = useRef({ visible: false, frontmost: false });
   const socialVisibilityRef = useRef(false);
   const conveyorEngagementGainRef = useRef(null);
@@ -1116,7 +1342,6 @@ function App() {
       app8: { x: 34, y: 602 },
       app9: { x: 122, y: 782 },
       app10: { x: 90, y: 868 },
-      app11: { x: 36, y: 26 },
       exit: { x: 640, y: 930 },
       app7: { x: 220, y: 56 },
     };
@@ -1190,8 +1415,15 @@ function App() {
   const storyStateRef = useRef(storyState);
   const openRef = useRef({});
   const minimizedRef = useRef({});
+  const activeChatIdRef = useRef('');
+  const winStateRef = useRef({});
+  const focusedWindowAppIdRef = useRef(storyState.ui?.focusedAppId || '');
+  const seenIncomingHistoryIdsRef = useRef({});
   const terminalPromptTimersRef = useRef([]);
   const persistentNotifTimersRef = useRef([]);
+  const notifiedIncomingEntryIdsRef = useRef(new Set());
+  const queuedReplyResumeKeysRef = useRef(new Set());
+  const bikeReplyRecoveryScheduledRef = useRef(false);
   const screenFlashTimerRef = useRef(null);
   const momIntroTimerRef = useRef(null);
   const prologueAudioRef = useRef(null);
@@ -1319,6 +1551,7 @@ function App() {
   const clearFriendReconTimers = useCallback(() => {
     friendReconTimersRef.current.forEach((id) => window.clearTimeout(id));
     friendReconTimersRef.current = [];
+    friendIgnoreTimerScheduledRef.current = false;
   }, []);
   const playMessageSendSound = useCallback(() => {
     if (typeof window === 'undefined') return;
@@ -1338,6 +1571,7 @@ function App() {
   }, []);
 
   const bringToFront = useCallback((id) => {
+    focusedWindowAppIdRef.current = id || '';
     setWinState((s) => {
       const maxZ = Math.max(...Object.values(s).map((w) => w.z || 1));
       const overlayBaseZ = activeMessengerPhotoMessageId ? PHOTO_VIEWER_Z_INDEX : 0;
@@ -1491,17 +1725,22 @@ function App() {
     });
   }, [persistRuntimeState]);
 
-  const isMessengerWindowVisible = useCallback(
-    () => !!openRef.current.app3 && !minimizedRef.current.app3,
-    [],
-  );
-
   const isMessengerWindowFrontmost = useCallback(() => {
     if (!openRef.current.app3 || minimizedRef.current.app3) return false;
-    const messengerZ = winState?.app3?.z || 0;
-    const maxZ = Math.max(...Object.values(winState || {}).map((windowItem) => windowItem?.z || 0), 0);
-    return messengerZ >= maxZ;
-  }, [winState]);
+    const focusedAppId = focusedWindowAppIdRef.current || '';
+    if (focusedAppId) return focusedAppId === 'app3';
+    const currentWinState = winStateRef.current || {};
+    const messengerZ = currentWinState?.app3?.z || 0;
+    const otherOpenWindowZ = Object.entries(currentWinState || {})
+      .filter(([appId]) => appId !== 'app3' && !!openRef.current[appId] && !minimizedRef.current[appId])
+      .map(([, windowItem]) => windowItem?.z || 0);
+    const maxOtherZ = otherOpenWindowZ.length > 0 ? Math.max(...otherOpenWindowZ) : 0;
+    return messengerZ > maxOtherZ;
+  }, []);
+
+  const isMessengerChatFrontmost = useCallback((chatId) => (
+    !!chatId && isMessengerWindowFrontmost() && activeChatIdRef.current === chatId
+  ), [isMessengerWindowFrontmost]);
 
   const clearUnreadChat = useCallback((chatId) => {
     if (!chatId) return;
@@ -1574,17 +1813,26 @@ function App() {
 
   const dismissPersistentNotifsByChatId = useCallback((chatId) => {
     if (!chatId) return;
-    setPersistentNotifs((prev) => prev.filter((notif) => notif.chatId !== chatId));
-    const removedEntries = persistentNotifTimersRef.current.filter((entry) => {
-      const notif = persistentNotifs.find((item) => item.id === entry.id);
-      return notif?.chatId === chatId;
+    setPersistentNotifs((prev) => {
+      const removedIds = new Set(
+        prev
+          .filter((notif) => notif.chatId === chatId)
+          .map((notif) => notif.id),
+      );
+      if (removedIds.size === 0) return prev;
+
+      persistentNotifTimersRef.current.forEach((entry) => {
+        if (removedIds.has(entry.id)) {
+          window.clearTimeout(entry.timerId);
+        }
+      });
+      persistentNotifTimersRef.current = persistentNotifTimersRef.current.filter(
+        (entry) => !removedIds.has(entry.id),
+      );
+
+      return prev.filter((notif) => notif.chatId !== chatId);
     });
-    removedEntries.forEach((entry) => window.clearTimeout(entry.timerId));
-    persistentNotifTimersRef.current = persistentNotifTimersRef.current.filter((entry) => {
-      const notif = persistentNotifs.find((item) => item.id === entry.id);
-      return notif?.chatId !== chatId;
-    });
-  }, [persistentNotifs]);
+  }, []);
 
   const pushPersistentNotif = useCallback(({ title, text, appId = 'app3', chatId = null, autoDismiss = true }) => {
     const notifId = `notif-${appId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
@@ -1642,10 +1890,172 @@ function App() {
     });
   }, [persistRuntimeState, pushPersistentNotif]);
 
+  const scheduleIncomingChatEntry = useCallback(({
+    chatId,
+    entry,
+    title = 'Сообщение',
+    notificationText = '',
+    delayMs = 0,
+    sound = null,
+    timerStoreRef = photoReplyTimersRef,
+  }) => {
+    if (!chatId || !entry?.id) return 0;
+
+    const scheduleKey = `${chatId}:${entry.id}`;
+    const notifyKey = `${chatId}:${entry.id}`;
+    const emitEntryNotification = () => {
+      if (notifiedIncomingEntryIdsRef.current.has(notifyKey)) return;
+      if (isMessengerChatFrontmost(chatId)) return;
+      notifiedIncomingEntryIdsRef.current.add(notifyKey);
+      if (sound === 'k') playKNotificationSound(false);
+      if (sound === 'friend') playFriendNotificationSound();
+      if (sound === 'mama') playMamaNotificationSound();
+      pushPersistentNotif({
+        title,
+        text: visibleText,
+        appId: 'app3',
+        chatId,
+      });
+    };
+
+    if (scheduledIncomingEntryIdsRef.current.has(scheduleKey)) {
+      return 0;
+    }
+
+    const existingHistory = storyStateRef.current?.messenger?.historyByChat?.[chatId] || [];
+    if (existingHistory.some((item) => item?.id === entry.id)) {
+      const visibleText = entry.text || notificationText || (entry.audioSrc ? 'Голосовое сообщение' : 'Фотография');
+      if (!notifiedIncomingEntryIdsRef.current.has(notifyKey) && !isMessengerChatFrontmost(chatId)) {
+        notifiedIncomingEntryIdsRef.current.add(notifyKey);
+        if (sound === 'k') playKNotificationSound(false);
+        if (sound === 'friend') playFriendNotificationSound();
+        if (sound === 'mama') playMamaNotificationSound();
+        pushPersistentNotif({
+          title,
+          text: visibleText,
+          appId: 'app3',
+          chatId,
+        });
+      }
+      return 0;
+    }
+
+    scheduledIncomingEntryIdsRef.current.add(scheduleKey);
+    const visibleText = entry.text || notificationText || (entry.audioSrc ? 'Голосовое сообщение' : 'Фотография');
+    const typingDurationMs = Math.max(0, Math.ceil(visibleText.length * PHOTO_REPLY_TYPING_SPEED_MS));
+    const startDelayMs = Math.max(0, Number(delayMs || 0));
+
+    const typingTimerId = window.setTimeout(() => {
+      setStoryState((prev) => {
+        const currentHistory = prev.messenger?.historyByChat?.[chatId] || [];
+        if (currentHistory.some((item) => item?.id === entry.id)) {
+          return prev;
+        }
+
+        const nextState = {
+          ...prev,
+          messenger: {
+            ...prev.messenger,
+            typingByChat: {
+              ...(prev.messenger?.typingByChat || {}),
+              [chatId]: {
+                active: true,
+                durationMs: typingDurationMs,
+              },
+            },
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
+    }, startDelayMs);
+    timerStoreRef.current.push(typingTimerId);
+
+    const messageTimerId = window.setTimeout(() => {
+      let didAppend = false;
+      setStoryState((prev) => {
+        const currentHistory = prev.messenger?.historyByChat?.[chatId] || [];
+        if (currentHistory.some((item) => item?.id === entry.id)) {
+          return prev;
+        }
+
+        didAppend = true;
+        const shouldSuppressAttention = isMessengerChatFrontmost(chatId);
+        const nextUnreadChatIds = shouldSuppressAttention
+          ? (prev.messenger?.unreadChatIds || []).filter((id) => id !== chatId)
+          : Array.from(new Set([...(prev.messenger?.unreadChatIds || []), chatId]));
+        const nextState = {
+          ...prev,
+          messenger: {
+            ...prev.messenger,
+            historyByChat: {
+              ...(prev.messenger?.historyByChat || {}),
+              [chatId]: [
+                ...currentHistory,
+                entry,
+              ],
+            },
+            typingByChat: {
+              ...(prev.messenger?.typingByChat || {}),
+              [chatId]: {
+                active: false,
+                durationMs: 0,
+              },
+            },
+            unreadChatIds: nextUnreadChatIds,
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
+      scheduledIncomingEntryIdsRef.current.delete(scheduleKey);
+
+      if (didAppend && !isMessengerChatFrontmost(chatId)) {
+        emitEntryNotification();
+      }
+    }, startDelayMs + typingDurationMs);
+    timerStoreRef.current.push(messageTimerId);
+
+    return startDelayMs + typingDurationMs;
+  }, [
+    isMessengerChatFrontmost,
+    persistRuntimeState,
+    playFriendNotificationSound,
+    playKNotificationSound,
+    playMamaNotificationSound,
+    pushPersistentNotif,
+  ]);
+
+  const notifyIncomingMessage = useCallback(({
+    chatId,
+    title = 'Сообщение',
+    text = '',
+    sound = null,
+    autoDismiss = true,
+  }) => {
+    if (!chatId || isMessengerChatFrontmost(chatId)) return;
+    if (sound === 'k') playKNotificationSound(false);
+    if (sound === 'friend') playFriendNotificationSound();
+    if (sound === 'mama') playMamaNotificationSound();
+    pushPersistentNotif({
+      title,
+      text,
+      appId: 'app3',
+      chatId,
+      autoDismiss,
+    });
+  }, [
+    isMessengerChatFrontmost,
+    playFriendNotificationSound,
+    playKNotificationSound,
+    playMamaNotificationSound,
+    pushPersistentNotif,
+  ]);
+
   const submitMessengerScriptEvent = useCallback((chatId, eventId, historyEntry = null) => {
     const scriptEvent = findScriptEventById(chatId, eventId);
     const isIncomingMessage = scriptEvent?.type === 'message_other' && historyEntry?.direction === 'incoming';
-    const shouldSuppressAttention = isMessengerWindowFrontmost() && activeChatId === chatId;
+    const shouldSuppressAttention = isMessengerChatFrontmost(chatId);
 
     setStoryState((prev) => {
       let nextState = completeMessengerScriptEvent(prev, editorContent, chatId, eventId, {
@@ -1666,18 +2076,12 @@ function App() {
     });
 
     if (isIncomingMessage && !shouldSuppressAttention) {
-      if (chatId === 'chat3') {
-        playMamaNotificationSound();
-      }
-      if (chatId === 'chat-k') {
-        playKNotificationSound(eventId === 'k_001');
-      }
       const chatTitle = editorContent.messenger.chats.find((chat) => chat.id === chatId)?.title || 'Мессенджер';
-      pushPersistentNotif({
+      notifyIncomingMessage({
+        chatId,
         title: chatTitle,
         text: historyEntry?.text || scriptEvent?.text || 'Новое сообщение',
-        appId: 'app3',
-        chatId,
+        sound: chatId === 'chat3' ? 'mama' : (chatId === 'chat-k' ? 'k' : null),
         autoDismiss: !(chatId === 'chat-k' && eventId === 'k_001'),
       });
     }
@@ -1703,7 +2107,7 @@ function App() {
           }
 
           const nextMamaHistory = nextState.messenger?.historyByChat?.chat3 || [];
-          const shouldSuppressMamaAttention = isMessengerWindowFrontmost() && activeChatId === 'chat3';
+          const shouldSuppressMamaAttention = isMessengerChatFrontmost('chat3');
           const nextUnreadChatIds = shouldSuppressMamaAttention
             ? (nextState.messenger?.unreadChatIds || []).filter((id) => id !== 'chat3')
             : Array.from(new Set([...(nextState.messenger?.unreadChatIds || []), 'chat3']));
@@ -1725,15 +2129,12 @@ function App() {
           return nextState;
         });
 
-        if (!(isMessengerWindowFrontmost() && activeChatId === 'chat3')) {
-          playMamaNotificationSound();
-          pushPersistentNotif({
-            title: 'Мама',
-            text: notifText,
-            appId: 'app3',
-            chatId: 'chat3',
-          });
-        }
+        notifyIncomingMessage({
+          chatId: 'chat3',
+          title: 'Мама',
+          text: notifText,
+          sound: 'mama',
+        });
       };
 
       const mamaPhotoTimerId = window.setTimeout(() => {
@@ -1756,14 +2157,11 @@ function App() {
       sequenceTimersRef.current.push(mamaSmileTimerId);
     }
   }, [
-    activeChatId,
     editorContent,
     findScriptEventById,
-    isMessengerWindowFrontmost,
+    notifyIncomingMessage,
+    isMessengerChatFrontmost,
     persistRuntimeState,
-    playKNotificationSound,
-    playMamaNotificationSound,
-    pushPersistentNotif,
   ]);
 
   const setTerminalPromptState = useCallback((updater) => {
@@ -1810,51 +2208,49 @@ function App() {
     appendTerminalLines([createTerminalProtocolLine('это потому, что ты отвлекся')]);
   }, [appendTerminalLines]);
 
+  const scheduleFriendSilenceFollowup = useCallback((delayMs = 20000) => {
+    const friendChatId = 'chat-druk';
+    const friendReplyId = 'dynamic-friend-recon-prompt';
+    if (friendIgnoreTimerScheduledRef.current) return;
+
+    friendIgnoreTimerScheduledRef.current = true;
+    const timerId = window.setTimeout(() => {
+      friendIgnoreTimerScheduledRef.current = false;
+      const currentState = storyStateRef.current || {};
+      const queuedReplies = currentState.messenger?.queuedPhotoRepliesByChat?.[friendChatId] || [];
+      if (!queuedReplies.some((entry) => entry?.id === friendReplyId)) return;
+
+      const friendHistory = currentState.messenger?.historyByChat?.[friendChatId] || [];
+      if (friendHistory.some((entry) => entry?.id === 'dynamic-friend-recon-ignore-1')) return;
+
+      scheduleIncomingChatEntry({
+        chatId: friendChatId,
+        entry: {
+          id: 'dynamic-friend-recon-ignore-1',
+          direction: 'incoming',
+          text: '???????',
+        },
+        title: 'Друг',
+        notificationText: '???????',
+        sound: 'friend',
+        timerStoreRef: friendReconTimersRef,
+      });
+    }, Math.max(0, Number(delayMs || 0)));
+    friendReconTimersRef.current.push(timerId);
+  }, [scheduleIncomingChatEntry]);
+
   const startFriendReconBranch = useCallback(() => {
     const friendChatId = 'chat-druk';
     const friendReplyId = 'dynamic-friend-recon-prompt';
 
-    const appendFriendHistoryEntry = (historyEntry, notifText) => {
-      setStoryState((prev) => {
-        const friendHistory = prev.messenger?.historyByChat?.[friendChatId] || [];
-        if (friendHistory.some((entry) => entry?.id === historyEntry.id)) {
-          return prev;
-        }
-        const shouldSuppressFriendAttention = isMessengerWindowFrontmost() && activeChatId === friendChatId;
-        const nextUnreadChatIds = shouldSuppressFriendAttention
-          ? (prev.messenger?.unreadChatIds || []).filter((id) => id !== friendChatId)
-          : Array.from(new Set([...(prev.messenger?.unreadChatIds || []), friendChatId]));
-        const nextState = {
-          ...prev,
-          messenger: {
-            ...prev.messenger,
-            historyByChat: {
-              ...(prev.messenger?.historyByChat || {}),
-              [friendChatId]: [
-                ...friendHistory,
-                historyEntry,
-              ],
-            },
-            unreadChatIds: nextUnreadChatIds,
-          },
-        };
-        persistRuntimeState(nextState);
-        return nextState;
-      });
-
-      if (!(isMessengerWindowFrontmost() && activeChatId === friendChatId)) {
-        playFriendNotificationSound();
-        pushPersistentNotif({
-          title: 'Друг',
-          text: notifText,
-          appId: 'app3',
-          chatId: friendChatId,
-        });
-      }
-    };
-
     const startNotifText = 'ты даже ничего не скажешь, серьезно?';
-    let didQueueFriendBranch = false;
+    const currentState = storyStateRef.current || {};
+    const existingQueueNow = currentState.messenger?.queuedPhotoRepliesByChat?.[friendChatId] || [];
+    const friendHistoryNow = currentState.messenger?.historyByChat?.[friendChatId] || [];
+    const hasStartEntryNow = friendHistoryNow.some((entry) => entry?.id === 'dynamic-friend-recon-start');
+    const hasQueuedBranchNow = existingQueueNow.some((entry) => entry?.id === friendReplyId);
+    const didAppendStartEntry = !hasStartEntryNow;
+    const didQueueFriendBranch = !hasQueuedBranchNow;
 
     setStoryState((prev) => {
       const existingQueue = prev.messenger?.queuedPhotoRepliesByChat?.[friendChatId] || [];
@@ -1864,11 +2260,10 @@ function App() {
       if (hasStartEntry && hasQueuedBranch) {
         return prev;
       }
-      const shouldSuppressFriendAttention = isMessengerWindowFrontmost() && activeChatId === friendChatId;
+      const shouldSuppressFriendAttention = isMessengerChatFrontmost(friendChatId);
       const nextUnreadChatIds = shouldSuppressFriendAttention
         ? (prev.messenger?.unreadChatIds || []).filter((id) => id !== friendChatId)
         : Array.from(new Set([...(prev.messenger?.unreadChatIds || []), friendChatId]));
-      didQueueFriendBranch = !hasQueuedBranch;
       const nextState = {
         ...prev,
         messenger: {
@@ -1892,160 +2287,7 @@ function App() {
               ? existingQueue
               : [
                 ...existingQueue,
-                {
-                  id: friendReplyId,
-                  label: 'Друг',
-                  conversation: [
-                    {
-                      direction: 'outgoing',
-                      text: 'Я не знаю, что мне сказать.',
-                    },
-                    {
-                      direction: 'incoming',
-                      text: 'можно попробовать «извини, что опять тебя продинамил»',
-                    },
-                    {
-                      direction: 'incoming',
-                      text: 'В чем твоя проблема?',
-                    },
-                    {
-                      direction: 'outgoing',
-                      text: 'Ты знаешь, что я уже месяц не выхожу из дома?',
-                    },
-                    {
-                      direction: 'outgoing',
-                      text: 'Ты хоть раз спросил, как у меня дела?',
-                    },
-                    {
-                      direction: 'incoming',
-                      text: 'я спрашивал!!! Ты не отвечал',
-                    },
-                    {
-                      direction: 'incoming',
-                      text: 'я звонил, ты не брал трубку',
-                    },
-                    {
-                      direction: 'incoming',
-                      text: 'я не телепат, чувак',
-                    },
-                    {
-                      direction: 'incoming',
-                      text: 'я вижу только, что ты обещал и не пришел, ОПЯТЬ',
-                    },
-                    {
-                      direction: 'outgoing',
-                      text: 'Потому что я не могу!',
-                    },
-                    {
-                      direction: 'incoming',
-                      text: 'почему???',
-                    },
-                    {
-                      direction: 'outgoing',
-                      text: 'Потому что мне плохо.',
-                    },
-                    {
-                      direction: 'incoming',
-                      text: 'почему??????',
-                      terminalComment: '> C:\\Users\\G> разве что-то не так?',
-                    },
-                    {
-                      direction: 'outgoing',
-                      text: 'Не знаю...',
-                    },
-                    {
-                      direction: 'incoming',
-                      text: '…',
-                    },
-                    {
-                      direction: 'outgoing',
-                      text: 'Думаю, потому, что у меня свободный доступ в мир, а я просиживаю задницу',
-                    },
-                    {
-                      direction: 'incoming',
-                      text: 'и поэтому не приходишь на тусовку?..',
-                    },
-                    {
-                      direction: 'outgoing',
-                      text: 'Не знаю. Это не так просто',
-                    },
-                    {
-                      direction: 'incoming',
-                      text: 'класс))',
-                    },
-                    {
-                      direction: 'outgoing',
-                      text: 'Ты когда-нибудь задумывался, что такой всеобъемлющей власти еще никогда не было у людей? Ни у кого, кто жил до нас.',
-                    },
-                    {
-                      direction: 'incoming',
-                      text: 'какой власти??',
-                    },
-                    {
-                      direction: 'outgoing',
-                      text: 'Под моим указательным пальцем находится вся культурная история человечества.',
-                    },
-                    {
-                      direction: 'incoming',
-                      text: 'рад за тебя',
-                    },
-                    {
-                      direction: 'outgoing',
-                      text: 'Я имею в виду что для нас нет вообще никаких ограничений, в пространстве, в информации.',
-                    },
-                    {
-                      direction: 'outgoing',
-                      text: 'Единственное ограничение - время. Каждая секунда важна, ими надо распоряжаться с умом',
-                    },
-                    {
-                      direction: 'outgoing',
-                      text: 'а я физически чувствую, как трачу их впустую.',
-                      sendBehavior: 'blocked_and_wiped',
-                      blockedTerminalComment: '> > C:\\Users\\G> >> …',
-                      blockedFollowupDelayMs: 3000,
-                      blockedFinalTerminalComment: 'ну и ладно',
-                      blockedFollowupEntries: [
-                        {
-                          id: 'dynamic-friend-recon-followup-2',
-                          direction: 'incoming',
-                          text: 'ладно, знаешь что',
-                        },
-                        {
-                          id: 'dynamic-friend-recon-followup-3',
-                          direction: 'incoming',
-                          text: 'проблема не в том, что ты не пришел',
-                        },
-                        {
-                          id: 'dynamic-friend-recon-followup-4',
-                          direction: 'incoming',
-                          text: 'проблема в том, что ты не считаешь нужным написать ДВА СЛОВА',
-                        },
-                        {
-                          id: 'dynamic-friend-recon-followup-5',
-                          direction: 'incoming',
-                          text: 'все, что ты думаешь, все это можно обсудить вживую, я же всегда тут',
-                        },
-                        {
-                          id: 'dynamic-friend-recon-followup-6',
-                          direction: 'incoming',
-                          text: 'ты ведешь себя так, как будто меня можно ставить на паузу и включать когда удобно',
-                        },
-                        {
-                          id: 'dynamic-friend-recon-followup-7',
-                          direction: 'incoming',
-                          text: 'это не так',
-                        },
-                        {
-                          id: 'dynamic-friend-recon-followup-8',
-                          direction: 'incoming',
-                          text: 'я больше так не хочу',
-                        },
-                      ],
-                    },
-                  ],
-                  terminalComment: '> C:\\Users\\G> активировать протокол «мои проблемы»',
-                  terminalCommentDelayMs: 2000,
-                },
+                createFriendReconQueueEntry(),
               ],
           },
           unreadChatIds: nextUnreadChatIds,
@@ -2055,37 +2297,231 @@ function App() {
       return nextState;
     });
 
-    if (didQueueFriendBranch) {
+    if (didAppendStartEntry || didQueueFriendBranch) {
       friendReconInputTerminalPendingRef.current = true;
-      if (!(isMessengerWindowFrontmost() && activeChatId === friendChatId)) {
-        playFriendNotificationSound();
-        pushPersistentNotif({
-          title: 'Друг',
-          text: startNotifText,
-          appId: 'app3',
-          chatId: friendChatId,
-        });
-      }
     }
 
-    const friendIgnoreTimerId = window.setTimeout(() => {
-      const queuedReplies = storyStateRef.current?.messenger?.queuedPhotoRepliesByChat?.[friendChatId] || [];
-      if (!queuedReplies.some((entry) => entry?.id === friendReplyId)) return;
-      appendFriendHistoryEntry({
-        id: 'dynamic-friend-recon-ignore-1',
-        direction: 'incoming',
-        text: '???????',
-      }, '???????');
-    }, 20000);
+    if (didAppendStartEntry) {
+      notifyIncomingMessage({
+        chatId: friendChatId,
+        title: 'Друг',
+        text: startNotifText,
+        sound: 'friend',
+      });
+    }
 
-    friendReconTimersRef.current.push(friendIgnoreTimerId);
+    if (didAppendStartEntry || didQueueFriendBranch) {
+      scheduleFriendSilenceFollowup(20000);
+    } else {
+      const queuedReplies = storyStateRef.current?.messenger?.queuedPhotoRepliesByChat?.[friendChatId] || [];
+      const friendHistory = storyStateRef.current?.messenger?.historyByChat?.[friendChatId] || [];
+      if (
+        queuedReplies.some((entry) => entry?.id === friendReplyId)
+        && friendHistory.some((entry) => entry?.id === 'dynamic-friend-recon-start')
+        && !friendHistory.some((entry) => entry?.id === 'dynamic-friend-recon-ignore-1')
+      ) {
+        scheduleFriendSilenceFollowup(20000);
+      }
+    }
   }, [
-    activeChatId,
-    isMessengerWindowFrontmost,
+    isMessengerChatFrontmost,
     persistRuntimeState,
-    playFriendNotificationSound,
-    pushPersistentNotif,
+    notifyIncomingMessage,
+    scheduleFriendSilenceFollowup,
   ]);
+
+  useEffect(() => {
+    const friendChatId = 'chat-druk';
+    const friendReplyId = 'dynamic-friend-recon-prompt';
+    const friendHistory = storyState.messenger?.historyByChat?.[friendChatId] || [];
+    const queuedReplies = storyState.messenger?.queuedPhotoRepliesByChat?.[friendChatId] || [];
+    const hasStartEntry = friendHistory.some((entry) => entry?.id === 'dynamic-friend-recon-start');
+    const hasIgnoreEntry = friendHistory.some((entry) => entry?.id === 'dynamic-friend-recon-ignore-1');
+    const hasQueuedBranch = queuedReplies.some((entry) => entry?.id === friendReplyId);
+
+    if (!hasStartEntry || hasIgnoreEntry || !hasQueuedBranch) return;
+    scheduleFriendSilenceFollowup(20000);
+  }, [
+    scheduleFriendSilenceFollowup,
+    storyState.messenger?.historyByChat,
+    storyState.messenger?.queuedPhotoRepliesByChat,
+  ]);
+
+  useEffect(() => {
+    const friendChatId = 'chat-druk';
+    const history = storyState.messenger?.historyByChat?.[friendChatId] || [];
+    if (history.length === 0) {
+      friendBlockedRecoveryScheduledRef.current = false;
+      return;
+    }
+
+    const hasFinalFollowup = history.some((entry) => entry?.id === 'dynamic-friend-recon-followup-8');
+    if (hasFinalFollowup) {
+      friendBlockedRecoveryScheduledRef.current = false;
+      return;
+    }
+
+    const hasBlockedOutgoing = history.some((entry) => (
+      entry?.direction === 'outgoing'
+      && entry?.text === 'а я физически чувствую, как трачу их впустую.'
+    ));
+    if (!hasBlockedOutgoing) {
+      friendBlockedRecoveryScheduledRef.current = false;
+      return;
+    }
+
+    const queuedReplies = storyState.messenger?.queuedPhotoRepliesByChat?.[friendChatId] || [];
+    const hasQueuedPrompt = queuedReplies.some((entry) => entry?.id === 'dynamic-friend-recon-prompt');
+    if (hasQueuedPrompt) return;
+
+    const typingState = storyState.messenger?.typingByChat?.[friendChatId];
+    if (typingState?.active) return;
+    if (photoReplyTimersRef.current.length > 0) return;
+
+    if (friendBlockedRecoveryScheduledRef.current) return;
+    friendBlockedRecoveryScheduledRef.current = true;
+
+    const reconPrompt = createFriendReconQueueEntry();
+    const blockedEntry = (reconPrompt.conversation || []).find((entry) => (
+      entry?.direction === 'outgoing' && entry?.sendBehavior === 'blocked_and_wiped'
+    ));
+    const blockedFollowupEntries = Array.isArray(blockedEntry?.blockedFollowupEntries)
+      ? blockedEntry.blockedFollowupEntries
+      : [];
+
+    const isFollowupAlreadyInHistory = (baseEntry) => history.some((historyEntry) => {
+      if (!historyEntry || historyEntry.direction !== 'incoming') return false;
+      const historyId = typeof historyEntry.id === 'string' ? historyEntry.id : '';
+      const baseId = typeof baseEntry?.id === 'string' ? baseEntry.id : '';
+      if (baseId && (historyId === baseId || historyId.startsWith(`${baseId}-`))) {
+        return true;
+      }
+      const baseText = (baseEntry?.text || '').trim();
+      const historyText = (historyEntry.text || '').trim();
+      return !!baseText && historyText === baseText;
+    });
+    const missingFollowups = blockedFollowupEntries.filter((entry) => (
+      entry?.id && !isFollowupAlreadyInHistory(entry)
+    ));
+    if (missingFollowups.length === 0) return;
+
+    const blockedPostConversationEntries = Array.isArray(blockedEntry?.blockedPostConversationEntries)
+      ? blockedEntry.blockedPostConversationEntries
+      : [];
+    const blockedFinalTerminalComment = blockedEntry?.blockedFinalTerminalComment || '';
+
+    let delayMs = 0;
+    missingFollowups.forEach((entry, index) => {
+      delayMs = scheduleIncomingChatEntry({
+        chatId: friendChatId,
+        entry: {
+          id: entry.id,
+          direction: 'incoming',
+          text: entry.text || '',
+        },
+        title: 'Друг',
+        notificationText: entry.text || 'Новое сообщение',
+        delayMs,
+        sound: 'friend',
+        timerStoreRef: photoReplyTimersRef,
+      }) + Number(editorConfig.timings.messageGapMs ?? 0);
+
+      if (index === missingFollowups.length - 1) {
+        if (blockedFinalTerminalComment) {
+          const terminalTimerId = window.setTimeout(() => {
+            appendTerminalLines([createTerminalProtocolLine(blockedFinalTerminalComment)]);
+          }, delayMs);
+          photoReplyTimersRef.current.push(terminalTimerId);
+        }
+
+        let postConversationOffsetMs = delayMs;
+        blockedPostConversationEntries.forEach((postEntry) => {
+          const targetChatId = postEntry?.chatId || '';
+          const historyEntry = postEntry?.entry || null;
+          if (!targetChatId || !historyEntry?.id) return;
+          const existingTargetHistory = storyStateRef.current?.messenger?.historyByChat?.[targetChatId] || [];
+          if (existingTargetHistory.some((entry) => entry?.id === historyEntry.id)) {
+            notifyIncomingMessage({
+              chatId: targetChatId,
+              title: postEntry.notificationTitle || 'Сообщение',
+              text: postEntry.notificationText || historyEntry.text || 'Фотография',
+              sound: targetChatId === TERMINAL_ADVENTURE_CHAT_ID ? 'k' : null,
+            });
+            return;
+          }
+          postConversationOffsetMs = scheduleIncomingChatEntry({
+            chatId: targetChatId,
+            entry: historyEntry,
+            title: postEntry.notificationTitle || 'Сообщение',
+            notificationText: postEntry.notificationText || historyEntry.text || 'Фотография',
+            delayMs: postConversationOffsetMs,
+            sound: targetChatId === TERMINAL_ADVENTURE_CHAT_ID ? 'k' : null,
+            timerStoreRef: photoReplyTimersRef,
+          }) + Number(editorConfig.timings.messageGapMs ?? 0);
+        });
+      }
+    });
+  }, [
+    appendTerminalLines,
+    editorConfig.timings.messageGapMs,
+    notifyIncomingMessage,
+    scheduleIncomingChatEntry,
+    storyState.messenger?.historyByChat,
+    storyState.messenger?.queuedPhotoRepliesByChat,
+    storyState.messenger?.typingByChat,
+  ]);
+
+  useEffect(() => {
+    const friendChatId = 'chat-druk';
+    const history = storyState.messenger?.historyByChat?.[friendChatId] || [];
+    if (history.length === 0) return;
+
+    const followupEntries = history.filter((entry) => (
+      entry?.direction === 'incoming'
+      && typeof entry?.id === 'string'
+      && entry.id.startsWith('dynamic-friend-recon-followup-')
+    ));
+    if (followupEntries.length < 2) return;
+
+    const seenBaseIds = new Set();
+    let changed = false;
+    const nextHistory = history.filter((entry) => {
+      if (
+        entry?.direction !== 'incoming'
+        || typeof entry?.id !== 'string'
+        || !entry.id.startsWith('dynamic-friend-recon-followup-')
+      ) {
+        return true;
+      }
+      const baseIdMatch = entry.id.match(/^dynamic-friend-recon-followup-\d+/);
+      const baseId = baseIdMatch ? baseIdMatch[0] : entry.id;
+      if (seenBaseIds.has(baseId)) {
+        changed = true;
+        return false;
+      }
+      seenBaseIds.add(baseId);
+      return true;
+    });
+
+    if (!changed) return;
+
+    setStoryState((prev) => {
+      const currentHistory = prev.messenger?.historyByChat?.[friendChatId] || [];
+      if (currentHistory.length !== history.length) return prev;
+      const nextState = {
+        ...prev,
+        messenger: {
+          ...prev.messenger,
+          historyByChat: {
+            ...(prev.messenger?.historyByChat || {}),
+            [friendChatId]: nextHistory,
+          },
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+  }, [persistRuntimeState, storyState.messenger?.historyByChat]);
 
   const scheduleAdventureAction = useCallback((delayMs, action) => {
     const timerId = window.setTimeout(() => {
@@ -2910,12 +3346,16 @@ function App() {
       hotspotId: hotspot.id,
       label: hotspot.label || '',
       conversation: normalizedConversation,
+      postConversationEntries: Array.isArray(hotspot.postConversationEntries)
+        ? hotspot.postConversationEntries
+        : [],
       terminalComment: hotspot.terminalComment || '',
     };
 
     setStoryState((prev) => {
       const existingQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
-      const nextUnreadChatIds = activeChatId === chatId
+      const shouldSuppressAttention = isMessengerChatFrontmost(chatId);
+      const nextUnreadChatIds = shouldSuppressAttention
         ? (prev.messenger?.unreadChatIds || []).filter((id) => id !== chatId)
         : Array.from(new Set([...(prev.messenger?.unreadChatIds || []), chatId]));
       const nextState = {
@@ -2932,7 +3372,7 @@ function App() {
       persistRuntimeState(nextState);
       return nextState;
     });
-  }, [activeChatId, persistRuntimeState]);
+  }, [isMessengerChatFrontmost, persistRuntimeState]);
 
   const submitQueuedPhotoReply = useCallback((chatId, queuedReply) => {
     if (!chatId || !queuedReply?.id) return;
@@ -2944,6 +3384,11 @@ function App() {
     const conversation = Array.isArray(queuedReply.conversation) ? queuedReply.conversation : [];
     const [firstEntry, ...remainingEntries] = conversation;
     if (!firstEntry || firstEntry.direction !== 'outgoing' || !firstEntry.text) return;
+    const currentHistorySnapshot = storyStateRef.current?.messenger?.historyByChat?.[chatId] || [];
+    const firstOutgoingText = (firstEntry.text || '').trim();
+    const shouldAppendOutgoing = !currentHistorySnapshot.some((historyEntry) => (
+      historyEntry?.direction === 'outgoing' && (historyEntry.text || '').trim() === firstOutgoingText
+    ));
 
     const queuedReplySendBehavior = firstEntry.sendBehavior || queuedReply.sendBehavior || '';
     if (queuedReplySendBehavior === 'blocked_and_wiped') {
@@ -2954,10 +3399,23 @@ function App() {
 
       setStoryState((prev) => {
         const existingQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+        const currentHistory = prev.messenger?.historyByChat?.[chatId] || [];
+        const outgoingEntry = {
+          id: createUniqueHistoryEntryId(currentHistory, `${queuedReply.id}-reply`),
+          direction: 'outgoing',
+          text: firstEntry.text,
+        };
         const nextState = {
           ...prev,
           messenger: {
             ...prev.messenger,
+            historyByChat: {
+              ...(prev.messenger?.historyByChat || {}),
+              [chatId]: [
+                ...currentHistory,
+                outgoingEntry,
+              ],
+            },
             queuedPhotoRepliesByChat: {
               ...(prev.messenger?.queuedPhotoRepliesByChat || {}),
               [chatId]: existingQueue.filter((item) => item.id !== queuedReply.id),
@@ -2996,6 +3454,11 @@ function App() {
       const blockedFinalTerminalComment = firstEntry.blockedFinalTerminalComment
         || queuedReply.blockedFinalTerminalComment
         || '';
+      const blockedPostConversationEntries = Array.isArray(firstEntry.blockedPostConversationEntries)
+        ? firstEntry.blockedPostConversationEntries
+        : Array.isArray(queuedReply.blockedPostConversationEntries)
+          ? queuedReply.blockedPostConversationEntries
+          : [];
 
       let timelineOffsetMs = Math.max(0, Number(firstEntry.blockedFollowupDelayMs || queuedReply.blockedFollowupDelayMs || 0));
 
@@ -3023,12 +3486,30 @@ function App() {
         photoReplyTimersRef.current.push(typingTimerId);
 
         const messageTimerId = window.setTimeout(() => {
+          let appendedFollowupText = entry.text || 'Новое сообщение';
+          let didAppendFollowup = false;
           setStoryState((prev) => {
             const currentHistory = prev.messenger?.historyByChat?.[chatId] || [];
-            if (currentHistory.some((item) => item?.id === entry.id)) {
+            const incomingText = (entry.text || '').trim();
+            const hasSameFollowup = currentHistory.some((item) => (
+              item?.direction === 'incoming'
+              && (
+                item?.id === entry.id
+                || (typeof item?.id === 'string' && typeof entry?.id === 'string' && item.id.startsWith(`${entry.id}-`))
+                || (!!incomingText && (item?.text || '').trim() === incomingText)
+              )
+            ));
+            if (hasSameFollowup) {
               return prev;
             }
-            const shouldSuppressAttention = activeChatId === chatId;
+            didAppendFollowup = true;
+            const nextEntryId = entry.id || createUniqueHistoryEntryId(currentHistory, 'dynamic-friend-recon-followup');
+            const nextHistoryEntry = {
+              ...entry,
+              id: nextEntryId,
+            };
+            appendedFollowupText = nextHistoryEntry.text || appendedFollowupText;
+            const shouldSuppressAttention = isMessengerChatFrontmost(chatId);
             const nextUnreadChatIds = shouldSuppressAttention
               ? (prev.messenger?.unreadChatIds || []).filter((id) => id !== chatId)
               : Array.from(new Set([...(prev.messenger?.unreadChatIds || []), chatId]));
@@ -3040,7 +3521,7 @@ function App() {
                   ...(prev.messenger?.historyByChat || {}),
                   [chatId]: [
                     ...currentHistory,
-                    entry,
+                    nextHistoryEntry,
                   ],
                 },
                 typingByChat: {
@@ -3057,18 +3538,45 @@ function App() {
             return nextState;
           });
 
-          if (activeChatId !== chatId) {
-            playFriendNotificationSound();
-            pushPersistentNotif({
-              title: 'Друг',
-              text: entry.text || 'Новое сообщение',
-              appId: 'app3',
+          if (didAppendFollowup) {
+            notifyIncomingMessage({
               chatId,
+              title: 'Друг',
+              text: appendedFollowupText,
+              sound: 'friend',
             });
           }
 
           if (blockedFinalTerminalComment && index === blockedFollowupEntries.length - 1) {
             appendTerminalLines([createTerminalProtocolLine(blockedFinalTerminalComment)]);
+          }
+
+          if (index === blockedFollowupEntries.length - 1 && blockedPostConversationEntries.length > 0) {
+            let postConversationOffsetMs = 0;
+            blockedPostConversationEntries.forEach((postEntry) => {
+              const targetChatId = postEntry?.chatId || '';
+              const historyEntry = postEntry?.entry || null;
+              if (!targetChatId || !historyEntry?.id) return;
+              const existingTargetHistory = storyStateRef.current?.messenger?.historyByChat?.[targetChatId] || [];
+              if (existingTargetHistory.some((entry) => entry?.id === historyEntry.id)) {
+                notifyIncomingMessage({
+                  chatId: targetChatId,
+                  title: postEntry.notificationTitle || 'Сообщение',
+                  text: postEntry.notificationText || historyEntry.text || 'Фотография',
+                  sound: targetChatId === TERMINAL_ADVENTURE_CHAT_ID ? 'k' : null,
+                });
+                return;
+              }
+
+              postConversationOffsetMs = scheduleIncomingChatEntry({
+                chatId: targetChatId,
+                entry: historyEntry,
+                title: postEntry.notificationTitle || 'Сообщение',
+                notificationText: postEntry.notificationText || historyEntry.text || 'Фотография',
+                delayMs: postConversationOffsetMs,
+                sound: targetChatId === TERMINAL_ADVENTURE_CHAT_ID ? 'k' : null,
+              }) + Number(editorConfig.timings.messageGapMs ?? 0);
+            });
           }
         }, timelineOffsetMs + typingDurationMs);
         photoReplyTimersRef.current.push(messageTimerId);
@@ -3078,15 +3586,20 @@ function App() {
       return;
     }
 
-    playMessageSendSound();
+    if (shouldAppendOutgoing) {
+      playMessageSendSound();
+    }
 
-    setTypedByChat((prev) => ({
-      ...prev,
-      [chatId]: '',
-    }));
+    if (shouldAppendOutgoing) {
+      setTypedByChat((prev) => ({
+        ...prev,
+        [chatId]: '',
+      }));
+    }
 
     setStoryState((prev) => {
       const existingQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+      const currentHistory = prev.messenger?.historyByChat?.[chatId] || [];
       const nextState = {
         ...prev,
         messenger: {
@@ -3094,12 +3607,14 @@ function App() {
           historyByChat: {
             ...(prev.messenger?.historyByChat || {}),
             [chatId]: [
-              ...(prev.messenger?.historyByChat?.[chatId] || []),
-              {
-                id: `${queuedReply.id}-reply`,
-                direction: 'outgoing',
-                text: firstEntry.text,
-              },
+              ...currentHistory,
+              ...(shouldAppendOutgoing
+                ? [{
+                  id: createUniqueHistoryEntryId(currentHistory, `${queuedReply.id}-reply`),
+                  direction: 'outgoing',
+                  text: firstEntry.text,
+                }]
+                : []),
             ],
           },
           queuedPhotoRepliesByChat: {
@@ -3122,6 +3637,14 @@ function App() {
       persistRuntimeState(nextState);
       return nextState;
     });
+
+    if (firstEntry.terminalComment) {
+      const entryTerminalDelayMs = Math.max(0, Number(firstEntry.terminalCommentDelayMs || 0));
+      const entryTerminalTimerId = window.setTimeout(() => {
+        appendTerminalLines([createTerminalProtocolLine(firstEntry.terminalComment)]);
+      }, entryTerminalDelayMs);
+      photoReplyTimersRef.current.push(entryTerminalTimerId);
+    }
 
     const nextOutgoingIndex = remainingEntries.findIndex((entry) => entry.direction === 'outgoing');
     const autoIncomingEntries = nextOutgoingIndex === -1
@@ -3181,7 +3704,9 @@ function App() {
         const isLastAutoIncoming = index === autoIncomingEntries.length - 1;
         const shouldDeferToNextOutgoing = isLastAutoIncoming && deferredConversation.length > 0;
         setStoryState((prev) => {
-          const nextUnreadChatIds = activeChatId === chatId
+          const currentHistory = prev.messenger?.historyByChat?.[chatId] || [];
+          const shouldSuppressAttention = isMessengerChatFrontmost(chatId);
+          const nextUnreadChatIds = shouldSuppressAttention
             ? (prev.messenger?.unreadChatIds || []).filter((id) => id !== chatId)
             : Array.from(new Set([...(prev.messenger?.unreadChatIds || []), chatId]));
           const existingQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
@@ -3192,9 +3717,9 @@ function App() {
               historyByChat: {
                 ...(prev.messenger?.historyByChat || {}),
                 [chatId]: [
-                  ...(prev.messenger?.historyByChat?.[chatId] || []),
+                  ...currentHistory,
                   {
-                    id: `${queuedReply.id}-step-${index}`,
+                    id: createUniqueHistoryEntryId(currentHistory, `${queuedReply.id}-step-${index}`),
                     direction: 'incoming',
                     text: entry.text,
                   },
@@ -3233,28 +3758,37 @@ function App() {
           return nextState;
         });
         if (isLastAutoIncoming && Array.isArray(queuedReply.postConversationEntries) && queuedReply.postConversationEntries.length > 0) {
-          setStoryState((prev) => {
-            const currentHistory = prev.messenger?.historyByChat?.[chatId] || [];
-            const dedupedPostEntries = queuedReply.postConversationEntries.filter((entry) => (
-              entry?.id
-              && !currentHistory.some((item) => item?.id === entry.id || (item?.text && item.text === entry.text))
-            ));
-            if (dedupedPostEntries.length === 0) return prev;
-            const nextState = {
-              ...prev,
-              messenger: {
-                ...prev.messenger,
-                historyByChat: {
-                  ...(prev.messenger?.historyByChat || {}),
-                  [chatId]: [
-                    ...currentHistory,
-                    ...dedupedPostEntries,
-                  ],
-                },
-              },
-            };
-            persistRuntimeState(nextState);
-            return nextState;
+          const immediatePostConversationEntries = queuedReply.postConversationEntries
+            .filter((entry) => Math.max(0, Number(entry?.delayMs || 0)) === 0);
+          const delayedPostConversationEntries = queuedReply.postConversationEntries
+            .filter((entry) => Math.max(0, Number(entry?.delayMs || 0)) > 0);
+
+          let postConversationOffsetMs = 0;
+          immediatePostConversationEntries.forEach((postEntry) => {
+            if (!postEntry?.id) return;
+            const { delayMs: _delayMs, notificationTitle: _notificationTitle, notificationText: _notificationText, ...historyEntry } = postEntry;
+            postConversationOffsetMs = scheduleIncomingChatEntry({
+              chatId,
+              entry: historyEntry,
+              title: postEntry.notificationTitle || (chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'К.' : 'Сообщение'),
+              notificationText: postEntry.notificationText || historyEntry.text || 'Фотография',
+              delayMs: postConversationOffsetMs,
+              sound: chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'k' : null,
+            }) + Number(editorConfig.timings.messageGapMs ?? 0);
+          });
+
+          delayedPostConversationEntries.forEach((postEntry) => {
+            if (!postEntry?.id) return;
+            const postDelayMs = Math.max(0, Number(postEntry.delayMs || 0));
+            const { delayMs: _delayMs, notificationTitle: _notificationTitle, notificationText: _notificationText, ...historyEntry } = postEntry;
+            scheduleIncomingChatEntry({
+              chatId,
+              entry: historyEntry,
+              title: postEntry.notificationTitle || (chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'К.' : 'Сообщение'),
+              notificationText: postEntry.notificationText || historyEntry.text || 'Фотография',
+              delayMs: postDelayMs,
+              sound: chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'k' : null,
+            });
           });
         }
         if (entry.terminalComment) {
@@ -3306,7 +3840,7 @@ function App() {
         return nextState;
       });
     }
-  }, [activeChatId, appendTerminalLines, clearFriendReconTimers, editorConfig.timings.messageGapMs, persistRuntimeState, playFriendNotificationSound, playMessageSendSound, pushPersistentNotif]);
+  }, [appendTerminalLines, clearFriendReconTimers, editorConfig.timings.messageGapMs, isMessengerChatFrontmost, notifyIncomingMessage, persistRuntimeState, playMessageSendSound, scheduleIncomingChatEntry]);
 
   const handleMessengerPhotoPointerMove = useCallback((event) => {
     if (!activeMessengerPhoto) return;
@@ -3993,6 +4527,107 @@ function App() {
   }, [minimized]);
 
   useEffect(() => {
+    activeChatIdRef.current = activeChatId;
+  }, [activeChatId]);
+
+  useEffect(() => {
+    const historyByChat = storyState.messenger?.historyByChat || {};
+    const chatTitleById = Object.fromEntries((editorContent.messenger?.chats || []).map((chat) => [chat.id, chat.title || 'Сообщение']));
+
+    const isFirstSync = Object.keys(seenIncomingHistoryIdsRef.current).length === 0;
+    if (isFirstSync) {
+      const bootstrap = {};
+      Object.entries(historyByChat).forEach(([chatId, history]) => {
+        bootstrap[chatId] = new Set(
+          (history || [])
+            .filter((entry) => entry?.direction === 'incoming' && entry?.id)
+            .map((entry) => entry.id),
+        );
+      });
+      seenIncomingHistoryIdsRef.current = bootstrap;
+      return;
+    }
+
+    Object.entries(historyByChat).forEach(([chatId, history]) => {
+      if (!seenIncomingHistoryIdsRef.current[chatId]) {
+        seenIncomingHistoryIdsRef.current[chatId] = new Set();
+      }
+      const seenIds = seenIncomingHistoryIdsRef.current[chatId];
+      (history || []).forEach((entry) => {
+        if (!entry?.id || entry.direction !== 'incoming') return;
+        if (seenIds.has(entry.id)) return;
+        seenIds.add(entry.id);
+
+        const attachment = getMessengerPhotoAttachment(entry.id);
+        const notifText = entry.text
+          || (entry.audioSrc ? 'Голосовое сообщение' : (attachment ? 'Фотография' : 'Новое сообщение'));
+        notifyIncomingMessage({
+          chatId,
+          title: chatTitleById[chatId] || 'Сообщение',
+          text: notifText,
+          sound: chatId === 'chat3' ? 'mama' : (chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'k' : (chatId === 'chat-druk' ? 'friend' : null)),
+        });
+      });
+    });
+  }, [editorContent.messenger?.chats, notifyIncomingMessage, storyState.messenger?.historyByChat]);
+
+  useEffect(() => {
+    winStateRef.current = winState;
+  }, [winState]);
+
+  useEffect(() => {
+    if (!isDevRoute) return () => {};
+
+    let prevSignature = '';
+    const timerId = window.setInterval(() => {
+      const messengerState = storyStateRef.current?.messenger || {};
+      const historyByChat = messengerState.historyByChat || {};
+      const historyCount = Object.values(historyByChat).reduce(
+        (acc, history) => acc + (Array.isArray(history) ? history.length : 0),
+        0,
+      );
+      const queuedRepliesByChat = messengerState.queuedPhotoRepliesByChat || {};
+      const queuedRepliesCount = Object.values(queuedRepliesByChat).reduce(
+        (acc, entries) => acc + (Array.isArray(entries) ? entries.length : 0),
+        0,
+      );
+      const memoryMb = Number(window.performance?.memory?.usedJSHeapSize || 0) / (1024 * 1024);
+      const diag = {
+        ts: new Date().toISOString(),
+        memoryMb: Number.isFinite(memoryMb) && memoryMb > 0 ? Number(memoryMb.toFixed(1)) : null,
+        socialPosts: socialPosts.length,
+        socialPostIndex: socialPostIndexRef.current,
+        historyCount,
+        terminalLines: (storyStateRef.current?.terminal?.lines || []).length,
+        persistentNotifs: persistentNotifs.length,
+        queuedReplies: queuedRepliesCount,
+        typingTimers: Object.keys(typingTimersRef.current || {}).length,
+        sequenceTimers: sequenceTimersRef.current.length,
+        beatRevealTimers: beatRevealTimersRef.current.length,
+        workSubmitTimers: workSubmitTimersRef.current.length,
+        kHouseTimers: kHouseSequenceTimersRef.current.length,
+        friendReconTimers: friendReconTimersRef.current.length,
+        conveyorNotifTimers: conveyorNotifTimersRef.current.length,
+        conveyorTerminalTimers: conveyorTerminalTimersRef.current.length,
+        photoReplyTimers: photoReplyTimersRef.current.length,
+        terminalPromptTimers: terminalPromptTimersRef.current.length,
+        persistentNotifTimers: persistentNotifTimersRef.current.length,
+        scheduledIncomingSet: scheduledIncomingEntryIdsRef.current.size,
+      };
+
+      const signature = JSON.stringify(diag);
+      if (signature !== prevSignature) {
+        prevSignature = signature;
+        window.__fomoDiag = diag;
+        // eslint-disable-next-line no-console
+        console.log('[fomo:diag]', diag);
+      }
+    }, 3000);
+
+    return () => window.clearInterval(timerId);
+  }, [isDevRoute, persistentNotifs.length, socialPosts.length]);
+
+  useEffect(() => {
     const messengerAppId = 'app3';
     const isMessengerVisible = !!open[messengerAppId] && !minimized[messengerAppId];
     if (!isMessengerVisible) return;
@@ -4110,6 +4745,8 @@ function App() {
     });
 
     setStoryState((prev) => {
+      // In dev we may have old checkpoints with player-message ids saved as raw event ids.
+      // Keep them as valid to avoid a repair loop that can trigger repeated re-renders.
       const historyByChat = prev.messenger?.historyByChat || {};
       let hasChanges = false;
       const nextHistoryByChat = Object.fromEntries(
@@ -4117,7 +4754,9 @@ function App() {
           const validIds = validHistoryIdsByChat.get(chatId);
           const nextHistory = (history || []).filter((entry) => {
             if (!validIds || !entry?.id) return true;
-            const shouldKeep = validIds.has(entry.id) || isDynamicMessengerHistoryEntryId(entry.id);
+            const shouldKeep = validIds.has(entry.id)
+              || validIds.has(`${entry.id}-reply`)
+              || isDynamicMessengerHistoryEntryId(entry.id);
             if (!shouldKeep) {
               hasChanges = true;
             }
@@ -4349,6 +4988,7 @@ function App() {
     friendReconTimersRef.current = [];
     photoReplyTimersRef.current.forEach((id) => window.clearTimeout(id));
     photoReplyTimersRef.current = [];
+    scheduledIncomingEntryIdsRef.current.clear();
     clearTerminalPromptTimers();
     persistentNotifTimersRef.current.forEach((entry) => window.clearTimeout(entry.timerId));
     persistentNotifTimersRef.current = [];
@@ -4543,6 +5183,9 @@ function App() {
   const closeWindow = (id) => {
     setOpen((p) => ({ ...p, [id]: false }));
     setMinimized((p) => ({ ...p, [id]: false }));
+    if (focusedWindowAppIdRef.current === id) {
+      focusedWindowAppIdRef.current = '';
+    }
     if (id === GAME_ICON_ID) {
       setGameScreen('start');
     }
@@ -4676,6 +5319,9 @@ function App() {
 
   const minimizeWindow = (id) => {
     setMinimized((p) => ({ ...p, [id]: true }));
+    if (focusedWindowAppIdRef.current === id) {
+      focusedWindowAppIdRef.current = '';
+    }
   };
 
   useEffect(() => {
@@ -4805,6 +5451,7 @@ function App() {
     friendReconTimersRef.current = [];
     photoReplyTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
     photoReplyTimersRef.current = [];
+    scheduledIncomingEntryIdsRef.current.clear();
     terminalPromptTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
     terminalPromptTimersRef.current = [];
   }, [editorContent, getDefaultIconPositions, getDefaultWindowState]);
@@ -4813,6 +5460,17 @@ function App() {
     if (!isDevRoute) return;
     const nextState = createDevCheckpointState({
       kTargetEventId: 'k_070',
+    });
+
+    clearStoryState('dev');
+    saveStoryState(nextState, 'dev');
+    restoreDefaultRuntimeState(nextState, 'game');
+  };
+  const launchDevFriendConflict = () => {
+    if (!isDevRoute) return;
+    const nextState = createDevCheckpointState({
+      kTargetEventId: 'k_073',
+      friendConflictMode: 'after-k',
     });
 
     clearStoryState('dev');
@@ -4964,7 +5622,7 @@ function App() {
       caption,
       likes,
       time: `${hours}ч`,
-      image: `https://picsum.photos/seed/fomo-${index}/900/1100`,
+      image: `https://picsum.photos/seed/fomo-${index}/450/550`,
     };
   }, []);
   const createSocialBatch = useCallback((count) => {
@@ -5086,13 +5744,29 @@ function App() {
           : false;
         const threadDate = activeScene?.dateLabel || threadDateLabel;
         const typingState = storyState.messenger?.typingByChat?.[active.id];
+        const hasFriendConflictStart = active.id === 'chat-druk'
+          && history.some((entry) => entry?.id === 'dynamic-friend-recon-start');
+        const hasFriendConflictFinal = active.id === 'chat-druk'
+          && history.some((entry) => entry?.id === 'dynamic-friend-recon-followup-8');
+        const hasFriendConflictQueued = active.id === 'chat-druk'
+          && queuedPhotoReplies.some((entry) => entry?.id === 'dynamic-friend-recon-prompt');
+        const hasFriendConflictFollowup = active.id === 'chat-druk'
+          && history.some((entry) => typeof entry?.id === 'string' && entry.id.startsWith('dynamic-friend-recon-followup-'));
+        const isFriendConflictInProgress = active.id === 'chat-druk'
+          && hasFriendConflictStart
+          && !hasFriendConflictFinal
+          && (hasFriendConflictQueued || hasFriendConflictFollowup || !!typingState?.active);
         const isSceneFinished = !!script && !nextEvent && !pendingQueuedPhotoReply && !isPhotoReplyInFlight;
         const idleInputText = isPhotoReplyInFlight
           ? ''
           : (isSceneFinished
             ? (
               active.id === 'chat-druk'
-                ? 'еще подумать над ответом'
+                ? (
+                  hasFriendConflictFinal
+                    ? 'вот и поговорили'
+                    : (isFriendConflictInProgress ? '' : 'еще подумать над ответом')
+                )
                 : active.id === 'chat3'
                   ? 'виноватое молчание сына, не купившего билеты'
                   : 'пока сказать нечего'
@@ -5149,7 +5823,7 @@ function App() {
                     const attachment = getMessengerPhotoAttachment(msg.id);
                     return (
                       <div
-                        key={msg.id || `${active.id}-${i}`}
+                        key={`${msg.id || `${active.id}-message`}-${i}`}
                         className={`thread-message ${msg.direction === 'outgoing' ? 'outgoing' : 'incoming'} ${activeChatThemeClass}${attachment ? ' thread-message--photo' : ''}${msg.audioSrc ? ' thread-message--audio' : ''}`}
                       >
                         {msg.text ? <div className="thread-message-text">{msg.text}</div> : null}
@@ -5555,9 +6229,14 @@ function App() {
   };
 
   const loadMoreSocial = useCallback(() => {
+    const now = Date.now();
     if (socialLoadingRef.current) return;
+    if (now - socialLastLoadAtRef.current < SOCIAL_LOAD_THROTTLE_MS) return;
     socialLoadingRef.current = true;
-    setSocialPosts((prev) => [...prev, ...createSocialBatch(6)]);
+    socialLastLoadAtRef.current = now;
+    setSocialPosts((prev) => (
+      [...prev, ...createSocialBatch(6)].slice(-SOCIAL_RENDER_WINDOW_SIZE)
+    ));
     requestAnimationFrame(() => {
       socialLoadingRef.current = false;
     });
@@ -5640,7 +6319,7 @@ function App() {
                 </div>
               </div>
               <div className="social-image-wrap">
-                <img src={post.image} alt={post.caption} />
+                <img src={post.image} alt={post.caption} loading="lazy" decoding="async" />
               </div>
               <div className="social-actions-row">
                 <button type="button">Нравится</button>
@@ -6032,14 +6711,15 @@ function App() {
   }, [bringToFront, openWindow, storyState.terminal?.lines, view]);
 
   useEffect(() => {
-    if (!isMessengerWindowVisible() || !activeChatId) return;
+    if (!isMessengerWindowFrontmost() || !activeChatId) return;
     clearUnreadChat(activeChatId);
-  }, [activeChatId, clearUnreadChat, isMessengerWindowVisible, open, minimized, storyState.messenger?.unreadChatIds]);
+  }, [activeChatId, clearUnreadChat, isMessengerWindowFrontmost, open, minimized, storyState.messenger?.unreadChatIds]);
 
   useEffect(() => {
-    if (!isMessengerWindowVisible() || !activeChatId) return;
+    if (!isMessengerWindowFrontmost() || !activeChatId) return;
+    if (!persistentNotifs.some((notif) => notif.chatId === activeChatId)) return;
     dismissPersistentNotifsByChatId(activeChatId);
-  }, [activeChatId, dismissPersistentNotifsByChatId, isMessengerWindowVisible, open, minimized]);
+  }, [activeChatId, dismissPersistentNotifsByChatId, isMessengerWindowFrontmost, open, minimized, persistentNotifs]);
 
   useEffect(() => {
     const activeScene = getActiveMessengerScene(editorContent, storyState.messenger, TERMINAL_ADVENTURE_CHAT_ID);
@@ -6179,8 +6859,7 @@ function App() {
         if (nextHistory.some((entry) => entry?.id === historyEntry.id)) {
           return prev;
         }
-        const shouldSuppressAttention = isMessengerWindowFrontmost()
-          && activeChatId === TERMINAL_ADVENTURE_CHAT_ID;
+        const shouldSuppressAttention = isMessengerChatFrontmost(TERMINAL_ADVENTURE_CHAT_ID);
         const nextUnreadChatIds = shouldSuppressAttention
           ? (prev.messenger?.unreadChatIds || []).filter((id) => id !== TERMINAL_ADVENTURE_CHAT_ID)
           : Array.from(new Set([...(prev.messenger?.unreadChatIds || []), TERMINAL_ADVENTURE_CHAT_ID]));
@@ -6243,15 +6922,12 @@ function App() {
         audioSrc: K_HOUSE_VOICE_AUDIO_SRC,
         audioLabel: 'Голосовое сообщение',
       });
-      if (!(isMessengerWindowFrontmost() && activeChatId === TERMINAL_ADVENTURE_CHAT_ID)) {
-        playKNotificationSound(false);
-        pushPersistentNotif({
-          title: 'К.',
-          text: 'Голосовое сообщение',
-          appId: 'app3',
-          chatId: TERMINAL_ADVENTURE_CHAT_ID,
-        });
-      }
+      notifyIncomingMessage({
+        chatId: TERMINAL_ADVENTURE_CHAT_ID,
+        title: 'К.',
+        text: 'Голосовое сообщение',
+        sound: 'k',
+      });
     }, K_HOUSE_VOICE_DELAY_MS);
 
     const followupTimerId = window.setTimeout(() => {
@@ -6260,15 +6936,12 @@ function App() {
         direction: 'incoming',
         text: 'я пошла на разведку! Убираю пока телефон',
       });
-      if (!(isMessengerWindowFrontmost() && activeChatId === TERMINAL_ADVENTURE_CHAT_ID)) {
-        playKNotificationSound(false);
-        pushPersistentNotif({
-          title: 'К.',
-          text: 'я пошла на разведку! Убираю пока телефон',
-          appId: 'app3',
-          chatId: TERMINAL_ADVENTURE_CHAT_ID,
-        });
-      }
+      notifyIncomingMessage({
+        chatId: TERMINAL_ADVENTURE_CHAT_ID,
+        title: 'К.',
+        text: 'я пошла на разведку! Убираю пока телефон',
+        sound: 'k',
+      });
     }, K_HOUSE_FOLLOWUP_DELAY_MS);
 
     const friendReconTimerId = window.setTimeout(() => {
@@ -6314,14 +6987,310 @@ function App() {
     activeChatId,
     appendTerminalLines,
     editorContent,
+    isMessengerChatFrontmost,
     isMessengerWindowFrontmost,
+    notifyIncomingMessage,
     persistRuntimeState,
-    playKNotificationSound,
     pushPersistentNotif,
     startFriendReconBranch,
     storyState.flags?.kHouseVoiceSequenceScheduled,
     storyState.messenger,
     typedByChat,
+  ]);
+
+  useEffect(() => {
+    const kHistory = storyState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [];
+    const returnMessageIndex = kHistory.findIndex((entry) => entry?.id === 'dynamic-k-house-return-1');
+    if (returnMessageIndex === -1) return;
+    if (kHistory.some((entry) => entry?.id === 'dynamic-k-house-photo-1')) return;
+
+    scheduleIncomingChatEntry({
+      chatId: TERMINAL_ADVENTURE_CHAT_ID,
+      entry: {
+        id: 'dynamic-k-house-photo-1',
+        direction: 'incoming',
+        text: '',
+      },
+      title: 'К.',
+      notificationText: 'Фотография',
+      sound: 'k',
+    });
+  }, [scheduleIncomingChatEntry, storyState.messenger?.historyByChat]);
+
+  useEffect(() => {
+    const roofPhotoMessageId = 'dynamic-k-roof-close-photo-1';
+    const nextPhotoMessageId = 'dynamic-k-shed-garden-photo-1';
+    const kHistory = storyState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [];
+    if (!kHistory.some((entry) => entry?.id === roofPhotoMessageId)) return;
+    if (kHistory.some((entry) => entry?.id === nextPhotoMessageId)) return;
+    if (!areAllMessageHotspotsInspected(roofPhotoMessageId, storyState.messenger?.inspectedPhotoHotspotsByMessage || {})) return;
+    const queuedPhotoReplies = storyState.messenger?.queuedPhotoRepliesByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [];
+    const hasPendingRepliesForRoofPhoto = queuedPhotoReplies.some((entry) => entry?.messageId === roofPhotoMessageId);
+    if (hasPendingRepliesForRoofPhoto) return;
+    const isPhotoReplyInFlight = !!storyState.messenger?.photoReplyInFlightByChat?.[TERMINAL_ADVENTURE_CHAT_ID];
+    if (isPhotoReplyInFlight) return;
+    const typingState = storyState.messenger?.typingByChat?.[TERMINAL_ADVENTURE_CHAT_ID];
+    if (typingState?.active) return;
+
+    scheduleIncomingChatEntry({
+      chatId: TERMINAL_ADVENTURE_CHAT_ID,
+      entry: {
+        id: nextPhotoMessageId,
+        direction: 'incoming',
+        text: '',
+      },
+      title: 'К.',
+      notificationText: 'Фотография',
+      delayMs: 10000,
+      sound: 'k',
+    });
+  }, [
+    scheduleIncomingChatEntry,
+    storyState.messenger?.historyByChat,
+    storyState.messenger?.inspectedPhotoHotspotsByMessage,
+    storyState.messenger?.photoReplyInFlightByChat,
+    storyState.messenger?.queuedPhotoRepliesByChat,
+    storyState.messenger?.typingByChat,
+  ]);
+
+  useEffect(() => {
+    const chatId = TERMINAL_ADVENTURE_CHAT_ID;
+    const ded3MessageId = 'dynamic-k-shed-garden-photo-1';
+    const history = storyState.messenger?.historyByChat?.[chatId] || [];
+    if (!history.some((entry) => entry?.id === ded3MessageId)) return;
+    if (!areAllMessageHotspotsInspected(ded3MessageId, storyState.messenger?.inspectedPhotoHotspotsByMessage || {})) return;
+
+    const queuedReplies = storyState.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+    const hasPendingRepliesForDed3 = queuedReplies.some((entry) => entry?.messageId === ded3MessageId);
+    if (hasPendingRepliesForDed3) return;
+    const isPhotoReplyInFlight = !!storyState.messenger?.photoReplyInFlightByChat?.[chatId];
+    if (isPhotoReplyInFlight) return;
+    const typingState = storyState.messenger?.typingByChat?.[chatId];
+    if (typingState?.active) return;
+
+    const sequenceEntries = [
+      { id: 'dynamic-k-shed-seq-1', text: 'иду в сарай', delayMs: 0 },
+      { id: 'dynamic-k-shed-seq-2', text: 'окей, я в сарае. Тут ничего интересного.', delayMs: K_SHED_STATUS_DELAY_MS },
+      { id: 'dynamic-k-shed-seq-3', text: 'дед говорил, что тут шарится банда местных мальчишек. Романтично по-моему.', delayMs: 1200 },
+      { id: 'dynamic-k-shed-seq-4', text: 'погоди-ка, тут еще лестница, сейчас залезу.', delayMs: 1200 },
+      { id: 'dynamic-k-shed-seq-5', text: 'ты не поверишь………………….', delayMs: 3500 },
+    ];
+
+    if (history.some((entry) => entry?.id === 'dynamic-k-shed-seq-1')) return;
+
+    let sequenceOffsetMs = 0;
+    sequenceEntries.forEach((entry, index) => {
+      sequenceOffsetMs += Math.max(0, Number(entry.delayMs || 0));
+      const totalDelayMs = sequenceOffsetMs;
+      scheduleIncomingChatEntry({
+        chatId,
+        entry: {
+          id: entry.id,
+          direction: 'incoming',
+          text: entry.text,
+        },
+        title: 'К.',
+        notificationText: entry.text,
+        delayMs: totalDelayMs,
+        sound: 'k',
+        timerStoreRef: kHouseSequenceTimersRef,
+      });
+      if (index < sequenceEntries.length - 1) {
+        sequenceOffsetMs += Number(editorConfig.timings.messageGapMs ?? 0);
+      }
+    });
+  }, [
+    editorConfig.timings.messageGapMs,
+    scheduleIncomingChatEntry,
+    storyState.messenger?.historyByChat,
+    storyState.messenger?.inspectedPhotoHotspotsByMessage,
+    storyState.messenger?.photoReplyInFlightByChat,
+    storyState.messenger?.queuedPhotoRepliesByChat,
+    storyState.messenger?.typingByChat,
+  ]);
+
+  useEffect(() => {
+    const chatId = TERMINAL_ADVENTURE_CHAT_ID;
+    const queuedReplies = storyState.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+    const isPhotoReplyInFlight = !!storyState.messenger?.photoReplyInFlightByChat?.[chatId];
+    const typingState = storyState.messenger?.typingByChat?.[chatId];
+    if (isPhotoReplyInFlight || typingState?.active) return;
+    const queuedReply = queuedReplies[0];
+    if (!queuedReply) return;
+    const firstEntry = (queuedReply.conversation || [])[0];
+    if (!firstEntry || firstEntry.direction !== 'outgoing' || !firstEntry.text) return;
+    const kHistory = storyState.messenger?.historyByChat?.[chatId] || [];
+    const hasOutgoingAlreadyInHistory = kHistory.some((entry) => (
+      entry?.direction === 'outgoing' && (entry.text || '').trim() === (firstEntry.text || '').trim()
+    ));
+    if (!hasOutgoingAlreadyInHistory) return;
+
+    const resumeKey = `${queuedReply.id}:${kHistory.length}`;
+    if (queuedReplyResumeKeysRef.current.has(resumeKey)) return;
+    queuedReplyResumeKeysRef.current.add(resumeKey);
+
+    submitQueuedPhotoReply(chatId, queuedReply);
+  }, [
+    storyState.messenger?.historyByChat,
+    storyState.messenger?.photoReplyInFlightByChat,
+    storyState.messenger?.queuedPhotoRepliesByChat,
+    storyState.messenger?.typingByChat,
+    submitQueuedPhotoReply,
+  ]);
+
+  useEffect(() => {
+    const chatId = TERMINAL_ADVENTURE_CHAT_ID;
+    const kHistory = storyState.messenger?.historyByChat?.[chatId] || [];
+    if (!kHistory.some((entry) => entry?.id === 'dynamic-k-shed-garden-photo-1')) return;
+    const hasBikeQuestion = kHistory.some((entry) => (
+      entry?.direction === 'outgoing' && entry?.text === 'у деда есть внуки?'
+    ));
+    if (!hasBikeQuestion) {
+      bikeReplyRecoveryScheduledRef.current = false;
+      return;
+    }
+    const hasBikeAnswer = kHistory.some((entry) => (
+      entry?.direction === 'incoming' && entry?.text === 'нет, говорю же, он совсем один.'
+    ));
+    if (hasBikeAnswer) {
+      bikeReplyRecoveryScheduledRef.current = false;
+      return;
+    }
+    const typingState = storyState.messenger?.typingByChat?.[chatId];
+    if (typingState?.active) return;
+    const queuedReplies = storyState.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+    const hasQueuedBikeContinuation = queuedReplies.some((entry) => (
+      entry?.messageId === 'dynamic-k-shed-garden-photo-1'
+      && entry?.hotspotId === 'bike'
+    ));
+    if (hasQueuedBikeContinuation) {
+      bikeReplyRecoveryScheduledRef.current = false;
+      return;
+    }
+    if (bikeReplyRecoveryScheduledRef.current) return;
+    bikeReplyRecoveryScheduledRef.current = true;
+
+    const deliveryDelayMs = scheduleIncomingChatEntry({
+      chatId,
+      entry: {
+        id: 'dynamic-k-shed-bike-recover-answer-1',
+        direction: 'incoming',
+        text: 'нет, говорю же, он совсем один.',
+      },
+      title: 'К.',
+      notificationText: 'нет, говорю же, он совсем один.',
+      sound: 'k',
+      timerStoreRef: photoReplyTimersRef,
+    });
+
+    const queueRemainderTimerId = window.setTimeout(() => {
+      setStoryState((prev) => {
+        const currentHistory = prev.messenger?.historyByChat?.[chatId] || [];
+        const alreadyQueued = (prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || []).some((entry) => (
+          entry?.messageId === 'dynamic-k-shed-garden-photo-1'
+          && entry?.hotspotId === 'bike'
+        ));
+        if (alreadyQueued) return prev;
+        const nextState = {
+          ...prev,
+          messenger: {
+            ...prev.messenger,
+            queuedPhotoRepliesByChat: {
+              ...(prev.messenger?.queuedPhotoRepliesByChat || {}),
+              [chatId]: dedupePhotoReplyQueue([
+                {
+                  id: `photo-hotspot-dynamic-k-shed-garden-photo-1-bike-recovered-${Date.now()}`,
+                  messageId: 'dynamic-k-shed-garden-photo-1',
+                  hotspotId: 'bike',
+                  label: 'Велосипед',
+                  conversation: [
+                    { direction: 'outgoing', text: 'Странно, а велик как будто детский.' },
+                    { direction: 'incoming', text: 'может он там много лет валяется' },
+                    { direction: 'outgoing', text: 'Не бывает бесхозных великов в деревне' },
+                  ],
+                  postConversationEntries: [],
+                  terminalComment: '',
+                },
+                ...(prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || []),
+              ]),
+            },
+            photoReplyInFlightByChat: {
+              ...(prev.messenger?.photoReplyInFlightByChat || {}),
+              [chatId]: false,
+            },
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
+      bikeReplyRecoveryScheduledRef.current = false;
+    }, deliveryDelayMs + Number(editorConfig.timings.messageGapMs ?? 0));
+    photoReplyTimersRef.current.push(queueRemainderTimerId);
+  }, [
+    editorConfig.timings.messageGapMs,
+    persistRuntimeState,
+    scheduleIncomingChatEntry,
+    storyState.messenger?.historyByChat,
+    storyState.messenger?.queuedPhotoRepliesByChat,
+    storyState.messenger?.typingByChat,
+  ]);
+
+  useEffect(() => {
+    if (!storyState.flags?.kHouseVoiceSequenceScheduled) return;
+    if (kHouseSequenceTimersRef.current.length > 0) return;
+
+    const chatId = TERMINAL_ADVENTURE_CHAT_ID;
+    const kHistory = storyState.messenger?.historyByChat?.[chatId] || [];
+    const hasDeparting = kHistory.some((entry) => entry?.id === 'dynamic-k-house-departing');
+    const hasVoice = kHistory.some((entry) => entry?.id === 'dynamic-k-house-voice');
+    const hasFollowup = kHistory.some((entry) => entry?.id === 'dynamic-k-house-followup');
+    if (!hasDeparting || hasVoice && hasFollowup) return;
+
+    const queuedPhotoReplies = storyState.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+    const isPhotoReplyInFlight = !!storyState.messenger?.photoReplyInFlightByChat?.[chatId];
+    if (queuedPhotoReplies.length > 0 || isPhotoReplyInFlight) return;
+
+    if (!hasVoice) {
+      const voiceDelayMs = 1500;
+      scheduleIncomingChatEntry({
+        chatId,
+        entry: {
+          id: 'dynamic-k-house-voice',
+          direction: 'incoming',
+          text: '',
+          audioSrc: K_HOUSE_VOICE_AUDIO_SRC,
+          audioLabel: 'Голосовое сообщение',
+        },
+        title: 'К.',
+        notificationText: 'Голосовое сообщение',
+        delayMs: voiceDelayMs,
+        sound: 'k',
+        timerStoreRef: kHouseSequenceTimersRef,
+      });
+    }
+
+    if (!hasFollowup) {
+      const followupDelayMs = hasVoice ? 2000 : 4500;
+      scheduleIncomingChatEntry({
+        chatId,
+        entry: {
+          id: 'dynamic-k-house-followup',
+          direction: 'incoming',
+          text: 'я пошла на разведку! Убираю пока телефон',
+        },
+        title: 'К.',
+        notificationText: 'я пошла на разведку! Убираю пока телефон',
+        delayMs: followupDelayMs,
+        sound: 'k',
+        timerStoreRef: kHouseSequenceTimersRef,
+      });
+    }
+  }, [
+    scheduleIncomingChatEntry,
+    storyState.flags?.kHouseVoiceSequenceScheduled,
+    storyState.messenger?.historyByChat,
+    storyState.messenger?.photoReplyInFlightByChat,
+    storyState.messenger?.queuedPhotoRepliesByChat,
   ]);
 
   useEffect(() => {
@@ -6393,41 +7362,43 @@ function App() {
 
   return (
     <div className="app-shell">
-      {isDevRoute && (
-        <DevEditorPanel
-          visible={editorVisible}
-          onToggle={() => setEditorVisible((prev) => !prev)}
-          showToggle={false}
-          config={editorConfig}
-          content={editorContent}
-          onConfigChange={setEditorConfig}
-          onContentChange={setEditorContent}
-          onSaveDraft={saveEditorDraft}
-          onRestoreLastSnapshot={restoreLastEditorSnapshot}
-          onDownloadScenarioJson={downloadEditorScenarioJson}
-          onImportScenarioJson={importEditorScenarioJson}
-          onResetDraft={() => {
-            const nextConfig = normalizeEditorConfig(STORY_EDITOR_CONFIG, STORY_EDITOR_CONFIG);
-            const nextContent = normalizeEditorContent(STORY_CONTENT, STORY_CONTENT);
-            setEditorConfig(nextConfig);
-            setEditorContent(nextContent);
-            setEditorDraftSavedAt(null);
-            setEditorAutoSavedAt(null);
-            setEditorLastGoodSavedAt(null);
-            setEditorSnapshots([]);
-            setEditorDraftBaseline(JSON.stringify({
-              config: nextConfig,
-              content: nextContent,
-            }));
-            clearLegacyEditorStorage();
-          }}
-          savedAt={editorDraftSavedAt}
-          autoSavedAt={editorAutoSavedAt}
-          lastGoodSavedAt={editorLastGoodSavedAt}
-          snapshotCount={editorSnapshots.length}
-          hasUnsavedChanges={hasUnsavedEditorChanges}
-          issues={validationIssues}
-        />
+      {isDevRoute && editorVisible && (
+        <Suspense fallback={null}>
+          <DevEditorPanel
+            visible={editorVisible}
+            onToggle={() => setEditorVisible((prev) => !prev)}
+            showToggle={false}
+            config={editorConfig}
+            content={editorContent}
+            onConfigChange={setEditorConfig}
+            onContentChange={setEditorContent}
+            onSaveDraft={saveEditorDraft}
+            onRestoreLastSnapshot={restoreLastEditorSnapshot}
+            onDownloadScenarioJson={downloadEditorScenarioJson}
+            onImportScenarioJson={importEditorScenarioJson}
+            onResetDraft={() => {
+              const nextConfig = normalizeEditorConfig(STORY_EDITOR_CONFIG, STORY_EDITOR_CONFIG);
+              const nextContent = normalizeEditorContent(STORY_CONTENT, STORY_CONTENT);
+              setEditorConfig(nextConfig);
+              setEditorContent(nextContent);
+              setEditorDraftSavedAt(null);
+              setEditorAutoSavedAt(null);
+              setEditorLastGoodSavedAt(null);
+              setEditorSnapshots([]);
+              setEditorDraftBaseline(JSON.stringify({
+                config: nextConfig,
+                content: nextContent,
+              }));
+              clearLegacyEditorStorage();
+            }}
+            savedAt={editorDraftSavedAt}
+            autoSavedAt={editorAutoSavedAt}
+            lastGoodSavedAt={editorLastGoodSavedAt}
+            snapshotCount={editorSnapshots.length}
+            hasUnsavedChanges={hasUnsavedEditorChanges}
+            issues={validationIssues}
+          />
+        </Suspense>
       )}
       {view === 'prologue' ? (
         <div className="prologue-screen" key="prologue" onClick={handlePrologueClick} role="presentation">
@@ -6510,6 +7481,13 @@ function App() {
               >
                 Второй акт
               </button>
+              <button
+                type="button"
+                className="dev-launch-btn"
+                onClick={launchDevFriendConflict}
+              >
+                К ссоре с другом
+              </button>
             </div>
           )}
           {screenFlashActive && <div className="screen-flash" aria-hidden="true" />}
@@ -6523,7 +7501,7 @@ function App() {
                     position: 'absolute',
                     right: '22px',
                     bottom: `${22 + ((persistentNotifs.length - 1 - index) * 88)}px`,
-                    zIndex: 100 + index,
+                    zIndex: 1000000 + index,
                   }}
                   type="button"
                   onClick={() => handlePersistentNotifClick(notif)}
@@ -6570,9 +7548,7 @@ function App() {
                       ? 'window--calendar'
                       : getAppType(it.id) === 'text-file'
                         ? 'window--text-file'
-                        : getAppType(it.id) === 'snake'
-                          ? 'window--snake'
-                          : ''}
+                        : ''}
                 visible={!!open[it.id] && !minimized[it.id]}
                 size={winState[it.id].size}
                 pos={winState[it.id].pos}
