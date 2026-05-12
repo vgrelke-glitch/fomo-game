@@ -27,3 +27,7 @@ public/files/kitchen_v2.mov
 
 public/files/kitchen_v2.mp4
 public/files/kitchen_v2.mov
+
+# local working artifacts
+backups/
+files/

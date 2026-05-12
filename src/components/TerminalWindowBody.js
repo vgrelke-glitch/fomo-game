@@ -5,16 +5,29 @@ const TYPE_SPEED_MS = 22;
 const ADVENTURE_PROMPT_LINE_TEXT = 'запустить_процесс: приключение.ехе?..';
 const TERMINAL_PRINT_AUDIO_SRC = '/files/audio/terminal_print.mp3';
 
-function TerminalStaticLine({ text }) {
+function TerminalStaticLine({
+  text,
+  promptText = TERMINAL_PROMPT,
+  textClassName = '',
+  noPromptGap = false,
+}) {
   return (
     <div className="terminal-line">
-      <span className="terminal-prompt">{TERMINAL_PROMPT} </span>
-      <span className="terminal-line-text">{text}</span>
+      {promptText ? <span className="terminal-prompt">{promptText}{noPromptGap ? '' : ' '}</span> : null}
+      <span className={`terminal-line-text${textClassName ? ` ${textClassName}` : ''}`}>{text}</span>
     </div>
   );
 }
 
-function TerminalAnimatedLine({ lineId, text, onComplete, typeSpeedMs = TYPE_SPEED_MS }) {
+function TerminalAnimatedLine({
+  lineId,
+  text,
+  onComplete,
+  typeSpeedMs = TYPE_SPEED_MS,
+  promptText = TERMINAL_PROMPT,
+  textClassName = '',
+  noPromptGap = false,
+}) {
   const [visibleLength, setVisibleLength] = useState(0);
 
   useEffect(() => {
@@ -42,8 +55,8 @@ function TerminalAnimatedLine({ lineId, text, onComplete, typeSpeedMs = TYPE_SPE
 
   return (
     <div className="terminal-line">
-      <span className="terminal-prompt">{TERMINAL_PROMPT} </span>
-      <span className="terminal-line-text">{text.slice(0, visibleLength)}</span>
+      {promptText ? <span className="terminal-prompt">{promptText}{noPromptGap ? '' : ' '}</span> : null}
+      <span className={`terminal-line-text${textClassName ? ` ${textClassName}` : ''}`}>{text.slice(0, visibleLength)}</span>
     </div>
   );
 }
@@ -55,6 +68,8 @@ function TerminalPromptActions({ prompt, onAcceptPrompt, onRejectPrompt }) {
   }
 
   const areActionsDisabled = prompt.stage !== 'choice';
+  const acceptLabel = (prompt?.acceptLabel || 'ДА').toUpperCase();
+  const rejectLabel = (prompt?.rejectLabel || 'НЕТ').toUpperCase();
 
   return (
     <div className="terminal-line terminal-line--prompt-actions">
@@ -64,7 +79,7 @@ function TerminalPromptActions({ prompt, onAcceptPrompt, onRejectPrompt }) {
         onClick={onAcceptPrompt}
         disabled={areActionsDisabled}
       >
-        [ДА]
+        [{acceptLabel}]
       </button>
       <button
         type="button"
@@ -72,7 +87,7 @@ function TerminalPromptActions({ prompt, onAcceptPrompt, onRejectPrompt }) {
         onClick={onRejectPrompt}
         disabled={!!prompt.noDisabled || areActionsDisabled}
       >
-        [НЕТ]
+        [{rejectLabel}]
       </button>
     </div>
   );
@@ -177,6 +192,9 @@ export default function TerminalWindowBody({
                   text={line.text || ''}
                   onComplete={onCompleteLine}
                   typeSpeedMs={line.typeSpeedMs}
+                  promptText={typeof line.promptText === 'string' ? line.promptText : TERMINAL_PROMPT}
+                  textClassName={line.textClassName || ''}
+                  noPromptGap={!!line.noPromptGap}
                 />
                 {shouldRenderActionsAfterLine ? (
                   <TerminalPromptActions
@@ -192,7 +210,12 @@ export default function TerminalWindowBody({
 
           return (
             <React.Fragment key={line.id}>
-              <TerminalStaticLine text={line.text || ''} />
+              <TerminalStaticLine
+                text={line.text || ''}
+                promptText={typeof line.promptText === 'string' ? line.promptText : TERMINAL_PROMPT}
+                textClassName={line.textClassName || ''}
+                noPromptGap={!!line.noPromptGap}
+              />
               {shouldRenderActionsAfterLine ? (
                 <TerminalPromptActions
                   key={`${prompt?.id || 'terminal-prompt'}-${prompt?.cycle || 0}-${line.id}`}

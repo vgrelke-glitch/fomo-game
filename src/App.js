@@ -14,6 +14,13 @@ import fromKPhoto2 from './fromK/ph3.png';
 import fromKDedHousePhoto from './fromK/дед1.png';
 import fromKRoofClosePhoto from './fromK/дед2.png';
 import fromKShedGardenPhoto from './fromK/дед3.png';
+import fromKShedMidPhoto1 from './fromK/сарай1.png';
+import fromKShedMidPhoto2 from './fromK/сарай2.png';
+import fromKShedVideo from './fromK/видео.штаб.mp4';
+import fromKShedHQPhoto1 from './fromK/штаб1.png';
+import fromKShedHQPhoto2 from './fromK/штаб2.png';
+import fromKShedHQPhoto3 from './fromK/штаб3.png';
+import fromKShedHQPhoto4 from './fromK/штаб4.png';
 import fromMPhoto2 from './fromM/картинка2.jpeg';
 import AppWindowContent from './components/AppWindowContent';
 import ChatAudioMessage from './components/ChatAudioMessage';
@@ -42,6 +49,7 @@ const INITIAL_EDITOR_CONFIG = normalizeEditorConfig(STORY_EDITOR_CONFIG, STORY_E
 const PROLOGUE_AUDIO_SRC = '/files/audio/intro.mp3';
 const CHAPTER1_AUDIO_SRC = '/files/audio/chapter1.mp3';
 const K_HOUSE_VOICE_AUDIO_SRC = '/files/audio/voice.ogg';
+const K_SHED_BOYS_AUDIO_SRC = '/files/audio/boys.dialog.m4a';
 const MAMA_NOTIFICATION_AUDIO_SRC = '/files/audio/M_not.mp3';
 const FRIEND_NOTIFICATION_AUDIO_SRC = '/files/audio/D_not.mp3';
 const K_FIRST_NOTIFICATION_AUDIO_SRC = '/files/audio/K_first_not.mp3';
@@ -460,6 +468,299 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
       },
     ],
   },
+  'dynamic-k-shed-mid-photo-2': {
+    image: fromKShedMidPhoto2,
+    alt: 'Сарай 2',
+    hotspots: [],
+  },
+  'dynamic-k-shed-mid-photo-1': {
+    image: fromKShedMidPhoto1,
+    alt: 'Сарай 1',
+    hotspots: [],
+  },
+  'dynamic-k-shed-video-1': {
+    video: fromKShedVideo,
+    alt: 'Видео от К.',
+    hotspots: [],
+  },
+  'dynamic-k-shed-hq-photo-1': {
+    image: fromKShedHQPhoto1,
+    alt: 'Штаб 1',
+    hotspots: [
+      {
+        id: 'hq-blankets',
+        label: 'Лежанка',
+        left: 0.23,
+        top: 0.59,
+        width: 0.34,
+        height: 0.20,
+        conversation: [
+          { direction: 'outgoing', text: 'Они тут что, спят?' },
+          { direction: 'incoming', text: 'надеюсь, нет' },
+          { direction: 'incoming', text: 'хотя выглядит уютно' },
+          { direction: 'outgoing', text: 'Это уже не штаб, это дача внутри сарая' },
+        ],
+      },
+      {
+        id: 'hq-bike',
+        label: 'Велосипед',
+        left: 0.57,
+        top: 0.53,
+        width: 0.26,
+        height: 0.21,
+        conversation: [
+          { direction: 'outgoing', text: 'Велосипед чинят?' },
+          { direction: 'incoming', text: 'похоже на то' },
+          { direction: 'incoming', text: 'колесо отдельно, цепь отдельно, все как положено' },
+          { direction: 'outgoing', text: 'Мастерская…' },
+        ],
+      },
+      {
+        id: 'hq-flag',
+        label: 'Флаг',
+        left: 0.09,
+        top: 0.36,
+        width: 0.11,
+        height: 0.25,
+        conversation: [
+          { direction: 'outgoing', text: 'Это у них флаг?' },
+          { direction: 'incoming', text: 'кажется да' },
+          { direction: 'incoming', text: 'очень серьезная организация' },
+          { direction: 'incoming', text: 'без флага не считается' },
+        ],
+      },
+      {
+        id: 'hq-ropes-crates',
+        label: 'Веревки и ящики',
+        left: 0.70,
+        top: 0.27,
+        width: 0.25,
+        height: 0.56,
+        conversation: [
+          { direction: 'outgoing', text: 'У них тут запасы на все случаи жизни.' },
+          { direction: 'incoming', text: 'ну вдруг надо кого-то спасать' },
+          { direction: 'incoming', text: 'или куда-нибудь залезть' },
+          { direction: 'outgoing', text: 'Второе как будто бы наиболее вероятно' },
+        ],
+      },
+      {
+        id: 'hq-light-slits',
+        label: 'Щели света',
+        left: 0.58,
+        top: 0.17,
+        width: 0.24,
+        height: 0.22,
+        conversation: [
+          { direction: 'outgoing', text: 'Красиво тут.' },
+          { direction: 'incoming', text: 'да' },
+          { direction: 'incoming', text: 'пыль летает в лучах' },
+          { direction: 'outgoing', text: 'Как там запах?' },
+          { direction: 'incoming', text: 'пахнет сеном и старым деревом' },
+          { direction: 'outgoing', text: 'Вообще-то звучит идеально' },
+          { direction: 'incoming', text: 'так и есть. Я хочу сюда переехать))' },
+        ],
+      },
+    ],
+  },
+  'dynamic-k-shed-hq-photo-2': {
+    image: fromKShedHQPhoto2,
+    alt: 'Штаб 2',
+    hotspots: [
+      {
+        id: 'hq2-map',
+        label: 'Карта',
+        left: 0.33,
+        top: 0.63,
+        width: 0.36,
+        height: 0.30,
+        conversation: [
+          { direction: 'outgoing', text: 'Похоже на карту?' },
+          { direction: 'incoming', text: 'слушай, что-то знакомое, секунду' },
+          { direction: 'incoming', text: 'я подумала, что вот это синее пятно мне что-то напоминает. Залезла в карты, а тут есть такое озеро рядом!', delayMs: 30000 },
+          { direction: 'incoming', text: 'Мы в детстве тоже такие рисовали... Может они украли камень и спрятали его здесь?' },
+          { direction: 'outgoing', text: 'Крестик выглядит важным' },
+          { direction: 'incoming', text: 'Считаешь нужно пойти по крестику?' },
+          { direction: 'outgoing', text: 'Только если хочешь найти СОКРОВИЩА' },
+          { direction: 'incoming', text: 'я однозначно хочу найти сокровища!!!' },
+          { direction: 'outgoing', text: 'Тогда забирай карту!' },
+          { direction: 'incoming', text: 'зачем? Я же сфоткала…' },
+          { direction: 'outgoing', text: 'Это волшебный артефакт, он тебе пригодится!!' },
+          {
+            direction: 'incoming',
+            text: 'Я смотрю ты втянулся! Окей, забираю карту',
+            terminalComment: 'получен волшебный артефакт: Карта Чердачных Сокровищ',
+            terminalCommentDelayMs: 2200,
+          },
+        ],
+      },
+      {
+        id: 'hq2-pencil',
+        label: 'Карандаш',
+        left: 0.62,
+        top: 0.57,
+        width: 0.09,
+        height: 0.07,
+        conversation: [
+          { direction: 'outgoing', text: 'Слушай, а карта... мне кажется, она свежая...' },
+          { direction: 'incoming', text: 'как ты понял?' },
+          { direction: 'outgoing', text: 'Синий карандаш тут прямо валяется.' },
+          { direction: 'incoming', text: 'ты что из школы детективов??' },
+          { direction: 'outgoing', text: 'Нет я из школы фей' },
+        ],
+      },
+      {
+        id: 'hq2-compass',
+        label: 'Компас',
+        left: 0.47,
+        top: 0.38,
+        width: 0.09,
+        height: 0.10,
+        conversation: [
+          { direction: 'outgoing', text: 'Сколько же всего тут нужного и важного…' },
+          { direction: 'incoming', text: 'да тут хватит собрать отряд в поход' },
+          { direction: 'incoming', text: 'и мастерскую' },
+          { direction: 'incoming', text: 'и что угодно вообще' },
+          { direction: 'incoming', text: 'не хватает только бутербродов' },
+          { direction: 'outgoing', text: 'И взрослого, который скажет: «никуда не ходите»' },
+        ],
+      },
+      {
+        id: 'hq2-cassette',
+        label: 'Кассеты',
+        left: 0.66,
+        top: 0.88,
+        width: 0.18,
+        height: 0.10,
+        conversation: [
+          { direction: 'outgoing', text: 'А есть приемник?' },
+          { direction: 'incoming', text: 'для кассет?' },
+          { direction: 'incoming', text: 'ага, какой-то пыльный есть' },
+          { direction: 'outgoing', text: 'Интересно, они вообще знают, как ее включать?' },
+          { direction: 'incoming', text: 'а ты знаешь как ее включать?)' },
+          { direction: 'outgoing', text: 'мне кажется еще да…' },
+          { direction: 'incoming', text: 'может, это древний артефакт' },
+          { direction: 'incoming', text: 'как карта' },
+          { direction: 'outgoing', text: 'Как мы' },
+          { direction: 'incoming', text: 'да брось))' },
+        ],
+      },
+      {
+        id: 'hq2-jar',
+        label: 'Банка',
+        left: 0.72,
+        top: 0.56,
+        width: 0.13,
+        height: 0.15,
+        conversation: [
+          { direction: 'outgoing', text: 'А что в банке?' },
+          { direction: 'incoming', text: 'гайки, стеклышки, монетки' },
+          { direction: 'incoming', text: 'это валюта. Валюта В БАНКЕ' },
+          { direction: 'outgoing', text: 'Курс нестабильный…' },
+        ],
+      },
+    ],
+  },
+  'dynamic-k-shed-hq-photo-3': {
+    image: fromKShedHQPhoto3,
+    alt: 'Штаб 3',
+    hotspots: [
+      {
+        id: 'hq3-slingshot',
+        label: 'Рогатка',
+        left: 0.74,
+        top: 0.26,
+        width: 0.20,
+        height: 0.42,
+        conversation: [
+          { direction: 'outgoing', text: 'Подожди.' },
+          { direction: 'outgoing', text: 'Это рогатка?' },
+          { direction: 'incoming', text: 'типа того' },
+          { direction: 'incoming', text: 'только огромная' },
+          { direction: 'outgoing', text: 'Они стреляют из нее? В птиц?..' },
+          { direction: 'incoming', text: 'ужас' },
+          { direction: 'incoming', text: 'я не верю, это все выглядит намного добрее' },
+        ],
+      },
+      {
+        id: 'hq3-rubber-bands',
+        label: 'Резина',
+        left: 0.34,
+        top: 0.57,
+        width: 0.26,
+        height: 0.22,
+        conversation: [
+          { direction: 'outgoing', text: 'Тут даже резина натянута.' },
+          { direction: 'incoming', text: 'да' },
+          { direction: 'incoming', text: 'она самодельная, но рабочая' },
+          { direction: 'outgoing', text: 'Мне это не нравится.' },
+          { direction: 'incoming', text: 'мне тоже, но она смешная' },
+          { direction: 'outgoing', text: 'Смешная опасная штука' },
+        ],
+      },
+      {
+        id: 'hq3-window',
+        label: 'Окно',
+        left: 0.57,
+        top: 0.10,
+        width: 0.22,
+        height: 0.34,
+        conversation: [
+          { direction: 'outgoing', text: 'А окно куда выходит?' },
+          { direction: 'incoming', text: 'на грядки' },
+          { direction: 'incoming', text: 'и дальше в сторону дома' },
+          { direction: 'outgoing', text: 'Интересно…' },
+        ],
+      },
+      {
+        id: 'hq3-ropes-boards',
+        label: 'Веревки и доски',
+        left: 0.17,
+        top: 0.38,
+        width: 0.36,
+        height: 0.28,
+        conversation: [
+          { direction: 'outgoing', text: 'Они тут все сами строят?' },
+          { direction: 'incoming', text: 'похоже' },
+          { direction: 'outgoing', text: 'Криво, но с душой' },
+          { direction: 'incoming', text: 'лучший стиль архитектуры' },
+        ],
+      },
+      {
+        id: 'hq3-bike-parts',
+        label: 'Велосипедные детали',
+        left: 0.28,
+        top: 0.70,
+        width: 0.38,
+        height: 0.21,
+        conversation: [
+          { direction: 'outgoing', text: 'Тут снова велосипедные штуки.' },
+          { direction: 'incoming', text: 'да, насос, камера, какие-то гайки' },
+          { direction: 'outgoing', text: 'У них не штаб, а сервисный центр' },
+          { direction: 'incoming', text: 'деревенский стартап' },
+        ],
+      },
+      {
+        id: 'hq3-garden-view',
+        label: 'Вид на грядки',
+        left: 0.58,
+        top: 0.02,
+        width: 0.34,
+        height: 0.30,
+        conversation: [
+          { direction: 'outgoing', text: 'Отсюда хорошо видно двор.' },
+          { direction: 'incoming', text: 'ага' },
+          { direction: 'incoming', text: 'можно сидеть и смотреть, кто идет' },
+          { direction: 'outgoing', text: 'Наблюдательный пункт' },
+          { direction: 'incoming', text: 'это база мечты' },
+        ],
+      },
+    ],
+  },
+  'dynamic-k-shed-hq-photo-4': {
+    image: fromKShedHQPhoto4,
+    alt: 'Штаб 4',
+    hotspots: [],
+  },
   'dynamic-mama-photo-1': {
     image: fromMPhoto2,
     alt: 'Фото от мамы',
@@ -556,6 +857,7 @@ const TERMINAL_PROTOCOL_ELLIPSIS_4_SPEED_MS = 500;
 const TERMINAL_PROTOCOL_ELLIPSIS_6_SPEED_MS = 500;
 const TERMINAL_PROTOCOL_ENDING_TEXT = 'НАЧАЛО: Погоня за звездой';
 const TERMINAL_PROTOCOL_ENDING_DELAY_MS = 2000;
+const CHAPTER1_INTRO_VIEW = 'chapter1_intro';
 const PERSISTENT_NOTIFICATION_LIFETIME_MS = 7000;
 const K_HOUSE_VOICE_DELAY_MS = 12000;
 const K_HOUSE_FOLLOWUP_DELAY_MS = 24000;
@@ -722,12 +1024,20 @@ const normalizeAdventureDraftText = (value = '') => (
     : ''
 );
 
-const createTerminalProtocolLine = (text, { id, typeSpeedMs, delayMs = 0 } = {}) => ({
+const createTerminalProtocolLine = (text, {
+  id,
+  typeSpeedMs,
+  delayMs = 0,
+  promptText,
+  textClassName,
+} = {}) => ({
   id: id || `terminal-protocol-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
   text,
   status: 'pending',
   typeSpeedMs,
   delayMs,
+  ...(typeof promptText === 'string' ? { promptText } : {}),
+  ...(textClassName ? { textClassName } : {}),
 });
 const createMessengerHistoryEntryFromEvent = (event) => {
   if (!event?.id) return null;
@@ -949,6 +1259,7 @@ const createFriendReconQueueEntry = () => ({
       blockedTerminalComment: '> > C:\\Users\\G> >> …',
       blockedFollowupDelayMs: 3000,
       blockedFinalTerminalComment: 'ну и ладно',
+      blockedFinalTerminalCommentDelayMs: 2200,
       blockedPostConversationEntries: [
         {
           chatId: 'chat-k',
@@ -1113,6 +1424,141 @@ const createDevCheckpointState = ({
     },
     notifications: [],
     autoStartedSequenceIds: desktopStartSequenceIds,
+  };
+
+  return nextState;
+};
+const createDevBeforeShedSequenceState = () => {
+  let nextState = createDevCheckpointState({
+    kTargetEventId: 'k_073',
+    friendConflictMode: 'after-k',
+  });
+
+  const dedPhotoId = 'dynamic-k-house-photo-1';
+  const roofPhotoId = 'dynamic-k-roof-close-photo-1';
+  const shedPhotoId = 'dynamic-k-shed-garden-photo-1';
+
+  nextState = appendChatHistoryEntries(nextState, TERMINAL_ADVENTURE_CHAT_ID, [
+    {
+      id: 'dynamic-k-house-return-1',
+      direction: 'incoming',
+      text: 'чай допит. Очень милый дед. Мне кажется, очень одинокий.',
+    },
+    { id: dedPhotoId, direction: 'incoming', text: '' },
+    { id: roofPhotoId, direction: 'incoming', text: '' },
+    { id: shedPhotoId, direction: 'incoming', text: '' },
+  ]);
+
+  const inspectedByMessage = {
+    ...(nextState.messenger?.inspectedPhotoHotspotsByMessage || {}),
+    [dedPhotoId]: (MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID[dedPhotoId]?.hotspots || []).map((hotspot) => hotspot.id),
+    [roofPhotoId]: (MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID[roofPhotoId]?.hotspots || []).map((hotspot) => hotspot.id),
+    [shedPhotoId]: (MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID[shedPhotoId]?.hotspots || []).map((hotspot) => hotspot.id),
+  };
+
+  nextState = {
+    ...nextState,
+    messenger: {
+      ...nextState.messenger,
+      inspectedPhotoHotspotsByMessage: inspectedByMessage,
+      queuedPhotoRepliesByChat: {
+        ...(nextState.messenger?.queuedPhotoRepliesByChat || {}),
+        [TERMINAL_ADVENTURE_CHAT_ID]: [],
+      },
+      photoReplyInFlightByChat: {
+        ...(nextState.messenger?.photoReplyInFlightByChat || {}),
+        [TERMINAL_ADVENTURE_CHAT_ID]: false,
+      },
+      typingByChat: {
+        ...(nextState.messenger?.typingByChat || {}),
+        [TERMINAL_ADVENTURE_CHAT_ID]: {
+          active: false,
+          durationMs: 0,
+        },
+      },
+      unreadChatIds: [],
+    },
+    flags: {
+      ...(nextState.flags || {}),
+      kHouseVoiceSequenceScheduled: true,
+    },
+    ui: {
+      ...(nextState.ui || {}),
+      activeChatId: TERMINAL_ADVENTURE_CHAT_ID,
+      focusedAppId: 'app3',
+    },
+  };
+
+  return nextState;
+};
+
+const createDevAtBoysVoiceState = () => {
+  let nextState = createDevBeforeShedSequenceState();
+  const chatId = TERMINAL_ADVENTURE_CHAT_ID;
+
+  nextState = appendChatHistoryEntries(nextState, chatId, [
+    { id: 'dynamic-k-shed-seq-1', direction: 'incoming', text: 'иду в сарай' },
+    { id: 'dynamic-k-shed-seq-2', direction: 'incoming', text: 'окей, я в сарае. Тут ничего интересного.' },
+    { id: 'dynamic-k-shed-mid-photo-2', direction: 'incoming', text: '' },
+    { id: 'dynamic-k-shed-mid-photo-1', direction: 'incoming', text: '' },
+    { id: 'dynamic-k-shed-seq-3', direction: 'incoming', text: 'дед говорил, что тут шарится банда местных мальчишек. Романтично по-моему.' },
+    { id: 'dynamic-k-shed-seq-4', direction: 'incoming', text: 'только я не вижу никаких следов мальчишек' },
+    { id: 'dynamic-k-shed-seq-5', direction: 'incoming', text: 'сейчас еще по лестнице залезу' },
+    { id: 'dynamic-k-shed-seq-5b', direction: 'incoming', text: 'ты не поверишь………………….' },
+    { id: 'dynamic-k-shed-video-1', direction: 'incoming', text: '' },
+    { id: 'dynamic-k-shed-seq-6', direction: 'incoming', text: 'ЭТО НАСТОЯЩИЙ ШТАБ.' },
+    { id: 'dynamic-k-shed-seq-9', direction: 'incoming', text: 'так, ну здесь никого нет, но повсюду куча приколов.' },
+    { id: 'dynamic-k-shed-hq-photo-1', direction: 'incoming', text: '' },
+    { id: 'dynamic-k-shed-hq-photo-2', direction: 'incoming', text: '' },
+    { id: 'dynamic-k-shed-hq-photo-3', direction: 'incoming', text: '' },
+    { id: 'dynamic-k-shed-hq-photo-4', direction: 'incoming', text: '' },
+    { id: 'dynamic-k-shed-range-seq-1', direction: 'incoming', text: 'видишь, они просто играют.' },
+    { id: 'dynamic-k-shed-range-seq-2', direction: 'incoming', text: 'аааа, слушай, я как-то даже не заметила, когда сюда шла. Это у них тир' },
+    { id: 'dynamic-k-shed-range-seq-3', direction: 'incoming', text: 'стой я что-то слышу' },
+    { id: 'dynamic-k-shed-range-seq-4', direction: 'incoming', text: 'Кто-то пришел!!' },
+    { id: 'dynamic-k-shed-range-seq-5', direction: 'incoming', text: 'ЗАЧЕМ??' },
+    { id: 'dynamic-k-shed-range-seq-7', direction: 'incoming', text: 'ААААААА' },
+    {
+      id: 'dynamic-k-shed-boys-voice',
+      direction: 'incoming',
+      text: '',
+      audioSrc: K_SHED_BOYS_AUDIO_SRC,
+      audioLabel: 'Голосовое сообщение',
+    },
+  ]);
+
+  nextState = {
+    ...nextState,
+    messenger: {
+      ...nextState.messenger,
+      queuedPhotoRepliesByChat: {
+        ...(nextState.messenger?.queuedPhotoRepliesByChat || {}),
+        [chatId]: [],
+      },
+      photoReplyInFlightByChat: {
+        ...(nextState.messenger?.photoReplyInFlightByChat || {}),
+        [chatId]: false,
+      },
+      typingByChat: {
+        ...(nextState.messenger?.typingByChat || {}),
+        [chatId]: { active: false, durationMs: 0 },
+      },
+    },
+    flags: {
+      ...(nextState.flags || {}),
+      kShedTerminalLockMode: false,
+      kShedPanicTerminalStarted: false,
+      kShedNarratorIntroStarted: false,
+    },
+    terminal: {
+      ...(nextState.terminal || {}),
+      lines: [],
+    },
+    ui: {
+      ...(nextState.ui || {}),
+      focusedAppId: 'app3',
+      activeChatId: chatId,
+    },
   };
 
   return nextState;
@@ -1396,10 +1842,16 @@ function App() {
   const [endingStarted, setEndingStarted] = useState(false);
   const [endingIndex, setEndingIndex] = useState(0);
   const [endingDone, setEndingDone] = useState(false);
+  const [endingStage, setEndingStage] = useState('heart');
+  const [endingTitleVisible, setEndingTitleVisible] = useState(false);
+  const [endingFomoVisible, setEndingFomoVisible] = useState(false);
+  const [endingCreditsVisible, setEndingCreditsVisible] = useState(false);
+  const [endingDirectorVisible, setEndingDirectorVisible] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
   const [notifVariant, setNotifVariant] = useState('initial');
   const [toastLeaving, setToastLeaving] = useState(false);
   const [screenFlashActive, setScreenFlashActive] = useState(false);
+  const [storyMessageFlashText, setStoryMessageFlashText] = useState('');
   const [typedByChat, setTypedByChat] = useState({});
   const [adventureDeclineInputState, setAdventureDeclineInputState] = useState(null);
   const [activeNoteId, setActiveNoteId] = useState('note1');
@@ -1418,13 +1870,26 @@ function App() {
   const activeChatIdRef = useRef('');
   const winStateRef = useRef({});
   const focusedWindowAppIdRef = useRef(storyState.ui?.focusedAppId || '');
-  const seenIncomingHistoryIdsRef = useRef({});
   const terminalPromptTimersRef = useRef([]);
   const persistentNotifTimersRef = useRef([]);
   const notifiedIncomingEntryIdsRef = useRef(new Set());
+  const notifiedMessageKeysRef = useRef(new Set());
   const queuedReplyResumeKeysRef = useRef(new Set());
-  const bikeReplyRecoveryScheduledRef = useRef(false);
+  const kHouseReturnSeenRef = useRef(
+    (storyState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [])
+      .some((entry) => entry?.id === 'dynamic-k-house-return-1')
+  );
+  const coauthorFlashMessageSeenRef = useRef(
+    (storyState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [])
+      .some((entry) => entry?.id === 'k_060a' && entry?.direction === 'incoming')
+  );
+  const shedConveyorNudgeAnchorSeenRef = useRef(
+    (storyState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [])
+      .some((entry) => entry?.id === 'dynamic-k-shed-seq-1')
+  );
   const screenFlashTimerRef = useRef(null);
+  const storyMessageFlashStartTimerRef = useRef(null);
+  const storyMessageFlashTimerRef = useRef(null);
   const momIntroTimerRef = useRef(null);
   const prologueAudioRef = useRef(null);
   const prologueAudioStartedRef = useRef(false);
@@ -1941,7 +2406,12 @@ function App() {
     }
 
     scheduledIncomingEntryIdsRef.current.add(scheduleKey);
-    const visibleText = entry.text || notificationText || (entry.audioSrc ? 'Голосовое сообщение' : 'Фотография');
+    const attachment = getMessengerPhotoAttachment(entry.id);
+    const visibleText = entry.text || notificationText || (
+      entry.audioSrc
+        ? 'Голосовое сообщение'
+        : (attachment?.video ? 'Видео' : 'Фотография')
+    );
     const typingDurationMs = Math.max(0, Math.ceil(visibleText.length * PHOTO_REPLY_TYPING_SPEED_MS));
     const startDelayMs = Math.max(0, Number(delayMs || 0));
 
@@ -2031,10 +2501,16 @@ function App() {
     title = 'Сообщение',
     text = '',
     sound = null,
+    isFirstKMessage = false,
+    dedupeKey = '',
     autoDismiss = true,
   }) => {
     if (!chatId || isMessengerChatFrontmost(chatId)) return;
-    if (sound === 'k') playKNotificationSound(false);
+    if (dedupeKey && notifiedMessageKeysRef.current.has(dedupeKey)) return;
+    if (dedupeKey) {
+      notifiedMessageKeysRef.current.add(dedupeKey);
+    }
+    if (sound === 'k') playKNotificationSound(!!isFirstKMessage);
     if (sound === 'friend') playFriendNotificationSound();
     if (sound === 'mama') playMamaNotificationSound();
     pushPersistentNotif({
@@ -2055,6 +2531,9 @@ function App() {
   const submitMessengerScriptEvent = useCallback((chatId, eventId, historyEntry = null) => {
     const scriptEvent = findScriptEventById(chatId, eventId);
     const isIncomingMessage = scriptEvent?.type === 'message_other' && historyEntry?.direction === 'incoming';
+    const alreadyInHistory = !!(historyEntry?.id && (
+      (storyStateRef.current?.messenger?.historyByChat?.[chatId] || []).some((entry) => entry?.id === historyEntry.id)
+    ));
     const shouldSuppressAttention = isMessengerChatFrontmost(chatId);
 
     setStoryState((prev) => {
@@ -2075,13 +2554,15 @@ function App() {
       return nextState;
     });
 
-    if (isIncomingMessage && !shouldSuppressAttention) {
+    if (isIncomingMessage && !shouldSuppressAttention && !alreadyInHistory) {
       const chatTitle = editorContent.messenger.chats.find((chat) => chat.id === chatId)?.title || 'Мессенджер';
       notifyIncomingMessage({
         chatId,
         title: chatTitle,
         text: historyEntry?.text || scriptEvent?.text || 'Новое сообщение',
         sound: chatId === 'chat3' ? 'mama' : (chatId === 'chat-k' ? 'k' : null),
+        isFirstKMessage: chatId === 'chat-k' && eventId === 'k_001',
+        dedupeKey: `${chatId}:${historyEntry?.id || eventId}`,
         autoDismiss: !(chatId === 'chat-k' && eventId === 'k_001'),
       });
     }
@@ -2134,6 +2615,7 @@ function App() {
           title: 'Мама',
           text: notifText,
           sound: 'mama',
+          dedupeKey: `chat3:${entry.id}`,
         });
       };
 
@@ -3009,6 +3491,42 @@ function App() {
 
   const rejectAdventureTerminalPrompt = useCallback(() => {
     const prompt = storyState.terminal?.prompt;
+    if (prompt?.id === 'terminal-close-confirm' && prompt.stage === 'choice') {
+      const isShedEndingMoment = !!storyState.flags?.kShedTerminalLockMode
+        && !!storyState.flags?.kShedPanicTerminalSequenceDone
+        && !!storyState.flags?.kShedNarratorQuestionShown
+        && (storyState.terminal?.lines || []).some((line) => (
+          line?.id === 'dynamic-k-shed-narrator-question-8' && line?.status === 'done'
+        ));
+      setStoryState((prev) => {
+        const nextState = {
+          ...prev,
+          flags: {
+            ...(prev.flags || {}),
+            kTerminalCloseUnlocked: true,
+            kTerminalCloseChoiceHandled: true,
+          },
+          terminal: {
+            ...(prev.terminal || {}),
+            prompt: null,
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
+      if (isShedEndingMoment) {
+        setView('ending');
+      }
+      setOpen((prevOpen) => ({
+        ...prevOpen,
+        app7: false,
+      }));
+      setMinimized((prevMinimized) => ({
+        ...prevMinimized,
+        app7: false,
+      }));
+      return;
+    }
     if (!prompt || prompt.id !== TERMINAL_ADVENTURE_PROMPT_ID || prompt.stage !== 'choice') {
       return;
     }
@@ -3098,6 +3616,10 @@ function App() {
     persistRuntimeState,
     runStoryEffects,
     setActiveChatId,
+    storyState.flags?.kShedNarratorQuestionShown,
+    storyState.flags?.kShedPanicTerminalSequenceDone,
+    storyState.flags?.kShedTerminalLockMode,
+    storyState.terminal?.lines,
     storyState.terminal?.prompt,
     updateAdventureProtocolPrompt,
   ]);
@@ -3106,6 +3628,42 @@ function App() {
     clearTerminalPromptTimers();
 
     const prompt = storyState.terminal?.prompt;
+    if (prompt?.id === 'terminal-close-confirm' && prompt.stage === 'choice') {
+      const isShedEndingMoment = !!storyState.flags?.kShedTerminalLockMode
+        && !!storyState.flags?.kShedPanicTerminalSequenceDone
+        && !!storyState.flags?.kShedNarratorQuestionShown
+        && (storyState.terminal?.lines || []).some((line) => (
+          line?.id === 'dynamic-k-shed-narrator-question-8' && line?.status === 'done'
+        ));
+      setStoryState((prev) => {
+        const nextState = {
+          ...prev,
+          flags: {
+            ...(prev.flags || {}),
+            kTerminalCloseUnlocked: true,
+            kTerminalCloseChoiceHandled: true,
+          },
+          terminal: {
+            ...(prev.terminal || {}),
+            prompt: null,
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
+      if (isShedEndingMoment) {
+        setView('ending');
+      }
+      setOpen((prevOpen) => ({
+        ...prevOpen,
+        app7: false,
+      }));
+      setMinimized((prevMinimized) => ({
+        ...prevMinimized,
+        app7: false,
+      }));
+      return;
+    }
     if (!prompt || prompt.id !== TERMINAL_ADVENTURE_PROMPT_ID || prompt.stage !== 'choice') {
       return;
     }
@@ -3259,6 +3817,10 @@ function App() {
     queueAdventureTerminalPrompt,
     scheduleAdventureAction,
     startAdventureAcceptanceDraftFlow,
+    storyState.flags?.kShedNarratorQuestionShown,
+    storyState.flags?.kShedPanicTerminalSequenceDone,
+    storyState.flags?.kShedTerminalLockMode,
+    storyState.terminal?.lines,
     storyState.terminal?.prompt,
     updateAdventureProtocolPrompt,
   ]);
@@ -3548,7 +4110,14 @@ function App() {
           }
 
           if (blockedFinalTerminalComment && index === blockedFollowupEntries.length - 1) {
-            appendTerminalLines([createTerminalProtocolLine(blockedFinalTerminalComment)]);
+            const finalCommentDelayMs = Math.max(
+              0,
+              Number(firstEntry.blockedFinalTerminalCommentDelayMs || queuedReply.blockedFinalTerminalCommentDelayMs || 0),
+            );
+            const finalCommentTimerId = window.setTimeout(() => {
+              appendTerminalLines([createTerminalProtocolLine(blockedFinalTerminalComment)]);
+            }, finalCommentDelayMs);
+            photoReplyTimersRef.current.push(finalCommentTimerId);
           }
 
           if (index === blockedFollowupEntries.length - 1 && blockedPostConversationEntries.length > 0) {
@@ -3682,6 +4251,7 @@ function App() {
     let timelineOffsetMs = 0;
 
     autoIncomingEntries.forEach((entry, index) => {
+      const stepDelayMs = Math.max(0, Number(entry?.delayMs ?? delayMs));
       const typingDurationMs = Math.max(0, Math.ceil((entry.text || '').length * PHOTO_REPLY_TYPING_SPEED_MS));
       const typingTimerId = window.setTimeout(() => {
         setStoryState((prev) => ({
@@ -3697,19 +4267,67 @@ function App() {
             },
           },
         }));
-      }, timelineOffsetMs + delayMs);
+      }, timelineOffsetMs + stepDelayMs);
       photoReplyTimersRef.current.push(typingTimerId);
 
       const messageTimerId = window.setTimeout(() => {
         const isLastAutoIncoming = index === autoIncomingEntries.length - 1;
         const shouldDeferToNextOutgoing = isLastAutoIncoming && deferredConversation.length > 0;
+        let didAppendIncoming = false;
         setStoryState((prev) => {
           const currentHistory = prev.messenger?.historyByChat?.[chatId] || [];
+          const incomingText = (entry.text || '').trim();
+          const hasSameIncoming = currentHistory.some((item) => (
+            item?.direction === 'incoming'
+            && (
+              (entry?.id && item?.id === entry.id)
+              || (!!incomingText && (item?.text || '').trim() === incomingText)
+            )
+          ));
+          if (hasSameIncoming) {
+            const existingQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+            const nextState = {
+              ...prev,
+              messenger: {
+                ...prev.messenger,
+                queuedPhotoRepliesByChat: shouldDeferToNextOutgoing
+                  ? {
+                    ...(prev.messenger?.queuedPhotoRepliesByChat || {}),
+                    [chatId]: dedupePhotoReplyQueue([
+                      {
+                        ...queuedReply,
+                        conversation: deferredConversation,
+                        terminalComment: '',
+                        terminalCommentDelayMs: 0,
+                        postConversationEntries: [],
+                      },
+                      ...existingQueue,
+                    ]),
+                  }
+                  : (prev.messenger?.queuedPhotoRepliesByChat || {}),
+                photoReplyInFlightByChat: {
+                  ...(prev.messenger?.photoReplyInFlightByChat || {}),
+                  [chatId]: shouldDeferToNextOutgoing ? false : !(isLastAutoIncoming && deferredConversation.length === 0),
+                },
+                typingByChat: {
+                  ...(prev.messenger?.typingByChat || {}),
+                  [chatId]: {
+                    active: false,
+                    durationMs: 0,
+                  },
+                },
+              },
+            };
+            persistRuntimeState(nextState);
+            return nextState;
+          }
+          didAppendIncoming = true;
           const shouldSuppressAttention = isMessengerChatFrontmost(chatId);
           const nextUnreadChatIds = shouldSuppressAttention
             ? (prev.messenger?.unreadChatIds || []).filter((id) => id !== chatId)
             : Array.from(new Set([...(prev.messenger?.unreadChatIds || []), chatId]));
           const existingQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+          const nextIncomingId = entry?.id || createUniqueHistoryEntryId(currentHistory, `${queuedReply.id}-step-${index}`);
           const nextState = {
             ...prev,
             messenger: {
@@ -3719,7 +4337,7 @@ function App() {
                 [chatId]: [
                   ...currentHistory,
                   {
-                    id: createUniqueHistoryEntryId(currentHistory, `${queuedReply.id}-step-${index}`),
+                    id: nextIncomingId,
                     direction: 'incoming',
                     text: entry.text,
                   },
@@ -3757,6 +4375,57 @@ function App() {
           persistRuntimeState(nextState);
           return nextState;
         });
+        if (!didAppendIncoming) {
+          if (isLastAutoIncoming && Array.isArray(queuedReply.postConversationEntries) && queuedReply.postConversationEntries.length > 0) {
+            const immediatePostConversationEntries = queuedReply.postConversationEntries
+              .filter((entry) => Math.max(0, Number(entry?.delayMs || 0)) === 0);
+            const delayedPostConversationEntries = queuedReply.postConversationEntries
+              .filter((entry) => Math.max(0, Number(entry?.delayMs || 0)) > 0);
+
+            let postConversationOffsetMs = 0;
+            immediatePostConversationEntries.forEach((postEntry) => {
+              if (!postEntry?.id) return;
+              const { delayMs: _delayMs, notificationTitle: _notificationTitle, notificationText: _notificationText, ...historyEntry } = postEntry;
+              postConversationOffsetMs = scheduleIncomingChatEntry({
+                chatId,
+                entry: historyEntry,
+                title: postEntry.notificationTitle || (chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'К.' : 'Сообщение'),
+                notificationText: postEntry.notificationText || historyEntry.text || 'Фотография',
+                delayMs: postConversationOffsetMs,
+                sound: chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'k' : null,
+              }) + Number(editorConfig.timings.messageGapMs ?? 0);
+            });
+
+            delayedPostConversationEntries.forEach((postEntry) => {
+              if (!postEntry?.id) return;
+              const postDelayMs = Math.max(0, Number(postEntry.delayMs || 0));
+              const { delayMs: _delayMs, notificationTitle: _notificationTitle, notificationText: _notificationText, ...historyEntry } = postEntry;
+              scheduleIncomingChatEntry({
+                chatId,
+                entry: historyEntry,
+                title: postEntry.notificationTitle || (chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'К.' : 'Сообщение'),
+                notificationText: postEntry.notificationText || historyEntry.text || 'Фотография',
+                delayMs: postDelayMs,
+                sound: chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'k' : null,
+              });
+            });
+          }
+          if (entry.terminalComment) {
+            const entryDelayMs = Math.max(0, Number(entry.terminalCommentDelayMs || 0));
+            const timerId = window.setTimeout(() => {
+              appendTerminalLines([createTerminalProtocolLine(entry.terminalComment)]);
+            }, entryDelayMs);
+            photoReplyTimersRef.current.push(timerId);
+          }
+          if (queuedReply.terminalComment && isLastAutoIncoming) {
+            const delayMs = Math.max(0, Number(queuedReply.terminalCommentDelayMs || 0));
+            const timerId = window.setTimeout(() => {
+              appendTerminalLines([createTerminalProtocolLine(queuedReply.terminalComment)]);
+            }, delayMs);
+            photoReplyTimersRef.current.push(timerId);
+          }
+          return;
+        }
         if (isLastAutoIncoming && Array.isArray(queuedReply.postConversationEntries) && queuedReply.postConversationEntries.length > 0) {
           const immediatePostConversationEntries = queuedReply.postConversationEntries
             .filter((entry) => Math.max(0, Number(entry?.delayMs || 0)) === 0);
@@ -3805,9 +4474,9 @@ function App() {
           }, delayMs);
           photoReplyTimersRef.current.push(timerId);
         }
-      }, timelineOffsetMs + delayMs + typingDurationMs);
+      }, timelineOffsetMs + stepDelayMs + typingDurationMs);
       photoReplyTimersRef.current.push(messageTimerId);
-      timelineOffsetMs += delayMs + typingDurationMs;
+      timelineOffsetMs += stepDelayMs + typingDurationMs;
     });
 
     if (autoIncomingEntries.length === 0 && deferredConversation.length > 0) {
@@ -4194,6 +4863,52 @@ function App() {
   }, [storyState.ui?.screenFlashUntil]);
 
   useEffect(() => {
+    const history = storyState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [];
+    const coauthorMessage = history.find((entry) => (
+      entry?.id === 'k_060a' && entry?.direction === 'incoming'
+    ));
+    if (!coauthorMessage?.text) return;
+    if (history[history.length - 1]?.id !== 'k_060a') return;
+    if (coauthorFlashMessageSeenRef.current) return;
+    coauthorFlashMessageSeenRef.current = true;
+    if (storyState.flags?.kCoauthorFullscreenFlashShown) return;
+
+    if (storyMessageFlashStartTimerRef.current) {
+      window.clearTimeout(storyMessageFlashStartTimerRef.current);
+      storyMessageFlashStartTimerRef.current = null;
+    }
+    if (storyMessageFlashTimerRef.current) {
+      window.clearTimeout(storyMessageFlashTimerRef.current);
+      storyMessageFlashTimerRef.current = null;
+    }
+    storyMessageFlashStartTimerRef.current = window.setTimeout(() => {
+      setStoryMessageFlashText(coauthorMessage.text);
+      storyMessageFlashStartTimerRef.current = null;
+      storyMessageFlashTimerRef.current = window.setTimeout(() => {
+        setStoryMessageFlashText('');
+        storyMessageFlashTimerRef.current = null;
+      }, 950);
+    }, 1000);
+
+    setStoryState((prev) => {
+      if (prev.flags?.kCoauthorFullscreenFlashShown) return prev;
+      const nextState = {
+        ...prev,
+        flags: {
+          ...(prev.flags || {}),
+          kCoauthorFullscreenFlashShown: true,
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+  }, [
+    persistRuntimeState,
+    storyState.flags?.kCoauthorFullscreenFlashShown,
+    storyState.messenger?.historyByChat,
+  ]);
+
+  useEffect(() => {
     const allTasks = getUniqueWorkTasks(
       editorContent.appData?.workConveyor?.seedTasks || [],
       storyState.work?.tasks || [],
@@ -4305,11 +5020,17 @@ function App() {
 
   useEffect(() => {
     const submittedCount = storyState.work?.submittedTaskIds?.length || 0;
-    if (submittedCount < 3) return;
+    const completionMessagesCount = (storyState.work?.messages || []).filter((message) => (
+      message?.tone === 'success'
+    )).length;
+    if (Math.max(submittedCount, completionMessagesCount) < 3) return;
     if (storyState.flags?.kChatUnlockedAfterThirdTask) return;
 
+    let shouldSendFirstKMessage = false;
     setStoryState((prev) => {
       if (prev.flags?.kChatUnlockedAfterThirdTask) return prev;
+      const kHistory = prev.messenger?.historyByChat?.['chat-k'] || [];
+      shouldSendFirstKMessage = !kHistory.some((entry) => entry?.id === 'k_001');
 
       const nextState = {
         ...prev,
@@ -4323,14 +5044,27 @@ function App() {
       return nextState;
     });
 
-    submitMessengerScriptEvent('chat-k', 'k_001', {
-      id: 'k_001',
-      direction: 'incoming',
-      text: 'привет. Помнишь меня?',
-    });
+    if (shouldSendFirstKMessage) {
+      submitMessengerScriptEvent('chat-k', 'k_001', {
+        id: 'k_001',
+        direction: 'incoming',
+        text: 'привет. Помнишь меня?',
+      });
+      notifyIncomingMessage({
+        chatId: 'chat-k',
+        title: 'К.',
+        text: 'привет. Помнишь меня?',
+        sound: 'k',
+        isFirstKMessage: true,
+        dedupeKey: 'chat-k:k_001',
+        autoDismiss: false,
+      });
+    }
   }, [
+    notifyIncomingMessage,
     persistRuntimeState,
     storyState.flags,
+    storyState.work?.messages,
     storyState.work?.submittedTaskIds,
     submitMessengerScriptEvent,
   ]);
@@ -4529,47 +5263,6 @@ function App() {
   useEffect(() => {
     activeChatIdRef.current = activeChatId;
   }, [activeChatId]);
-
-  useEffect(() => {
-    const historyByChat = storyState.messenger?.historyByChat || {};
-    const chatTitleById = Object.fromEntries((editorContent.messenger?.chats || []).map((chat) => [chat.id, chat.title || 'Сообщение']));
-
-    const isFirstSync = Object.keys(seenIncomingHistoryIdsRef.current).length === 0;
-    if (isFirstSync) {
-      const bootstrap = {};
-      Object.entries(historyByChat).forEach(([chatId, history]) => {
-        bootstrap[chatId] = new Set(
-          (history || [])
-            .filter((entry) => entry?.direction === 'incoming' && entry?.id)
-            .map((entry) => entry.id),
-        );
-      });
-      seenIncomingHistoryIdsRef.current = bootstrap;
-      return;
-    }
-
-    Object.entries(historyByChat).forEach(([chatId, history]) => {
-      if (!seenIncomingHistoryIdsRef.current[chatId]) {
-        seenIncomingHistoryIdsRef.current[chatId] = new Set();
-      }
-      const seenIds = seenIncomingHistoryIdsRef.current[chatId];
-      (history || []).forEach((entry) => {
-        if (!entry?.id || entry.direction !== 'incoming') return;
-        if (seenIds.has(entry.id)) return;
-        seenIds.add(entry.id);
-
-        const attachment = getMessengerPhotoAttachment(entry.id);
-        const notifText = entry.text
-          || (entry.audioSrc ? 'Голосовое сообщение' : (attachment ? 'Фотография' : 'Новое сообщение'));
-        notifyIncomingMessage({
-          chatId,
-          title: chatTitleById[chatId] || 'Сообщение',
-          text: notifText,
-          sound: chatId === 'chat3' ? 'mama' : (chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'k' : (chatId === 'chat-druk' ? 'friend' : null)),
-        });
-      });
-    });
-  }, [editorContent.messenger?.chats, notifyIncomingMessage, storyState.messenger?.historyByChat]);
 
   useEffect(() => {
     winStateRef.current = winState;
@@ -5031,12 +5724,54 @@ function App() {
       messageSendAudioRef.current.src = '';
       messageSendAudioRef.current = null;
     }
+    if (storyMessageFlashTimerRef.current) {
+      window.clearTimeout(storyMessageFlashTimerRef.current);
+      storyMessageFlashTimerRef.current = null;
+    }
+    if (storyMessageFlashStartTimerRef.current) {
+      window.clearTimeout(storyMessageFlashStartTimerRef.current);
+      storyMessageFlashStartTimerRef.current = null;
+    }
     printKeyAudioPoolRef.current.forEach(({ audio }) => {
       audio.pause();
       audio.src = '';
     });
     printKeyAudioPoolRef.current = [];
   }, [clearTerminalPromptTimers]);
+
+  useEffect(() => {
+    if (view !== 'ending') return;
+    setEndingStage('heart');
+    setEndingTitleVisible(false);
+  }, [view]);
+
+  useEffect(() => {
+    if (view !== 'ending') return;
+    if (endingStage !== 'title') return;
+    setEndingTitleVisible(false);
+    setEndingFomoVisible(false);
+    setEndingCreditsVisible(false);
+    setEndingDirectorVisible(false);
+
+    const titleTimerId = window.setTimeout(() => {
+      setEndingTitleVisible(true);
+    }, 40);
+    const fomoTimerId = window.setTimeout(() => {
+      setEndingFomoVisible(true);
+    }, 1100);
+    const creditsTimerId = window.setTimeout(() => {
+      setEndingCreditsVisible(true);
+    }, 3100);
+    const directorTimerId = window.setTimeout(() => {
+      setEndingDirectorVisible(true);
+    }, 5100);
+    return () => {
+      window.clearTimeout(titleTimerId);
+      window.clearTimeout(fomoTimerId);
+      window.clearTimeout(creditsTimerId);
+      window.clearTimeout(directorTimerId);
+    };
+  }, [endingStage, view]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -5050,7 +5785,7 @@ function App() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (view !== 'ending') return;
+    if (view !== CHAPTER1_INTRO_VIEW) return;
     if (!chapter1AudioRef.current) {
       const audio = new Audio(CHAPTER1_AUDIO_SRC);
       audio.preload = 'auto';
@@ -5068,7 +5803,7 @@ function App() {
   }, [view]);
 
   useEffect(() => {
-    if (view === 'prologue' || view === 'ending') {
+    if (view === 'prologue' || view === CHAPTER1_INTRO_VIEW || view === 'ending') {
       setShowNotif(false);
       setToastLeaving(false);
       if (view === 'prologue' && !prologueStarted) {
@@ -5077,7 +5812,7 @@ function App() {
         setPrologueIndex(0);
         setPrologueDone(false);
       }
-      if (view === 'ending' && !endingStarted) {
+      if (view === CHAPTER1_INTRO_VIEW && !endingStarted) {
         setEndingStarted(true);
         setEndingIndex(0);
         setEndingDone(false);
@@ -5165,7 +5900,7 @@ function App() {
   ]);
 
   useEffect(() => {
-    if (view !== 'ending') return;
+    if (view !== CHAPTER1_INTRO_VIEW) return;
     if (!endingStarted || endingDone) return;
     const intervalId = setInterval(() => {
       setEndingIndex((prev) => {
@@ -5452,8 +6187,28 @@ function App() {
     photoReplyTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
     photoReplyTimersRef.current = [];
     scheduledIncomingEntryIdsRef.current.clear();
+    notifiedIncomingEntryIdsRef.current.clear();
+    notifiedMessageKeysRef.current.clear();
+    kHouseReturnSeenRef.current = (
+      nextStoryState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || []
+    ).some((entry) => entry?.id === 'dynamic-k-house-return-1');
+    coauthorFlashMessageSeenRef.current = (
+      nextStoryState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || []
+    ).some((entry) => entry?.id === 'k_060a' && entry?.direction === 'incoming');
+    shedConveyorNudgeAnchorSeenRef.current = (
+      nextStoryState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || []
+    ).some((entry) => entry?.id === 'dynamic-k-shed-seq-1');
     terminalPromptTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
     terminalPromptTimersRef.current = [];
+    if (storyMessageFlashTimerRef.current) {
+      window.clearTimeout(storyMessageFlashTimerRef.current);
+      storyMessageFlashTimerRef.current = null;
+    }
+    if (storyMessageFlashStartTimerRef.current) {
+      window.clearTimeout(storyMessageFlashStartTimerRef.current);
+      storyMessageFlashStartTimerRef.current = null;
+    }
+    setStoryMessageFlashText('');
   }, [editorContent, getDefaultIconPositions, getDefaultWindowState]);
 
   const launchDevSecondAct = () => {
@@ -5473,6 +6228,20 @@ function App() {
       friendConflictMode: 'after-k',
     });
 
+    clearStoryState('dev');
+    saveStoryState(nextState, 'dev');
+    restoreDefaultRuntimeState(nextState, 'game');
+  };
+  const launchDevBeforeShed = () => {
+    if (!isDevRoute) return;
+    const nextState = createDevBeforeShedSequenceState();
+    clearStoryState('dev');
+    saveStoryState(nextState, 'dev');
+    restoreDefaultRuntimeState(nextState, 'game');
+  };
+  const launchDevAtBoysVoice = () => {
+    if (!isDevRoute) return;
+    const nextState = createDevAtBoysVoiceState();
     clearStoryState('dev');
     saveStoryState(nextState, 'dev');
     restoreDefaultRuntimeState(nextState, 'game');
@@ -5769,7 +6538,9 @@ function App() {
                 )
                 : active.id === 'chat3'
                   ? 'виноватое молчание сына, не купившего билеты'
-                  : 'пока сказать нечего'
+                  : active.id === TERMINAL_ADVENTURE_CHAT_ID
+                    ? ''
+                    : 'пока сказать нечего'
             )
             : '');
         const inputValue = isMessengerInputBlockedByTerminalPrompt
@@ -5828,9 +6599,65 @@ function App() {
                       >
                         {msg.text ? <div className="thread-message-text">{msg.text}</div> : null}
                         {msg.audioSrc ? (
-                          <ChatAudioMessage src={msg.audioSrc} />
+                          <ChatAudioMessage
+                            src={msg.audioSrc}
+                            onEnded={() => {
+                              if (active.id !== TERMINAL_ADVENTURE_CHAT_ID) return;
+                              if (msg.id !== 'dynamic-k-shed-boys-voice') return;
+                              setStoryState((prev) => {
+                                const chatId = TERMINAL_ADVENTURE_CHAT_ID;
+                                const currentHistory = prev.messenger?.historyByChat?.[chatId] || [];
+                                if (currentHistory.some((entry) => entry?.id === 'dynamic-k-shed-boys-after-voice')) {
+                                  return prev;
+                                }
+                                const currentQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+                                const nextState = {
+                                  ...prev,
+                                  messenger: {
+                                    ...prev.messenger,
+                                    historyByChat: {
+                                      ...(prev.messenger?.historyByChat || {}),
+                                      [chatId]: [
+                                        ...currentHistory,
+                                        {
+                                          id: 'dynamic-k-shed-boys-after-voice',
+                                          direction: 'incoming',
+                                          text: 'МЕНЯ СЕЙЧАС НАЙДУТ',
+                                        },
+                                      ],
+                                    },
+                                    queuedPhotoRepliesByChat: {
+                                      ...(prev.messenger?.queuedPhotoRepliesByChat || {}),
+                                      [chatId]: dedupePhotoReplyQueue([
+                                        ...currentQueue,
+                                        {
+                                          id: 'dynamic-k-shed-boys-panic-prompt',
+                                          messageId: 'dynamic-k-shed-boys-voice',
+                                          hotspotId: 'boys-panic',
+                                          label: 'Паника',
+                                          conversation: [
+                                            { direction: 'outgoing', text: 'БЕЗ ПАНИКИ' },
+                                          ],
+                                          postConversationEntries: [],
+                                          terminalComment: '',
+                                        },
+                                      ]),
+                                    },
+                                  },
+                                };
+                                persistRuntimeState(nextState);
+                                return nextState;
+                              });
+                              notifyIncomingMessage({
+                                chatId: TERMINAL_ADVENTURE_CHAT_ID,
+                                title: 'К.',
+                                text: 'МЕНЯ СЕЙЧАС НАЙДУТ',
+                                sound: 'k',
+                              });
+                            }}
+                          />
                         ) : null}
-                        {attachment ? (
+                        {attachment?.image ? (
                           <button
                             type="button"
                             className="thread-photo-card"
@@ -5838,6 +6665,16 @@ function App() {
                           >
                             <img src={attachment.image} alt={attachment.alt} className="thread-photo-card-image" />
                           </button>
+                        ) : null}
+                        {attachment?.video ? (
+                          <div className="thread-photo-card thread-video-card">
+                            <video
+                              className="thread-photo-card-image thread-video-card-video"
+                              src={attachment.video}
+                              controls
+                              preload="metadata"
+                            />
+                          </div>
                         ) : null}
                       </div>
                     );
@@ -6369,7 +7206,7 @@ function App() {
       };
       if (skipStartupSequences) {
         let nextState = nextStateBase;
-        if (view === 'ending') {
+        if (view === CHAPTER1_INTRO_VIEW) {
           const activeScene = getActiveMessengerScene(editorContent, nextState.messenger, TERMINAL_ADVENTURE_CHAT_ID);
           const pendingAct2Events = (activeScene?.events || [])
             .filter((event) => ['k_069', 'k_070'].includes(event.id) && event.type === 'message_other');
@@ -6482,8 +7319,8 @@ function App() {
     setPrologueDone(true);
   };
 
-  const handleEndingClick = () => {
-    if (view !== 'ending') return;
+  const handleChapterIntroClick = () => {
+    if (view !== CHAPTER1_INTRO_VIEW) return;
     if (!chapter1AudioStartedRef.current && chapter1AudioRef.current) {
       chapter1AudioStartedRef.current = true;
       const playPromise = chapter1AudioRef.current.play();
@@ -6499,6 +7336,17 @@ function App() {
     }
     setEndingIndex(TERMINAL_PROTOCOL_ENDING_TEXT.length);
     setEndingDone(true);
+  };
+
+  const handleEndingClick = () => {
+    if (view !== 'ending' || endingStage !== 'heart') return;
+    setEndingStage('title');
+  };
+
+  const restartFromBeginning = () => {
+    if (typeof window === 'undefined') return;
+    clearStoryState(runtimeSlot);
+    window.location.reload();
   };
 
   const renderExitBody = () => (
@@ -6599,13 +7447,15 @@ function App() {
     const currentChatId = activeChatId || storyState.ui?.activeChatId || '';
 
     (editorContent.messenger.chats || []).forEach((chat) => {
-      if (!unlockedChatIds.has(chat.id) || chat.id !== currentChatId) return;
       const activeScene = getActiveMessengerScene(editorContent, storyState.messenger, chat.id);
       if (!activeScene) return;
 
       const eventIndex = eventIndexByChat[chat.id] || 0;
       const nextEvent = activeScene.events?.[eventIndex];
       if (!nextEvent) return;
+      const isActiveChat = chat.id === currentChatId;
+      const isKFirstInvite = chat.id === TERMINAL_ADVENTURE_CHAT_ID && nextEvent.id === 'k_001';
+      if (!unlockedChatIds.has(chat.id) || (!isActiveChat && !isKFirstInvite)) return;
       if (nextEvent.waitForEventId && !completedEventIds.includes(nextEvent.waitForEventId)) return;
       if (nextEvent.schema?.autoDeliver === false) return;
       if (nextEvent.type === 'message_player') return;
@@ -6790,7 +7640,7 @@ function App() {
     if (!storyState.flags?.acceptedAdventure) return;
     if (!completedEventIds.includes('k_068')) return;
     if (storyState.flags?.chapter1Shown) return;
-    if (view === 'ending') return;
+    if (view === CHAPTER1_INTRO_VIEW || view === 'ending') return;
 
     const timerId = window.setTimeout(() => {
       setStoryState((prev) => {
@@ -6804,7 +7654,7 @@ function App() {
         persistRuntimeState(nextState);
         return nextState;
       });
-      setView('ending');
+      setView(CHAPTER1_INTRO_VIEW);
     }, TERMINAL_PROTOCOL_ENDING_DELAY_MS);
 
     return () => window.clearTimeout(timerId);
@@ -6958,7 +7808,7 @@ function App() {
 
     const terminalMessageTimerId = window.setTimeout(() => {
       appendTerminalLines([
-        createTerminalProtocolLine('развлекайся, но не забывай про работу'),
+        createTerminalProtocolLine('развлекайся, но по крайней мерене забывай про работу'),
       ]);
     }, departingTypingDurationMs + 1500);
 
@@ -7018,6 +7868,35 @@ function App() {
   }, [scheduleIncomingChatEntry, storyState.messenger?.historyByChat]);
 
   useEffect(() => {
+    const chatId = TERMINAL_ADVENTURE_CHAT_ID;
+    const history = storyState.messenger?.historyByChat?.[chatId] || [];
+    const hasReturnMessage = history.some((entry) => entry?.id === 'dynamic-k-house-return-1');
+    const returnNotifKey = `${chatId}:dynamic-k-house-return-1`;
+
+    if (!hasReturnMessage) {
+      kHouseReturnSeenRef.current = false;
+      return;
+    }
+    if (kHouseReturnSeenRef.current) return;
+    kHouseReturnSeenRef.current = true;
+    if (isMessengerChatFrontmost(chatId)) return;
+    if (notifiedIncomingEntryIdsRef.current.has(returnNotifKey)) return;
+    notifiedIncomingEntryIdsRef.current.add(returnNotifKey);
+
+    notifyIncomingMessage({
+      chatId,
+      title: 'К.',
+      text: 'чай допит. Очень милый дед. Мне кажется, очень одинокий.',
+      sound: 'k',
+      dedupeKey: returnNotifKey,
+    });
+  }, [
+    isMessengerChatFrontmost,
+    notifyIncomingMessage,
+    storyState.messenger?.historyByChat,
+  ]);
+
+  useEffect(() => {
     const roofPhotoMessageId = 'dynamic-k-roof-close-photo-1';
     const nextPhotoMessageId = 'dynamic-k-shed-garden-photo-1';
     const kHistory = storyState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [];
@@ -7069,14 +7948,17 @@ function App() {
     if (typingState?.active) return;
 
     const sequenceEntries = [
-      { id: 'dynamic-k-shed-seq-1', text: 'иду в сарай', delayMs: 0 },
-      { id: 'dynamic-k-shed-seq-2', text: 'окей, я в сарае. Тут ничего интересного.', delayMs: K_SHED_STATUS_DELAY_MS },
-      { id: 'dynamic-k-shed-seq-3', text: 'дед говорил, что тут шарится банда местных мальчишек. Романтично по-моему.', delayMs: 1200 },
-      { id: 'dynamic-k-shed-seq-4', text: 'погоди-ка, тут еще лестница, сейчас залезу.', delayMs: 1200 },
-      { id: 'dynamic-k-shed-seq-5', text: 'ты не поверишь………………….', delayMs: 3500 },
+      { id: 'dynamic-k-shed-seq-1', direction: 'incoming', text: 'иду в сарай', delayMs: 0 },
+      { id: 'dynamic-k-shed-seq-2', direction: 'incoming', text: 'окей, я в сарае. Тут ничего интересного.', delayMs: K_SHED_STATUS_DELAY_MS },
+      { id: 'dynamic-k-shed-mid-photo-2', direction: 'incoming', text: '', delayMs: 700 },
+      { id: 'dynamic-k-shed-mid-photo-1', direction: 'incoming', text: '', delayMs: 700 },
+      { id: 'dynamic-k-shed-seq-3', direction: 'incoming', text: 'дед говорил, что тут шарится банда местных мальчишек. Романтично по-моему.', delayMs: 1200 },
+      { id: 'dynamic-k-shed-seq-4', direction: 'incoming', text: 'только я не вижу никаких следов мальчишек', delayMs: 900 },
+      { id: 'dynamic-k-shed-seq-5', direction: 'incoming', text: 'сейчас еще по лестнице залезу', delayMs: 1200 },
+      { id: 'dynamic-k-shed-seq-5b', direction: 'incoming', text: 'ты не поверишь………………….', delayMs: 20000 },
+      { id: 'dynamic-k-shed-video-1', direction: 'incoming', text: '', delayMs: 900 },
+      { id: 'dynamic-k-shed-seq-6', direction: 'incoming', text: 'ЭТО НАСТОЯЩИЙ ШТАБ.', delayMs: 1200 },
     ];
-
-    if (history.some((entry) => entry?.id === 'dynamic-k-shed-seq-1')) return;
 
     let sequenceOffsetMs = 0;
     sequenceEntries.forEach((entry, index) => {
@@ -7111,6 +7993,714 @@ function App() {
 
   useEffect(() => {
     const chatId = TERMINAL_ADVENTURE_CHAT_ID;
+    const history = storyState.messenger?.historyByChat?.[chatId] || [];
+    if (!history.some((entry) => entry?.id === 'dynamic-k-shed-seq-6')) return;
+    if (history.some((entry) => entry?.id === 'dynamic-k-shed-seq-9')) return;
+
+    const queuedReplies = storyState.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+    if (queuedReplies.some((entry) => entry?.id === 'dynamic-k-shed-hq-dialogue-prompt')) return;
+
+    setStoryState((prev) => {
+      const currentQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+      if (currentQueue.some((entry) => entry?.id === 'dynamic-k-shed-hq-dialogue-prompt')) {
+        return prev;
+      }
+      const nextState = {
+        ...prev,
+        messenger: {
+          ...prev.messenger,
+          queuedPhotoRepliesByChat: {
+            ...(prev.messenger?.queuedPhotoRepliesByChat || {}),
+            [chatId]: dedupePhotoReplyQueue([
+              ...currentQueue,
+              {
+                id: 'dynamic-k-shed-hq-dialogue-prompt',
+                messageId: 'dynamic-k-shed-video-1',
+                hotspotId: 'hq-dialogue',
+                label: 'Штаб',
+                conversation: [
+                  { direction: 'outgoing', text: 'Вау!!!' },
+                  { direction: 'outgoing', text: 'Опиши что ты видишь!' },
+                  { direction: 'incoming', text: 'так, ну здесь никого нет, но повсюду куча приколов.', id: 'dynamic-k-shed-seq-9' },
+                ],
+                postConversationEntries: [
+                  {
+                    id: 'dynamic-k-shed-hq-photo-1',
+                    direction: 'incoming',
+                    text: '',
+                    delayMs: 800,
+                  },
+                ],
+                terminalComment: '',
+              },
+            ]),
+          },
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+  }, [
+    persistRuntimeState,
+    storyState.messenger?.historyByChat,
+    storyState.messenger?.queuedPhotoRepliesByChat,
+  ]);
+
+  useEffect(() => {
+    const chatId = TERMINAL_ADVENTURE_CHAT_ID;
+    const history = storyState.messenger?.historyByChat?.[chatId] || [];
+    if (!history.some((entry) => entry?.id === 'dynamic-k-shed-range-seq-7')) return;
+    if (history.some((entry) => entry?.id === 'dynamic-k-shed-boys-voice')) return;
+    const typingState = storyState.messenger?.typingByChat?.[chatId];
+    if (typingState?.active) return;
+
+    scheduleIncomingChatEntry({
+      chatId,
+      entry: {
+        id: 'dynamic-k-shed-boys-voice',
+        direction: 'incoming',
+        text: '',
+        audioSrc: K_SHED_BOYS_AUDIO_SRC,
+        audioLabel: 'Голосовое сообщение',
+      },
+      title: 'К.',
+      notificationText: 'Голосовое сообщение',
+      delayMs: 30000,
+      sound: 'k',
+      timerStoreRef: kHouseSequenceTimersRef,
+    });
+  }, [
+    scheduleIncomingChatEntry,
+    storyState.messenger?.historyByChat,
+    storyState.messenger?.typingByChat,
+  ]);
+
+  useEffect(() => {
+    const chatId = TERMINAL_ADVENTURE_CHAT_ID;
+    const history = storyState.messenger?.historyByChat?.[chatId] || [];
+    const hasPanicReply = history.some((entry) => (
+      entry?.direction === 'outgoing' && (entry?.text || '').trim() === 'БЕЗ ПАНИКИ'
+    ));
+    if (!hasPanicReply) return;
+    if (storyState.flags?.kShedPanicTerminalStarted) return;
+
+    const sequence = [
+      { text: 'без паники...', delayMs: 0 },
+      { text: TERMINAL_PROTOCOL_ELLIPSIS_TEXT, delayMs: 1200, typeSpeedMs: TERMINAL_PROTOCOL_ELLIPSIS_4_SPEED_MS },
+      { text: 'без паники...', delayMs: 1200 },
+      { text: TERMINAL_PROTOCOL_ELLIPSIS_TEXT, delayMs: 1200, typeSpeedMs: TERMINAL_PROTOCOL_ELLIPSIS_4_SPEED_MS },
+      { text: 'без паники...', delayMs: 1200 },
+      { text: 'без паники...', delayMs: 900 },
+      { text: 'без паники...', delayMs: 900 },
+    ];
+
+    let offsetMs = 0;
+    let penultimateAtMs = 0;
+    sequence.forEach((line, index) => {
+      offsetMs += Math.max(0, Number(line.delayMs || 0));
+      const timerId = window.setTimeout(() => {
+        appendTerminalLines([
+          createTerminalProtocolLine(line.text, { typeSpeedMs: line.typeSpeedMs }),
+        ]);
+      }, offsetMs);
+      kHouseSequenceTimersRef.current.push(timerId);
+      if (index === sequence.length - 2) {
+        penultimateAtMs = offsetMs;
+      }
+      if (index < sequence.length - 1) {
+        offsetMs += Number(editorConfig.timings.messageGapMs ?? 0);
+      }
+    });
+
+    const freezeTimerId = window.setTimeout(() => {
+      openWindow('app7');
+      bringToFront('app7');
+      setOpen((prev) => ({ ...prev, app7: true }));
+      setMinimized((prev) => ({ ...prev, app7: false }));
+      setWinState((prev) => ({
+        ...prev,
+        app7: {
+          ...(prev.app7 || {}),
+          pos: { x: 400, y: 160 },
+          size: { width: 1120, height: 760 },
+        },
+      }));
+      setStoryState((prev) => {
+        if (prev.flags?.kShedTerminalLockMode) return prev;
+        const nextState = {
+          ...prev,
+          flags: {
+            ...(prev.flags || {}),
+            kShedTerminalLockMode: true,
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
+    }, Math.max(0, penultimateAtMs));
+    kHouseSequenceTimersRef.current.push(freezeTimerId);
+
+    const finalLineDurationMs = Math.max(0, Math.ceil('без паники...'.length * 22));
+    const sequenceDoneTimerId = window.setTimeout(() => {
+      setStoryState((prev) => {
+        if (prev.flags?.kShedPanicTerminalSequenceDone) return prev;
+        const nextState = {
+          ...prev,
+          flags: {
+            ...(prev.flags || {}),
+            kShedPanicTerminalSequenceDone: true,
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
+    }, offsetMs + finalLineDurationMs + 250);
+    kHouseSequenceTimersRef.current.push(sequenceDoneTimerId);
+
+    setStoryState((prev) => {
+      if (prev.flags?.kShedPanicTerminalStarted) return prev;
+      const nextState = {
+        ...prev,
+        flags: {
+          ...(prev.flags || {}),
+          kShedPanicTerminalStarted: true,
+          kShedPanicTerminalSequenceDone: false,
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+  }, [
+    appendTerminalLines,
+    bringToFront,
+    editorConfig.timings.messageGapMs,
+    openWindow,
+    persistRuntimeState,
+    setStoryState,
+    setWinState,
+    storyState.flags?.kShedPanicTerminalStarted,
+    storyState.messenger?.historyByChat,
+  ]);
+
+  useEffect(() => {
+    if (!storyState.flags?.kShedTerminalLockMode) return;
+    if (!storyState.flags?.kShedPanicTerminalStarted) return;
+    if (!storyState.flags?.kShedPanicTerminalSequenceDone) return;
+    if (storyState.flags?.kShedNarratorIntroStarted) return;
+
+    const shellLineId = 'dynamic-k-shed-narrator-shell';
+    setStoryState((prev) => {
+      const existingLines = prev.terminal?.lines || [];
+      if (existingLines.some((line) => line.id === shellLineId)) return prev;
+      const nextState = {
+        ...prev,
+        terminal: {
+          ...(prev.terminal || {}),
+          lines: [
+            ...existingLines,
+            {
+              id: shellLineId,
+              text: '',
+              status: 'done',
+              promptText: '> > C:\\Users\\G>',
+            },
+          ],
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+
+    const eraseStep1TimerId = window.setTimeout(() => {
+      setStoryState((prev) => {
+        const nextLines = (prev.terminal?.lines || []).map((line) => (
+          line.id === shellLineId ? { ...line, promptText: '> > C:\\Users\\G' } : line
+        ));
+        const nextState = {
+          ...prev,
+          terminal: {
+            ...(prev.terminal || {}),
+            lines: nextLines,
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
+    }, 900);
+    kHouseSequenceTimersRef.current.push(eraseStep1TimerId);
+
+    const eraseStep2TimerId = window.setTimeout(() => {
+      setStoryState((prev) => {
+        const nextLines = (prev.terminal?.lines || []).map((line) => (
+          line.id === shellLineId ? { ...line, promptText: '> > C:\\Users\\' } : line
+        ));
+        const nextState = {
+          ...prev,
+          terminal: {
+            ...(prev.terminal || {}),
+            lines: nextLines,
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
+    }, 1260);
+    kHouseSequenceTimersRef.current.push(eraseStep2TimerId);
+
+    const narratorTimerId = window.setTimeout(() => {
+      setStoryState((prev) => {
+        const currentLines = prev.terminal?.lines || [];
+        const nextLines = currentLines.map((line) => (
+          line.id === shellLineId
+            ? {
+              ...line,
+              text: 'dev.mode>Narrator>',
+              status: 'pending',
+              typeSpeedMs: 95,
+              promptText: '> > C:\\Users\\',
+              textClassName: 'terminal-line-text--purple',
+              noPromptGap: true,
+            }
+            : line
+        ));
+        const nextState = {
+          ...prev,
+          terminal: {
+            ...(prev.terminal || {}),
+            lines: nextLines,
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
+    }, 1900);
+    kHouseSequenceTimersRef.current.push(narratorTimerId);
+
+    setStoryState((prev) => {
+      if (prev.flags?.kShedNarratorIntroStarted) return prev;
+      const nextState = {
+        ...prev,
+        flags: {
+          ...(prev.flags || {}),
+          kShedNarratorIntroStarted: true,
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+  }, [
+    appendTerminalLines,
+    persistRuntimeState,
+    setStoryState,
+    storyState.flags?.kShedNarratorIntroStarted,
+    storyState.flags?.kShedPanicTerminalStarted,
+    storyState.flags?.kShedPanicTerminalSequenceDone,
+    storyState.flags?.kShedTerminalLockMode,
+  ]);
+
+  useEffect(() => {
+    if (!storyState.flags?.kShedNarratorIntroStarted) return;
+    if (storyState.flags?.kShedNarratorQuestionShown) return;
+
+    const terminalLines = storyState.terminal?.lines || [];
+    const narratorLine = [...terminalLines].reverse().find((line) => (
+      typeof line?.text === 'string'
+      && line.text.trim().startsWith('dev.mode>Narrator>')
+    ));
+    if (!narratorLine || narratorLine.status !== 'done') return;
+
+    const narratorSequence = [
+      {
+        id: 'dynamic-k-shed-narrator-question-1',
+        text: 'О, нет, на самом интересном месте!!!',
+        pauseAfterMs: 1000,
+      },
+      {
+        id: 'dynamic-k-shed-narrator-question-2',
+        text: 'Так хочется узнать, что будет дальше! Найдут ли мальчишки К.? Уволят ли Героя с работы? Могут ли вообще уволить с такой работы? И что это за Терминал, который нельзя закрыть?..',
+        pauseAfterMs: 1000,
+      },
+      {
+        id: 'dynamic-k-shed-narrator-question-3',
+        text: 'Купит ли герой билеты к маме? Помирится ли с Другом? А главное – быть ли детской книге, и о чем в ней будет сказка?',
+        pauseAfterMs: 1000,
+      },
+      {
+        id: 'dynamic-k-shed-narrator-question-4',
+        text: 'Очень интересно наблюдать за чужим приключением. Но у тебя, дорогой игрок, наверняка есть свой рабочий стол, за которым нужно присматривать.',
+        pauseAfterMs: 1000,
+      },
+      {
+        id: 'dynamic-k-shed-narrator-question-5',
+        text: 'Кто-то точно ждет ответа в чатах. Карьера сама себя не построит. Вперед! Столько всего в одном месте, такой власти еще не было ни у кого, кто жил до нас...',
+        pauseAfterMs: 2000,
+      },
+      {
+        id: 'dynamic-k-shed-narrator-question-6',
+        text: 'Только помни всегда.',
+        pauseAfterMs: 1000,
+      },
+      {
+        id: 'dynamic-k-shed-narrator-question-7',
+        text: 'Именно в этот момент кто-то засыпает в поезде.',
+        pauseAfterMs: 1000,
+      },
+      {
+        id: 'dynamic-k-shed-narrator-question-8',
+        text: 'Чух-чух, чух-чух…',
+        pauseAfterMs: 0,
+      },
+    ];
+
+    const narratorTypeSpeedMs = 28;
+    let sequenceOffsetMs = 0;
+    narratorSequence.forEach((step, index) => {
+      const delayMs = sequenceOffsetMs;
+      const timerId = window.setTimeout(() => {
+        appendTerminalLines([
+          createTerminalProtocolLine(step.text, {
+            id: step.id,
+            promptText: '',
+            typeSpeedMs: narratorTypeSpeedMs,
+          }),
+        ]);
+      }, delayMs);
+      kHouseSequenceTimersRef.current.push(timerId);
+
+      const typingDurationMs = Math.max(0, step.text.length * narratorTypeSpeedMs);
+      sequenceOffsetMs += typingDurationMs + step.pauseAfterMs;
+    });
+
+    setStoryState((prev) => {
+      if (prev.flags?.kShedNarratorQuestionShown) return prev;
+      const nextState = {
+        ...prev,
+        flags: {
+          ...(prev.flags || {}),
+          kShedNarratorQuestionShown: true,
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+  }, [
+    appendTerminalLines,
+    persistRuntimeState,
+    setStoryState,
+    storyState.flags?.kShedNarratorIntroStarted,
+    storyState.flags?.kShedNarratorQuestionShown,
+    storyState.terminal?.lines,
+  ]);
+
+  useEffect(() => {
+    if (!storyState.flags?.kShedTerminalLockMode) return;
+    if (!storyState.flags?.kShedNarratorQuestionShown) return;
+    if (storyState.flags?.kTerminalCloseChoiceShown) return;
+
+    const terminalLines = storyState.terminal?.lines || [];
+    const finalNarratorLine = terminalLines.find((line) => line?.id === 'dynamic-k-shed-narrator-question-8');
+    if (!finalNarratorLine || finalNarratorLine.status !== 'done') return;
+
+    const showChoiceTimerId = window.setTimeout(() => {
+      appendTerminalLines([
+        createTerminalProtocolLine('Закрыть терминал?', {
+          id: 'dynamic-k-shed-terminal-close-question',
+          promptText: '',
+          typeSpeedMs: 28,
+        }),
+      ]);
+
+      setStoryState((prev) => {
+        if (prev.flags?.kTerminalCloseChoiceShown) return prev;
+        const nextState = {
+          ...prev,
+          flags: {
+            ...(prev.flags || {}),
+            kTerminalCloseChoiceShown: true,
+          },
+          terminal: {
+            ...(prev.terminal || {}),
+            prompt: {
+              id: 'terminal-close-confirm',
+              active: true,
+              stage: 'choice',
+              noDisabled: false,
+              cycle: (prev.terminal?.prompt?.cycle || 0) + 1,
+              acceptLabel: 'да',
+              rejectLabel: 'да',
+            },
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
+    }, 1000);
+
+    kHouseSequenceTimersRef.current.push(showChoiceTimerId);
+  }, [
+    appendTerminalLines,
+    persistRuntimeState,
+    storyState.flags?.kShedNarratorQuestionShown,
+    storyState.flags?.kShedTerminalLockMode,
+    storyState.flags?.kTerminalCloseChoiceShown,
+    storyState.terminal?.lines,
+  ]);
+
+  useEffect(() => {
+    const chatId = TERMINAL_ADVENTURE_CHAT_ID;
+    const messageId = 'dynamic-k-shed-hq-photo-1';
+    const nextPhotoId = 'dynamic-k-shed-hq-photo-2';
+    const history = storyState.messenger?.historyByChat?.[chatId] || [];
+    if (!history.some((entry) => entry?.id === messageId)) return;
+    if (history.some((entry) => entry?.id === nextPhotoId)) return;
+    if (!areAllMessageHotspotsInspected(messageId, storyState.messenger?.inspectedPhotoHotspotsByMessage || {})) return;
+
+    const queuedReplies = storyState.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+    if (queuedReplies.some((entry) => entry?.messageId === messageId)) return;
+    const isPhotoReplyInFlight = !!storyState.messenger?.photoReplyInFlightByChat?.[chatId];
+    if (isPhotoReplyInFlight) return;
+    const typingState = storyState.messenger?.typingByChat?.[chatId];
+    if (typingState?.active) return;
+
+    scheduleIncomingChatEntry({
+      chatId,
+      entry: {
+        id: nextPhotoId,
+        direction: 'incoming',
+        text: '',
+      },
+      title: 'К.',
+      notificationText: 'Фотография',
+      delayMs: 1200,
+      sound: 'k',
+      timerStoreRef: kHouseSequenceTimersRef,
+    });
+  }, [
+    scheduleIncomingChatEntry,
+    storyState.messenger?.historyByChat,
+    storyState.messenger?.inspectedPhotoHotspotsByMessage,
+    storyState.messenger?.photoReplyInFlightByChat,
+    storyState.messenger?.queuedPhotoRepliesByChat,
+    storyState.messenger?.typingByChat,
+  ]);
+
+  useEffect(() => {
+    const chatId = TERMINAL_ADVENTURE_CHAT_ID;
+    const messageId = 'dynamic-k-shed-hq-photo-2';
+    const nextPhotoId = 'dynamic-k-shed-hq-photo-3';
+    const history = storyState.messenger?.historyByChat?.[chatId] || [];
+    if (!history.some((entry) => entry?.id === messageId)) return;
+    if (history.some((entry) => entry?.id === nextPhotoId)) return;
+    if (!areAllMessageHotspotsInspected(messageId, storyState.messenger?.inspectedPhotoHotspotsByMessage || {})) return;
+
+    const queuedReplies = storyState.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+    if (queuedReplies.some((entry) => entry?.messageId === messageId)) return;
+    const isPhotoReplyInFlight = !!storyState.messenger?.photoReplyInFlightByChat?.[chatId];
+    if (isPhotoReplyInFlight) return;
+    const typingState = storyState.messenger?.typingByChat?.[chatId];
+    if (typingState?.active) return;
+
+    scheduleIncomingChatEntry({
+      chatId,
+      entry: {
+        id: nextPhotoId,
+        direction: 'incoming',
+        text: '',
+      },
+      title: 'К.',
+      notificationText: 'Фотография',
+      delayMs: 1200,
+      sound: 'k',
+      timerStoreRef: kHouseSequenceTimersRef,
+    });
+  }, [
+    scheduleIncomingChatEntry,
+    storyState.messenger?.historyByChat,
+    storyState.messenger?.inspectedPhotoHotspotsByMessage,
+    storyState.messenger?.photoReplyInFlightByChat,
+    storyState.messenger?.queuedPhotoRepliesByChat,
+    storyState.messenger?.typingByChat,
+  ]);
+
+  useEffect(() => {
+    const chatId = TERMINAL_ADVENTURE_CHAT_ID;
+    const history = storyState.messenger?.historyByChat?.[chatId] || [];
+    if (!history.some((entry) => entry?.id === 'dynamic-k-shed-seq-1')) return;
+    if (history[history.length - 1]?.id !== 'dynamic-k-shed-seq-1') return;
+    if (shedConveyorNudgeAnchorSeenRef.current) return;
+    shedConveyorNudgeAnchorSeenRef.current = true;
+    if (storyState.flags?.kShedTerminalConveyorNudgeShown) return;
+
+    const step1TimerId = window.setTimeout(() => {
+      appendTerminalLines([createTerminalProtocolLine('эй')]);
+    }, 1200);
+    const step2TimerId = window.setTimeout(() => {
+      appendTerminalLines([createTerminalProtocolLine('если ты не можешь быть многозадачным, то не нужно пытаться')]);
+    }, 3400);
+    const step3TimerId = window.setTimeout(() => {
+      appendTerminalLines([createTerminalProtocolLine('но далеко ты так не уедешь')]);
+    }, 6200);
+    const openConveyorTimerId = window.setTimeout(() => {
+      openWindow('app5');
+      bringToFront('app5');
+    }, 7600);
+
+    kHouseSequenceTimersRef.current.push(step1TimerId, step2TimerId, step3TimerId, openConveyorTimerId);
+
+    setStoryState((prev) => {
+      if (prev.flags?.kShedTerminalConveyorNudgeShown) return prev;
+      const nextState = {
+        ...prev,
+        flags: {
+          ...(prev.flags || {}),
+          kShedTerminalConveyorNudgeShown: true,
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+  }, [
+    appendTerminalLines,
+    bringToFront,
+    openWindow,
+    persistRuntimeState,
+    storyState.flags?.kShedTerminalConveyorNudgeShown,
+    storyState.messenger?.historyByChat,
+  ]);
+
+  useEffect(() => {
+    const chatId = TERMINAL_ADVENTURE_CHAT_ID;
+    const messageId = 'dynamic-k-shed-hq-photo-3';
+    const nextPhotoId = 'dynamic-k-shed-hq-photo-4';
+    const history = storyState.messenger?.historyByChat?.[chatId] || [];
+    if (!history.some((entry) => entry?.id === messageId)) return;
+    if (history.some((entry) => entry?.id === nextPhotoId)) return;
+    if (!areAllMessageHotspotsInspected(messageId, storyState.messenger?.inspectedPhotoHotspotsByMessage || {})) return;
+
+    const queuedReplies = storyState.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+    if (queuedReplies.some((entry) => entry?.messageId === messageId)) return;
+    const isPhotoReplyInFlight = !!storyState.messenger?.photoReplyInFlightByChat?.[chatId];
+    if (isPhotoReplyInFlight) return;
+    const typingState = storyState.messenger?.typingByChat?.[chatId];
+    if (typingState?.active) return;
+
+    scheduleIncomingChatEntry({
+      chatId,
+      entry: {
+        id: nextPhotoId,
+        direction: 'incoming',
+        text: '',
+      },
+      title: 'К.',
+      notificationText: 'Фотография',
+      delayMs: 1200,
+      sound: 'k',
+      timerStoreRef: kHouseSequenceTimersRef,
+    });
+  }, [
+    scheduleIncomingChatEntry,
+    storyState.messenger?.historyByChat,
+    storyState.messenger?.inspectedPhotoHotspotsByMessage,
+    storyState.messenger?.photoReplyInFlightByChat,
+    storyState.messenger?.queuedPhotoRepliesByChat,
+    storyState.messenger?.typingByChat,
+  ]);
+
+  useEffect(() => {
+    const chatId = TERMINAL_ADVENTURE_CHAT_ID;
+    const history = storyState.messenger?.historyByChat?.[chatId] || [];
+    if (!history.some((entry) => entry?.id === 'dynamic-k-shed-hq-photo-4')) return;
+    if (history.some((entry) => entry?.id === 'dynamic-k-shed-range-seq-4')) return;
+    const typingState = storyState.messenger?.typingByChat?.[chatId];
+    if (typingState?.active) return;
+
+    const sequenceEntries = [
+      { id: 'dynamic-k-shed-range-seq-1', text: 'видишь, они просто играют.' },
+      { id: 'dynamic-k-shed-range-seq-2', text: 'аааа, слушай, я как-то даже не заметила, когда сюда шла. Это у них тир' },
+      { id: 'dynamic-k-shed-range-seq-3', text: 'стой я что-то слышу', delayMs: 5000 },
+      { id: 'dynamic-k-shed-range-seq-4', text: 'Кто-то пришел!!', delayMs: 5000 },
+    ];
+
+    let sequenceOffsetMs = 900;
+    sequenceEntries.forEach((entry, index) => {
+      const totalDelayMs = sequenceOffsetMs;
+      scheduleIncomingChatEntry({
+        chatId,
+        entry: {
+          id: entry.id,
+          direction: 'incoming',
+          text: entry.text,
+        },
+        title: 'К.',
+        notificationText: entry.text,
+        delayMs: totalDelayMs,
+        sound: 'k',
+        timerStoreRef: kHouseSequenceTimersRef,
+      });
+      const nextGapMs = Math.max(0, Number(entry.delayMs ?? (Number(editorConfig.timings.messageGapMs ?? 0) + 600)));
+      sequenceOffsetMs += nextGapMs;
+      if (index < sequenceEntries.length - 1 && !entry.delayMs) {
+        sequenceOffsetMs += Number(editorConfig.timings.messageGapMs ?? 0);
+      }
+    });
+  }, [
+    editorConfig.timings.messageGapMs,
+    scheduleIncomingChatEntry,
+    storyState.messenger?.historyByChat,
+    storyState.messenger?.typingByChat,
+  ]);
+
+  useEffect(() => {
+    const chatId = TERMINAL_ADVENTURE_CHAT_ID;
+    const history = storyState.messenger?.historyByChat?.[chatId] || [];
+    if (!history.some((entry) => entry?.id === 'dynamic-k-shed-range-seq-4')) return;
+    if (history.some((entry) => entry?.id === 'dynamic-k-shed-range-seq-7')) return;
+
+    const queuedReplies = storyState.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+    if (queuedReplies.some((entry) => entry?.id === 'dynamic-k-shed-range-prompt')) return;
+
+    setStoryState((prev) => {
+      const currentQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+      if (currentQueue.some((entry) => entry?.id === 'dynamic-k-shed-range-prompt')) {
+        return prev;
+      }
+      const nextState = {
+        ...prev,
+        messenger: {
+          ...prev.messenger,
+          queuedPhotoRepliesByChat: {
+            ...(prev.messenger?.queuedPhotoRepliesByChat || {}),
+            [chatId]: dedupePhotoReplyQueue([
+              ...currentQueue,
+              {
+                id: 'dynamic-k-shed-range-prompt',
+                messageId: 'dynamic-k-shed-hq-photo-4',
+                hotspotId: 'range-followup',
+                label: 'Тир',
+                conversation: [
+                  { direction: 'outgoing', text: 'ПРЯЧЬСЯ' },
+                  { direction: 'incoming', text: 'ЗАЧЕМ??', id: 'dynamic-k-shed-range-seq-5' },
+                  { direction: 'outgoing', text: 'Будешь подслушивать!!!!!!!' },
+                  { direction: 'incoming', text: 'ААААААА', id: 'dynamic-k-shed-range-seq-7' },
+                ],
+                postConversationEntries: [],
+                terminalComment: '',
+              },
+            ]),
+          },
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+  }, [
+    persistRuntimeState,
+    storyState.messenger?.historyByChat,
+    storyState.messenger?.queuedPhotoRepliesByChat,
+  ]);
+
+  useEffect(() => {
+    const chatId = TERMINAL_ADVENTURE_CHAT_ID;
     const queuedReplies = storyState.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
     const isPhotoReplyInFlight = !!storyState.messenger?.photoReplyInFlightByChat?.[chatId];
     const typingState = storyState.messenger?.typingByChat?.[chatId];
@@ -7125,7 +8715,120 @@ function App() {
     ));
     if (!hasOutgoingAlreadyInHistory) return;
 
+    const remainingEntries = (queuedReply.conversation || []).slice(1);
+    const nextOutgoingIndex = remainingEntries.findIndex((entry) => entry?.direction === 'outgoing');
+    const autoIncomingEntries = nextOutgoingIndex === -1
+      ? remainingEntries
+      : remainingEntries.slice(0, nextOutgoingIndex);
+    const hasAllAutoIncomingInHistory = autoIncomingEntries.every((entry) => {
+      const incomingText = (entry?.text || '').trim();
+      return kHistory.some((historyEntry) => (
+        historyEntry?.direction === 'incoming'
+        && (
+          (entry?.id && historyEntry?.id === entry.id)
+          || (!!incomingText && (historyEntry?.text || '').trim() === incomingText)
+        )
+      ));
+    });
+
+    if (hasAllAutoIncomingInHistory && Array.isArray(queuedReply.postConversationEntries) && queuedReply.postConversationEntries.length > 0) {
+      setStoryState((prev) => {
+        const currentQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+        const nextState = {
+          ...prev,
+          messenger: {
+            ...prev.messenger,
+            queuedPhotoRepliesByChat: {
+              ...(prev.messenger?.queuedPhotoRepliesByChat || {}),
+              [chatId]: currentQueue.filter((item) => item?.id !== queuedReply.id),
+            },
+            photoReplyInFlightByChat: {
+              ...(prev.messenger?.photoReplyInFlightByChat || {}),
+              [chatId]: false,
+            },
+            typingByChat: {
+              ...(prev.messenger?.typingByChat || {}),
+              [chatId]: {
+                active: false,
+                durationMs: 0,
+              },
+            },
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
+
+      const immediatePostConversationEntries = queuedReply.postConversationEntries
+        .filter((entry) => Math.max(0, Number(entry?.delayMs || 0)) === 0);
+      const delayedPostConversationEntries = queuedReply.postConversationEntries
+        .filter((entry) => Math.max(0, Number(entry?.delayMs || 0)) > 0);
+
+      let postConversationOffsetMs = 0;
+      immediatePostConversationEntries.forEach((postEntry) => {
+        if (!postEntry?.id) return;
+        const { delayMs: _delayMs, notificationTitle: _notificationTitle, notificationText: _notificationText, ...historyEntry } = postEntry;
+        postConversationOffsetMs = scheduleIncomingChatEntry({
+          chatId,
+          entry: historyEntry,
+          title: postEntry.notificationTitle || 'К.',
+          notificationText: postEntry.notificationText || historyEntry.text || 'Фотография',
+          delayMs: postConversationOffsetMs,
+          sound: 'k',
+        }) + Number(editorConfig.timings.messageGapMs ?? 0);
+      });
+
+      delayedPostConversationEntries.forEach((postEntry) => {
+        if (!postEntry?.id) return;
+        const postDelayMs = Math.max(0, Number(postEntry.delayMs || 0));
+        const { delayMs: _delayMs, notificationTitle: _notificationTitle, notificationText: _notificationText, ...historyEntry } = postEntry;
+        scheduleIncomingChatEntry({
+          chatId,
+          entry: historyEntry,
+          title: postEntry.notificationTitle || 'К.',
+          notificationText: postEntry.notificationText || historyEntry.text || 'Фотография',
+          delayMs: postDelayMs,
+          sound: 'k',
+        });
+      });
+      return;
+    }
+
     const resumeKey = `${queuedReply.id}:${kHistory.length}`;
+    if (queuedReplyResumeKeysRef.current.has(resumeKey)) return;
+    queuedReplyResumeKeysRef.current.add(resumeKey);
+
+    submitQueuedPhotoReply(chatId, queuedReply);
+  }, [
+    editorConfig.timings.messageGapMs,
+    persistRuntimeState,
+    scheduleIncomingChatEntry,
+    storyState.messenger?.historyByChat,
+    storyState.messenger?.photoReplyInFlightByChat,
+    storyState.messenger?.queuedPhotoRepliesByChat,
+    storyState.messenger?.typingByChat,
+    setStoryState,
+    submitQueuedPhotoReply,
+  ]);
+
+  useEffect(() => {
+    const chatId = 'chat-druk';
+    const queuedReplies = storyState.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+    const isPhotoReplyInFlight = !!storyState.messenger?.photoReplyInFlightByChat?.[chatId];
+    const typingState = storyState.messenger?.typingByChat?.[chatId];
+    if (isPhotoReplyInFlight || typingState?.active) return;
+    const queuedReply = queuedReplies[0];
+    if (!queuedReply) return;
+    const firstEntry = (queuedReply.conversation || [])[0];
+    if (!firstEntry || firstEntry.direction !== 'outgoing' || !firstEntry.text) return;
+
+    const friendHistory = storyState.messenger?.historyByChat?.[chatId] || [];
+    const hasOutgoingAlreadyInHistory = friendHistory.some((entry) => (
+      entry?.direction === 'outgoing' && (entry.text || '').trim() === (firstEntry.text || '').trim()
+    ));
+    if (!hasOutgoingAlreadyInHistory) return;
+
+    const resumeKey = `${chatId}:${queuedReply.id}:${friendHistory.length}`;
     if (queuedReplyResumeKeysRef.current.has(resumeKey)) return;
     queuedReplyResumeKeysRef.current.add(resumeKey);
 
@@ -7139,98 +8842,49 @@ function App() {
   ]);
 
   useEffect(() => {
-    const chatId = TERMINAL_ADVENTURE_CHAT_ID;
-    const kHistory = storyState.messenger?.historyByChat?.[chatId] || [];
-    if (!kHistory.some((entry) => entry?.id === 'dynamic-k-shed-garden-photo-1')) return;
-    const hasBikeQuestion = kHistory.some((entry) => (
-      entry?.direction === 'outgoing' && entry?.text === 'у деда есть внуки?'
-    ));
-    if (!hasBikeQuestion) {
-      bikeReplyRecoveryScheduledRef.current = false;
-      return;
-    }
-    const hasBikeAnswer = kHistory.some((entry) => (
-      entry?.direction === 'incoming' && entry?.text === 'нет, говорю же, он совсем один.'
-    ));
-    if (hasBikeAnswer) {
-      bikeReplyRecoveryScheduledRef.current = false;
-      return;
-    }
-    const typingState = storyState.messenger?.typingByChat?.[chatId];
-    if (typingState?.active) return;
-    const queuedReplies = storyState.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
-    const hasQueuedBikeContinuation = queuedReplies.some((entry) => (
-      entry?.messageId === 'dynamic-k-shed-garden-photo-1'
-      && entry?.hotspotId === 'bike'
-    ));
-    if (hasQueuedBikeContinuation) {
-      bikeReplyRecoveryScheduledRef.current = false;
-      return;
-    }
-    if (bikeReplyRecoveryScheduledRef.current) return;
-    bikeReplyRecoveryScheduledRef.current = true;
-
-    const deliveryDelayMs = scheduleIncomingChatEntry({
-      chatId,
-      entry: {
-        id: 'dynamic-k-shed-bike-recover-answer-1',
-        direction: 'incoming',
-        text: 'нет, говорю же, он совсем один.',
-      },
-      title: 'К.',
-      notificationText: 'нет, говорю же, он совсем один.',
-      sound: 'k',
-      timerStoreRef: photoReplyTimersRef,
-    });
-
-    const queueRemainderTimerId = window.setTimeout(() => {
-      setStoryState((prev) => {
-        const currentHistory = prev.messenger?.historyByChat?.[chatId] || [];
-        const alreadyQueued = (prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || []).some((entry) => (
-          entry?.messageId === 'dynamic-k-shed-garden-photo-1'
-          && entry?.hotspotId === 'bike'
-        ));
-        if (alreadyQueued) return prev;
-        const nextState = {
-          ...prev,
-          messenger: {
-            ...prev.messenger,
-            queuedPhotoRepliesByChat: {
-              ...(prev.messenger?.queuedPhotoRepliesByChat || {}),
-              [chatId]: dedupePhotoReplyQueue([
-                {
-                  id: `photo-hotspot-dynamic-k-shed-garden-photo-1-bike-recovered-${Date.now()}`,
-                  messageId: 'dynamic-k-shed-garden-photo-1',
-                  hotspotId: 'bike',
-                  label: 'Велосипед',
-                  conversation: [
-                    { direction: 'outgoing', text: 'Странно, а велик как будто детский.' },
-                    { direction: 'incoming', text: 'может он там много лет валяется' },
-                    { direction: 'outgoing', text: 'Не бывает бесхозных великов в деревне' },
-                  ],
-                  postConversationEntries: [],
-                  terminalComment: '',
-                },
-                ...(prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || []),
-              ]),
-            },
-            photoReplyInFlightByChat: {
-              ...(prev.messenger?.photoReplyInFlightByChat || {}),
-              [chatId]: false,
-            },
-          },
-        };
-        persistRuntimeState(nextState);
-        return nextState;
+    const inFlightByChat = storyState.messenger?.photoReplyInFlightByChat || {};
+    const queuedByChat = storyState.messenger?.queuedPhotoRepliesByChat || {};
+    const typingByChat = storyState.messenger?.typingByChat || {};
+    const blockedChatIds = Object.entries(inFlightByChat)
+      .filter(([, inFlight]) => !!inFlight)
+      .map(([chatId]) => chatId)
+      .filter((chatId) => {
+        const queued = queuedByChat?.[chatId] || [];
+        const typing = typingByChat?.[chatId];
+        return queued.length > 0 && !typing?.active;
       });
-      bikeReplyRecoveryScheduledRef.current = false;
-    }, deliveryDelayMs + Number(editorConfig.timings.messageGapMs ?? 0));
-    photoReplyTimersRef.current.push(queueRemainderTimerId);
+
+    if (blockedChatIds.length === 0) return;
+    if (photoReplyTimersRef.current.length > 0) return;
+
+    setStoryState((prev) => {
+      const prevInFlightByChat = prev.messenger?.photoReplyInFlightByChat || {};
+      let changed = false;
+      const nextInFlightByChat = { ...prevInFlightByChat };
+
+      blockedChatIds.forEach((chatId) => {
+        if (!nextInFlightByChat?.[chatId]) return;
+        const queued = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+        const typing = prev.messenger?.typingByChat?.[chatId];
+        if (queued.length === 0 || typing?.active) return;
+        nextInFlightByChat[chatId] = false;
+        changed = true;
+      });
+
+      if (!changed) return prev;
+      const nextState = {
+        ...prev,
+        messenger: {
+          ...prev.messenger,
+          photoReplyInFlightByChat: nextInFlightByChat,
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
   }, [
-    editorConfig.timings.messageGapMs,
     persistRuntimeState,
-    scheduleIncomingChatEntry,
-    storyState.messenger?.historyByChat,
+    storyState.messenger?.photoReplyInFlightByChat,
     storyState.messenger?.queuedPhotoRepliesByChat,
     storyState.messenger?.typingByChat,
   ]);
@@ -7359,6 +9013,7 @@ function App() {
       .filter((it) => open[it.id])
       .map((it) => ({ id: it.id, title: it.title, minimized: minimized[it.id] })),
   ];
+  const isTerminalLockScene = !!storyState.flags?.kShedTerminalLockMode;
 
   return (
     <div className="app-shell">
@@ -7418,14 +9073,65 @@ function App() {
             </div>
           </div>
         </div>
-      ) : view === 'ending' ? (
-        <div className="prologue-screen" key="ending" onClick={handleEndingClick} role="presentation">
+      ) : view === CHAPTER1_INTRO_VIEW ? (
+        <div className="prologue-screen" key="chapter1_intro" onClick={handleChapterIntroClick} role="presentation">
           <div className="prologue-box">
             <div className="prologue-text">
               {endingStarted ? TERMINAL_PROTOCOL_ENDING_TEXT.slice(0, endingIndex) : ''}
               {endingStarted && !endingDone && <span className="prologue-caret" aria-hidden="true" />}
             </div>
           </div>
+        </div>
+      ) : view === 'ending' ? (
+        <div
+          className={`prologue-screen ending-screen${endingStage === 'title' ? ' ending-screen--title' : ''}`}
+          key="ending"
+          role="presentation"
+        >
+          {endingStage === 'heart' ? (
+            <button
+              type="button"
+              className="ending-heart-button"
+              onClick={handleEndingClick}
+              aria-label="Продолжить"
+            >
+              💖
+            </button>
+          ) : (
+            <div className="ending-credits">
+              <div className={`ending-title${endingTitleVisible ? ' is-visible' : ''}`}>
+                ПРОДОЛЖЕНИЕ СЛЕДУЕТ
+              </div>
+              <div className={`ending-subtitle${endingFomoVisible ? ' is-visible' : ''}`}>«ФОМО»</div>
+              <div className={`ending-credit-list${endingCreditsVisible ? ' is-visible' : ''}`}>
+                <div className="ending-credit-row"><span>Продюсер</span><span>Владимир Я Яньшин</span></div>
+                <div className="ending-credit-row"><span>Звукорежиссер</span><span>Евгений Grenz Роднянский</span></div>
+                <div className="ending-credit-row"><span>Композитор</span><span>Евгений Grenz Роднянский</span></div>
+                <div className="ending-credit-row"><span>Дизайнер</span><span>Александра dyddod Дидод</span></div>
+                <div className="ending-credit-row"><span>Сценарий</span><span>Варвара Забота Лобода</span></div>
+              </div>
+              <div className={`ending-director${endingDirectorVisible ? ' is-visible' : ''}`}>
+                <div className="ending-credit-row"><span>Режиссер</span><span>Варвара Лобода</span></div>
+                <div className="ending-actions">
+                  <button type="button" className="ending-action-btn" onClick={restartFromBeginning}>
+                    начать с начала
+                  </button>
+                  <button type="button" className="ending-action-btn" onClick={() => {}}>
+                    узнать больше о fomo
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          {isDevRoute && (
+            <button
+              type="button"
+              className="ending-dev-exit-btn"
+              onClick={() => openDesktop({ skipStartupSequences: true })}
+            >
+              На стол
+            </button>
+          )}
         </div>
       ) : view === 'landing' ? (
         <div className="landing" key="landing">
@@ -7457,8 +9163,8 @@ function App() {
           )}
         </div>
       ) : (
-        <div className="desktop-frame" ref={frameRef} key="desktop">
-          {isDevRoute && (
+        <div className={`desktop-frame${isTerminalLockScene ? ' desktop-frame--terminal-lock' : ''}`} ref={frameRef} key="desktop">
+          {isDevRoute && !isTerminalLockScene && (
             <div className="dev-toolbar">
               <button
                 type="button"
@@ -7488,10 +9194,38 @@ function App() {
               >
                 К ссоре с другом
               </button>
+              <button
+                type="button"
+                className="dev-launch-btn"
+                onClick={launchDevBeforeShed}
+              >
+                До «иду в сарай»
+              </button>
+              <button
+                type="button"
+                className="dev-launch-btn"
+                onClick={launchDevAtBoysVoice}
+              >
+                К голосовому
+              </button>
             </div>
           )}
+          {isDevRoute && isTerminalLockScene && (
+            <button
+              type="button"
+              className="dev-launch-btn dev-launch-btn--lock"
+              onClick={launchDevAtBoysVoice}
+            >
+              К голосовому
+            </button>
+          )}
           {screenFlashActive && <div className="screen-flash" aria-hidden="true" />}
-          {persistentNotifs.length > 0 && (
+          {storyMessageFlashText ? (
+            <div className="story-message-flash" aria-hidden="true">
+              <div className="story-message-flash__text">{storyMessageFlashText}</div>
+            </div>
+          ) : null}
+          {persistentNotifs.length > 0 && !isTerminalLockScene && (
             <div className="toast-stack">
               {persistentNotifs.map((notif, index) => (
                 <button
@@ -7513,7 +9247,8 @@ function App() {
             </div>
           )}
           <div className="desktop" ref={desktopRef}>
-            <div className="icons">
+            {!isTerminalLockScene && (
+              <div className="icons">
               {icons.map((it) => (
                 <DesktopIcon
                   key={it.id}
@@ -7524,9 +9259,12 @@ function App() {
                   onMeasure={handleIconMeasure}
                 />
               ))}
-            </div>
+              </div>
+            )}
 
-            {icons.map((it) => (
+            {icons
+              .filter((it) => (!isTerminalLockScene || it.id === 'app7'))
+              .map((it) => (
               <DesktopWindow
                 key={it.id}
                 {...it}
@@ -7554,7 +9292,7 @@ function App() {
                 pos={winState[it.id].pos}
                 zIndex={winState[it.id].z}
                 onClose={(id) => {
-                  if (id === 'app7') {
+                  if (id === 'app7' && !storyState.flags?.kTerminalCloseUnlocked) {
                     window.alert('Терминал нельзя закрыть.');
                     return;
                   }
@@ -7589,8 +9327,9 @@ function App() {
                   />
                 }
               />
-            ))}
+              ))}
           </div>
+          {!isTerminalLockScene && (
           <div className="taskbar">
             <button type="button" className="taskbar-start">
               Пуск
@@ -7617,6 +9356,7 @@ function App() {
               )}
             </div>
           </div>
+          )}
         </div>
       )}
       {activeMessengerPhoto && (
@@ -7675,7 +9415,7 @@ function App() {
                 </div>
               )}
             </div>
-          </div>
+          </div>}
         </div>
       )}
     </div>

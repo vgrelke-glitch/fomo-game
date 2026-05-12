@@ -9,7 +9,6 @@ export const STORY_EDITOR_CONFIG = {
     { id: 'app8', type: 'text-file', title: 'финал', window: { width: 760, height: 560 } },
     { id: 'app9', type: 'text-file', title: 'финал 1', window: { width: 760, height: 560 } },
     { id: 'app10', type: 'text-file', title: 'финал финал', window: { width: 760, height: 560 } },
-    { id: 'app11', type: 'snake', title: 'Змейка', window: { width: 860, height: 640 } },
     { id: 'exit', type: 'exit', title: 'Выход', window: { width: 900, height: 620 } },
   ],
   timings: {

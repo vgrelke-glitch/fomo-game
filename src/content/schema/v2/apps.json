@@ -8,6 +8,5 @@
   { "id": "app8", "type": "text-file", "title": "финал" },
   { "id": "app9", "type": "text-file", "title": "финал 1" },
   { "id": "app10", "type": "text-file", "title": "финал финал" },
-  { "id": "app11", "type": "snake", "title": "Змейка" },
   { "id": "exit", "type": "exit", "title": "Выход" }
 ]

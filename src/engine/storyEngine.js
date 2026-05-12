@@ -38,6 +38,21 @@ const dedupeWorkTasks = (tasks = []) => {
   });
 };
 
+const dedupeMessengerHistoryByChat = (historyByChat = {}) => (
+  Object.fromEntries(
+    Object.entries(historyByChat || {}).map(([chatId, history]) => {
+      const seenIds = new Set();
+      const nextHistory = (Array.isArray(history) ? history : []).filter((entry) => {
+        if (!entry?.id) return true;
+        if (seenIds.has(entry.id)) return false;
+        seenIds.add(entry.id);
+        return true;
+      });
+      return [chatId, nextHistory];
+    }),
+  )
+);
+
 export const getScriptStartSceneId = (script) => {
   if (!script) return '';
   if (script.startSceneId) return script.startSceneId;
@@ -184,6 +199,10 @@ export const loadStoryState = (content, slot = 'main') => {
       messenger: {
         ...createDefaultStoryState(content).messenger,
         ...(parsed.messenger || {}),
+        historyByChat: {
+          ...createDefaultStoryState(content).messenger.historyByChat,
+          ...dedupeMessengerHistoryByChat(parsed.messenger?.historyByChat || {}),
+        },
         choiceStateByEventId: {
           ...createDefaultStoryState(content).messenger.choiceStateByEventId,
           ...(parsed.messenger?.choiceStateByEventId || {}),

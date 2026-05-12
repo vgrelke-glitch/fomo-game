@@ -8,7 +8,9 @@ const formatTime = (value) => {
   return `${minutes}:${String(seconds).padStart(2, '0')}`;
 };
 
-export default function ChatAudioMessage({ src }) {
+const getAudioPositionStorageKey = (src) => `fomo_audio_progress:${src || ''}`;
+
+export default function ChatAudioMessage({ src, onEnded }) {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -18,13 +20,38 @@ export default function ChatAudioMessage({ src }) {
     const audio = audioRef.current;
     if (!audio) return undefined;
 
-    const handleLoadedMetadata = () => setDuration(audio.duration || 0);
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime || 0);
+    const handleLoadedMetadata = () => {
+      const nextDuration = audio.duration || 0;
+      setDuration(nextDuration);
+      if (typeof window === 'undefined' || !src || !Number.isFinite(nextDuration) || nextDuration <= 0) return;
+      const rawSavedTime = window.localStorage.getItem(getAudioPositionStorageKey(src));
+      const savedTime = Number(rawSavedTime || 0);
+      if (!Number.isFinite(savedTime) || savedTime <= 0) return;
+      const clampedTime = Math.min(savedTime, Math.max(0, nextDuration - 0.25));
+      audio.currentTime = clampedTime;
+      setCurrentTime(clampedTime);
+    };
+    const handleTimeUpdate = () => {
+      const nextTime = audio.currentTime || 0;
+      setCurrentTime(nextTime);
+      if (typeof window !== 'undefined' && src) {
+        window.localStorage.setItem(getAudioPositionStorageKey(src), String(nextTime));
+      }
+    };
     const handleEnded = () => {
       setIsPlaying(false);
       setCurrentTime(0);
+      if (typeof window !== 'undefined' && src) {
+        window.localStorage.removeItem(getAudioPositionStorageKey(src));
+      }
+      if (typeof onEnded === 'function') onEnded();
     };
-    const handlePause = () => setIsPlaying(false);
+    const handlePause = () => {
+      setIsPlaying(false);
+      if (typeof window !== 'undefined' && src) {
+        window.localStorage.setItem(getAudioPositionStorageKey(src), String(audio.currentTime || 0));
+      }
+    };
     const handlePlay = () => setIsPlaying(true);
 
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
@@ -40,7 +67,7 @@ export default function ChatAudioMessage({ src }) {
       audio.removeEventListener('pause', handlePause);
       audio.removeEventListener('play', handlePlay);
     };
-  }, []);
+  }, [onEnded, src]);
 
   const timeLabel = useMemo(
     () => `${formatTime(currentTime)} / ${formatTime(duration)}`,
@@ -57,12 +84,34 @@ export default function ChatAudioMessage({ src }) {
     audio.pause();
   };
 
+  const handleSeek = (event) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const nextTime = Number(event.target.value || 0);
+    if (!Number.isFinite(nextTime)) return;
+    audio.currentTime = nextTime;
+    setCurrentTime(nextTime);
+    if (typeof window !== 'undefined' && src) {
+      window.localStorage.setItem(getAudioPositionStorageKey(src), String(nextTime));
+    }
+  };
+
   return (
     <div className="thread-audio-card">
       <audio ref={audioRef} preload="metadata" src={src} />
       <button type="button" className="thread-audio-toggle" onClick={togglePlayback}>
         {isPlaying ? '❚❚' : '▶'}
       </button>
+      <input
+        type="range"
+        className="thread-audio-seek"
+        min={0}
+        max={duration || 0}
+        step={0.01}
+        value={Math.min(currentTime, duration || 0)}
+        onChange={handleSeek}
+        aria-label="Перемотка голосового сообщения"
+      />
       <div className="thread-audio-time">{timeLabel}</div>
     </div>
   );
