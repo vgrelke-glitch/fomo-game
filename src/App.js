@@ -296,7 +296,7 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         width: 0.08,
         height: 0.09,
         conversation: [
-          { direction: 'outgoing', text: 'Это вот дыра от метеорита? Как будто бы небольшая' },
+          { direction: 'outgoing', text: 'А, это вот дыра от метеорита? Как будто бы небольшая' },
           { direction: 'incoming', text: 'ага, надо поближе рассмотреть!' },
           { direction: 'outgoing', text: 'Я думаю, первое что тебе нужно сделать - это поболтать с дедом.' },
           { direction: 'incoming', text: 'окей! есть поболтать с дедом' },
@@ -1242,7 +1242,6 @@ const createFriendReconQueueEntry = () => ({
     {
       direction: 'incoming',
       text: 'почему??????',
-      terminalComment: '> C:\\Users\\G> разве что-то не так?',
     },
     {
       direction: 'outgoing',
@@ -1353,7 +1352,17 @@ const createFriendReconQueueEntry = () => ({
     {
       id: 'dynamic-friend-recon-followup-0a',
       direction: 'outgoing',
-      text: 'Нет, дело не в этом',
+      text: 'Нет, ты что',
+    },
+    {
+      id: 'dynamic-friend-recon-followup-0a-2',
+      direction: 'outgoing',
+      text: 'Совсем нет',
+    },
+    {
+      id: 'dynamic-friend-recon-followup-0a-3',
+      direction: 'outgoing',
+      text: 'Но дело не в этом',
     },
     {
       id: 'dynamic-friend-recon-followup-0b',
@@ -1426,7 +1435,7 @@ const createFriendReconQueueEntry = () => ({
       text: 'я больше так не хочу',
     },
   ],
-  terminalComment: '> C:\\Users\\G> активировать протокол «мои проблемы»',
+  terminalComment: 'АКТИВИРОВАТЬ ПРОТОКОЛ «мои проблемы»',
   terminalCommentDelayMs: 1000,
 });
 const createDevCheckpointState = ({

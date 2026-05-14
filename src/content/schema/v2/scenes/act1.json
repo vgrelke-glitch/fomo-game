@@ -69,7 +69,7 @@
           {
             "id": "friend_fx_focus_3",
             "type": "pushTerminalLine",
-            "text": "генерация протокола «извинение»"
+            "text": "ГЕНЕРАЦИЯ ПРОТОКОЛА: «извинение»"
           }
         ],
         "onSendEffects": [
