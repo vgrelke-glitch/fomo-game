@@ -1339,6 +1339,11 @@ const createFriendReconQueueEntry = () => ({
     {
       direction: 'outgoing',
       text: 'а я физически чувствую, как трачу их впустую.',
+      terminalComments: [
+        '...',
+        'самое время ГОНЯТЬСЯ ЗА МЕТЕОРИТОМ',
+      ],
+      terminalCommentDelayMs: 300,
     },
     {
       id: 'dynamic-friend-recon-followup-0',
@@ -1422,7 +1427,7 @@ const createFriendReconQueueEntry = () => ({
     },
   ],
   terminalComment: '> C:\\Users\\G> активировать протокол «мои проблемы»',
-  terminalCommentDelayMs: 2000,
+  terminalCommentDelayMs: 1000,
 });
 const createDevCheckpointState = ({
   kTargetEventId,
@@ -4726,10 +4731,13 @@ function App() {
       return nextState;
     });
 
-    if (firstEntry.terminalComment) {
+    const firstEntryTerminalComments = Array.isArray(firstEntry.terminalComments)
+      ? firstEntry.terminalComments.filter(Boolean)
+      : (firstEntry.terminalComment ? [firstEntry.terminalComment] : []);
+    if (firstEntryTerminalComments.length > 0) {
       const entryTerminalDelayMs = Math.max(0, Number(firstEntry.terminalCommentDelayMs || 0));
       const entryTerminalTimerId = window.setTimeout(() => {
-        appendTerminalLines([createTerminalProtocolLine(firstEntry.terminalComment)]);
+        appendTerminalLines(firstEntryTerminalComments.map((text) => createTerminalProtocolLine(text)));
       }, entryTerminalDelayMs);
       photoReplyTimersRef.current.push(entryTerminalTimerId);
     }
