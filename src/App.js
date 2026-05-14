@@ -1254,7 +1254,15 @@ const createFriendReconQueueEntry = () => ({
     },
     {
       direction: 'outgoing',
-      text: 'Мне кажется, это потому, что у меня свободный доступ в мир, а я просиживаю задницу…',
+      text: 'Меня не отпускает чувство вины',
+    },
+    {
+      direction: 'incoming',
+      text: 'еще бы',
+    },
+    {
+      direction: 'outgoing',
+      text: 'Мне страшно. Я все время думаю о том, что у меня свободный доступ в мир, а я просиживаю задницу…',
     },
     {
       direction: 'incoming',
@@ -1271,6 +1279,10 @@ const createFriendReconQueueEntry = () => ({
     {
       direction: 'incoming',
       text: 'класс))',
+    },
+    {
+      direction: 'outgoing',
+      text: 'Я имею в виду…',
     },
     {
       direction: 'outgoing',
@@ -1349,6 +1361,29 @@ const createFriendReconQueueEntry = () => ({
       direction: 'incoming',
       text: 'и что тебе кажется нужно с этим делать?',
       allowDuplicate: true,
+    },
+    {
+      id: 'dynamic-friend-recon-draft-unknown',
+      action: 'draft_erase',
+      draftText: 'Я не знаю',
+      kPingMessageId: 'dynamic-k-friend-recon-you-here',
+      kPingText: 'ты тут?',
+      kPingDelayMs: 600,
+    },
+    {
+      id: 'dynamic-friend-recon-followup-1',
+      direction: 'outgoing',
+      text: 'Может быть мне нужно что-то новое. Типо приключение? Чтобы расшевелиться?',
+    },
+    {
+      id: 'dynamic-friend-recon-followup-1a',
+      direction: 'incoming',
+      text: 'серьезно?',
+    },
+    {
+      id: 'dynamic-friend-recon-followup-1b',
+      direction: 'incoming',
+      text: 'я что, шутка какая-то?',
     },
     {
       id: 'dynamic-friend-recon-followup-2',
@@ -1939,6 +1974,7 @@ function App() {
   const notifiedIncomingEntryIdsRef = useRef(new Set());
   const notifiedMessageKeysRef = useRef(new Set());
   const queuedReplyResumeKeysRef = useRef(new Set());
+  const queuedDraftErasePingKeysRef = useRef(new Set());
   const kHouseReturnSeenRef = useRef(
     (storyState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [])
       .some((entry) => entry?.id === 'dynamic-k-house-return-1')
@@ -2427,12 +2463,14 @@ function App() {
     delayMs = 0,
     sound = null,
     timerStoreRef = photoReplyTimersRef,
+    suppressNotification = false,
   }) => {
     if (!chatId || !entry?.id) return 0;
 
     const scheduleKey = `${chatId}:${entry.id}`;
     const notifyKey = `${chatId}:${entry.id}`;
     const emitEntryNotification = () => {
+      if (suppressNotification) return;
       if (notifiedIncomingEntryIdsRef.current.has(notifyKey)) return;
       if (isMessengerChatFrontmost(chatId)) return;
       notifiedIncomingEntryIdsRef.current.add(notifyKey);
@@ -2545,6 +2583,176 @@ function App() {
     playKNotificationSound,
     playMamaNotificationSound,
     pushPersistentNotif,
+  ]);
+
+  useEffect(() => {
+    const queuedByChat = storyState.messenger?.queuedPhotoRepliesByChat || {};
+
+    Object.entries(queuedByChat).forEach(([chatId, queue]) => {
+      const queuedReply = Array.isArray(queue) ? queue[0] : null;
+      const draftEntry = queuedReply?.conversation?.[0];
+      if (!queuedReply?.id || draftEntry?.action !== 'draft_erase') return;
+      if (draftEntry.kPingScheduled && !draftEntry.eraseEnabled) {
+        const kPingMessageId = draftEntry.kPingMessageId || '';
+        const kHistory = storyState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [];
+        const hasKPing = !!kPingMessageId && kHistory.some((entry) => entry?.id === kPingMessageId);
+        if (!hasKPing) return;
+
+        setStoryState((prev) => {
+          const currentQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+          const currentQueuedReply = currentQueue.find((entry) => entry?.id === queuedReply.id);
+          const currentDraftEntry = currentQueuedReply?.conversation?.[0];
+          if (!currentQueuedReply || currentDraftEntry?.action !== 'draft_erase' || currentDraftEntry.eraseEnabled) return prev;
+
+          const nextQueue = currentQueue.map((entry) => (
+            entry?.id === queuedReply.id
+              ? {
+                ...entry,
+                conversation: [
+                  {
+                    ...currentDraftEntry,
+                    eraseEnabled: true,
+                  },
+                  ...(entry.conversation || []).slice(1),
+                ],
+              }
+              : entry
+          ));
+          const nextState = {
+            ...prev,
+            messenger: {
+              ...prev.messenger,
+              queuedPhotoRepliesByChat: {
+                ...(prev.messenger?.queuedPhotoRepliesByChat || {}),
+                [chatId]: nextQueue,
+              },
+            },
+          };
+          persistRuntimeState(nextState);
+          return nextState;
+        });
+        return;
+      }
+      if (draftEntry.kPingScheduled || draftEntry.eraseEnabled) return;
+
+      const draftText = draftEntry.draftText || '';
+      if (!draftText || (typedByChat[chatId] || '').length < draftText.length) return;
+
+      const pingKey = `${chatId}:${queuedReply.id}:${draftEntry.id || 'draft_erase'}`;
+      if (queuedDraftErasePingKeysRef.current.has(pingKey)) return;
+      queuedDraftErasePingKeysRef.current.add(pingKey);
+
+      setStoryState((prev) => {
+        const currentQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+        const currentQueuedReply = currentQueue.find((entry) => entry?.id === queuedReply.id);
+        const currentDraftEntry = currentQueuedReply?.conversation?.[0];
+        if (!currentQueuedReply || currentDraftEntry?.action !== 'draft_erase') return prev;
+        if (currentDraftEntry.kPingScheduled || currentDraftEntry.eraseEnabled) return prev;
+
+        const nextQueue = currentQueue.map((entry) => (
+          entry?.id === queuedReply.id
+            ? {
+              ...entry,
+              conversation: [
+                {
+                  ...currentDraftEntry,
+                  kPingScheduled: true,
+                  eraseEnabled: false,
+                },
+                ...(entry.conversation || []).slice(1),
+              ],
+            }
+            : entry
+        ));
+        const nextState = {
+          ...prev,
+          messenger: {
+            ...prev.messenger,
+            queuedPhotoRepliesByChat: {
+              ...(prev.messenger?.queuedPhotoRepliesByChat || {}),
+              [chatId]: nextQueue,
+            },
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
+
+      const kPingMessageId = draftEntry.kPingMessageId || `dynamic-k-draft-ping-${Date.now()}`;
+      const kPingText = draftEntry.kPingText || 'ты тут?';
+      const scheduledDurationMs = scheduleIncomingChatEntry({
+        chatId: TERMINAL_ADVENTURE_CHAT_ID,
+        entry: {
+          id: kPingMessageId,
+          direction: 'incoming',
+          text: kPingText,
+        },
+        title: 'К.',
+        notificationText: kPingText,
+        sound: 'k',
+        delayMs: Math.max(0, Number(draftEntry.kPingDelayMs || 0)),
+        timerStoreRef: photoReplyTimersRef,
+        suppressNotification: true,
+      });
+
+      const notificationTimerId = window.setTimeout(() => {
+        playKNotificationSound(false);
+        pushPersistentNotif({
+          title: 'К.',
+          text: kPingText,
+          appId: 'app3',
+          chatId: TERMINAL_ADVENTURE_CHAT_ID,
+        });
+      }, Math.max(0, Number(scheduledDurationMs || 0)));
+      photoReplyTimersRef.current.push(notificationTimerId);
+
+      const enableTimerId = window.setTimeout(() => {
+        setStoryState((prev) => {
+          const currentQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+          const currentQueuedReply = currentQueue.find((entry) => entry?.id === queuedReply.id);
+          const currentDraftEntry = currentQueuedReply?.conversation?.[0];
+          if (!currentQueuedReply || currentDraftEntry?.action !== 'draft_erase') return prev;
+          if (currentDraftEntry.eraseEnabled) return prev;
+
+          const nextQueue = currentQueue.map((entry) => (
+            entry?.id === queuedReply.id
+              ? {
+                ...entry,
+                conversation: [
+                  {
+                    ...currentDraftEntry,
+                    kPingScheduled: true,
+                    eraseEnabled: true,
+                  },
+                  ...(entry.conversation || []).slice(1),
+                ],
+              }
+              : entry
+          ));
+          const nextState = {
+            ...prev,
+            messenger: {
+              ...prev.messenger,
+              queuedPhotoRepliesByChat: {
+                ...(prev.messenger?.queuedPhotoRepliesByChat || {}),
+                [chatId]: nextQueue,
+              },
+            },
+          };
+          persistRuntimeState(nextState);
+          return nextState;
+        });
+      }, Math.max(0, Number(scheduledDurationMs || 0)));
+      photoReplyTimersRef.current.push(enableTimerId);
+    });
+  }, [
+    persistRuntimeState,
+    playKNotificationSound,
+    pushPersistentNotif,
+    scheduleIncomingChatEntry,
+    storyState.messenger?.historyByChat,
+    storyState.messenger?.queuedPhotoRepliesByChat,
+    typedByChat,
   ]);
 
   const notifyIncomingMessage = useCallback(({
@@ -3057,8 +3265,7 @@ function App() {
       ) {
         return true;
       }
-      const baseIdMatch = entry.id.match(/^dynamic-friend-recon-followup-\d+/);
-      const baseId = baseIdMatch ? baseIdMatch[0] : entry.id;
+      const baseId = entry.id;
       if (seenBaseIds.has(baseId)) {
         changed = true;
         return false;
@@ -4514,13 +4721,15 @@ function App() {
       photoReplyTimersRef.current.push(entryTerminalTimerId);
     }
 
-    const nextOutgoingIndex = remainingEntries.findIndex((entry) => entry.direction === 'outgoing');
-    const autoIncomingEntries = nextOutgoingIndex === -1
+    const nextManualEntryIndex = remainingEntries.findIndex((entry) => (
+      entry?.direction === 'outgoing' || entry?.action === 'draft_erase'
+    ));
+    const autoIncomingEntries = nextManualEntryIndex === -1
       ? remainingEntries
-      : remainingEntries.slice(0, nextOutgoingIndex);
-    const deferredConversation = nextOutgoingIndex === -1
+      : remainingEntries.slice(0, nextManualEntryIndex);
+    const deferredConversation = nextManualEntryIndex === -1
       ? []
-      : remainingEntries.slice(nextOutgoingIndex);
+      : remainingEntries.slice(nextManualEntryIndex);
 
     if (autoIncomingEntries.length === 0 && deferredConversation.length === 0) {
       if (queuedReply.terminalComment) {
@@ -4750,6 +4959,58 @@ function App() {
       });
     }
   }, [appendTerminalLines, clearFriendReconTimers, editorConfig.timings.messageGapMs, isMessengerChatFrontmost, notifyIncomingMessage, persistRuntimeState, playMessageSendSound, scheduleIncomingChatEntry, schedulePostConversationEntries]);
+
+  const completeQueuedDraftErase = useCallback((chatId, queuedReplyId) => {
+    if (!chatId || !queuedReplyId) return;
+
+    setTypedByChat((prev) => ({
+      ...prev,
+      [chatId]: '',
+    }));
+
+    setStoryState((prev) => {
+      const currentQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
+      const targetQueueEntry = currentQueue.find((entry) => entry?.id === queuedReplyId);
+      const draftEntry = targetQueueEntry?.conversation?.[0];
+      if (!targetQueueEntry || draftEntry?.action !== 'draft_erase') return prev;
+
+      const nextConversation = (targetQueueEntry.conversation || []).slice(1);
+      const nextQueue = nextConversation.length > 0
+        ? currentQueue.map((entry) => (
+          entry?.id === queuedReplyId
+            ? {
+              ...entry,
+              conversation: nextConversation,
+            }
+            : entry
+        ))
+        : currentQueue.filter((entry) => entry?.id !== queuedReplyId);
+
+      const nextState = {
+        ...prev,
+        messenger: {
+          ...prev.messenger,
+          queuedPhotoRepliesByChat: {
+            ...(prev.messenger?.queuedPhotoRepliesByChat || {}),
+            [chatId]: dedupePhotoReplyQueue(nextQueue),
+          },
+          photoReplyInFlightByChat: {
+            ...(prev.messenger?.photoReplyInFlightByChat || {}),
+            [chatId]: false,
+          },
+          typingByChat: {
+            ...(prev.messenger?.typingByChat || {}),
+            [chatId]: {
+              active: false,
+              durationMs: 0,
+            },
+          },
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+  }, [persistRuntimeState]);
 
   const handleMessengerPhotoPointerMove = useCallback((event) => {
     if (!activeMessengerPhoto) return;
@@ -6390,6 +6651,7 @@ function App() {
     scheduledIncomingEntryIdsRef.current.clear();
     notifiedIncomingEntryIdsRef.current.clear();
     notifiedMessageKeysRef.current.clear();
+    queuedDraftErasePingKeysRef.current.clear();
     kHouseReturnSeenRef.current = (
       nextStoryState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || []
     ).some((entry) => entry?.id === 'dynamic-k-house-return-1');
@@ -6663,6 +6925,9 @@ function App() {
           ? queuedPhotoReplies.find((entry) => entry?.messageId === activeMessengerPhotoMessageId) || queuedPhotoReplies[0] || null
           : queuedPhotoReplies[0] || null;
         const pendingQueuedPhotoReply = !pendingPlayerEvent && !isPhotoReplyInFlight ? prioritizedQueuedPhotoReply : null;
+        const pendingQueuedDraftEraseEntry = pendingQueuedPhotoReply?.conversation?.[0]?.action === 'draft_erase'
+          ? pendingQueuedPhotoReply.conversation[0]
+          : null;
         const previousEvent = currentEventIndex > 0
           ? activeScene?.events?.[currentEventIndex - 1] || null
           : null;
@@ -6724,7 +6989,9 @@ function App() {
 
           return outgoingEntries[matchedOutgoingCount]?.text || '';
         };
-        const queuedReplyTargetText = pendingQueuedPhotoReply
+        const queuedReplyTargetText = pendingQueuedDraftEraseEntry
+          ? (pendingQueuedDraftEraseEntry.draftText || '')
+          : pendingQueuedPhotoReply
           ? getNextQueuedOutgoingText(pendingQueuedPhotoReply, history)
           : '';
         const typedMessengerText = pendingPlayerEvent || pendingQueuedPhotoReply ? (typedByChat[active.id] || '') : '';
@@ -6741,7 +7008,7 @@ function App() {
           : queuedReplyTargetText;
         const isMessengerInputBlockedByTerminalPrompt = isAdventureTerminalPrompt
           && terminalPrompt?.allowMessengerInput === false;
-        const hasPendingPlayerInput = !!pendingPlayerEvent || !!queuedReplyTargetText;
+        const hasPendingPlayerInput = !!pendingPlayerEvent || !!queuedReplyTargetText || !!pendingQueuedDraftEraseEntry;
         const isPendingTapComplete = hasPendingPlayerInput
           ? typedMessengerText.length >= targetText.length && targetText.length > 0
           : false;
@@ -6788,6 +7055,7 @@ function App() {
             : idleInputText;
         const canSubmitMessage = hasPendingPlayerInput
           && !isMessengerInputBlockedByTerminalPrompt
+          && !pendingQueuedDraftEraseEntry
           && (!pendingChoice || !!selectedChoiceOption || isAdventureDraftVisibleFlow)
           && !isAdventureDeclineFlow
           && isPendingTapComplete;
@@ -7013,6 +7281,30 @@ function App() {
                             noSequenceStarted: true,
                           }));
                           runAdventureDeclinePostSequence(terminalPrompt?.yesCount || 0);
+                        }
+                        return;
+                      }
+                      if (pendingQueuedDraftEraseEntry) {
+                        const isProgressKey = e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter' || e.key === 'Tab' || e.key === ' ';
+                        if (!isProgressKey) return;
+                        e.preventDefault();
+
+                        const draftText = pendingQueuedDraftEraseEntry.draftText || '';
+                        if (pendingQueuedDraftEraseEntry.eraseEnabled) {
+                          const nextText = typedMessengerText.slice(0, -1);
+                          setTypedByChat((prev) => ({
+                            ...prev,
+                            [active.id]: nextText,
+                          }));
+
+                          if (nextText.length === 0) {
+                            completeQueuedDraftErase(active.id, pendingQueuedPhotoReply.id);
+                          }
+                          return;
+                        }
+
+                        if ((typedMessengerText || '').length < draftText.length) {
+                          typeMessengerMessageKey(active.id, pendingQueuedPhotoReply.id, draftText, e);
                         }
                         return;
                       }
