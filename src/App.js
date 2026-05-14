@@ -2,7 +2,6 @@ import React, { Suspense, useState, useRef, useEffect } from 'react';
 import logo from './logo.svg';
 import { useMemo, useCallback } from 'react';
 import iconNotes from './icons/заметки1.png';
-import iconTextFile from './icons/тексты.png';
 import iconMessenger from './icons/мессенджер4.png';
 import iconSocial from './icons/соцсеть2.png';
 import iconCalendar from './icons/календарь2.png';
@@ -69,9 +68,6 @@ const ICON_IMAGE_BY_ID = {
   app4: iconSocial,
   app5: iconConveyor,
   app6: iconCalendar,
-  app8: iconTextFile,
-  app9: iconTextFile,
-  app10: iconTextFile,
   exit: iconExit,
 };
 const ICON_IMAGE_BY_TYPE = {
@@ -115,10 +111,10 @@ const getDefaultWindowSize = (id) => {
 const PHOTO_VIEWER_Z_INDEX = 1000;
 const PHOTO_REPLY_TYPING_SPEED_MS = 42;
 const getPrologueTypingDelay = (char) => {
-  const baseDelay = 46 + Math.random() * 78;
-  if (/[.!?…]/.test(char)) return baseDelay + 220 + Math.random() * 260;
-  if (/[,;:—-]/.test(char)) return baseDelay + 90 + Math.random() * 150;
-  if (char === ' ') return baseDelay + Math.random() * 35;
+  const baseDelay = 42 + Math.random() * 70;
+  if (/[.!?…]/.test(char)) return baseDelay + 200 + Math.random() * 230;
+  if (/[,;:—-]/.test(char)) return baseDelay + 80 + Math.random() * 130;
+  if (char === ' ') return baseDelay + Math.random() * 30;
   return baseDelay;
 };
 const SOCIAL_PEOPLE = [
@@ -255,9 +251,10 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         height: 0.35,
         conversation: [
           { direction: 'outgoing', text: 'Они даже шахматы бросили?' },
-          { direction: 'incoming', text: 'ну да… тут важнее событие' },
+          { direction: 'incoming', text: 'ну да… тут суета' },
+          { direction: 'incoming', text: 'но они точно доиграют' },
           { direction: 'outgoing', text: 'Это общее место встречи?' },
-          { direction: 'incoming', text: 'ага, тут по вечерам все поболтать собираются' },
+          { direction: 'incoming', text: 'ага, тут по вечерам поболтать собираются' },
           { direction: 'outgoing', text: 'Мило…' },
         ],
       },
@@ -275,7 +272,7 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         width: 0.26,
         height: 0.14,
         conversation: [
-          { direction: 'outgoing', text: 'Крыша выглядит так, как будто ее и обычный дождь может пробить.' },
+          { direction: 'outgoing', text: 'Крыша выглядит так, как будто ее и обычный дождь может пробить...' },
           { direction: 'incoming', text: 'да, это правда…' },
         ],
       },
@@ -287,7 +284,7 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         width: 0.56,
         height: 0.19,
         conversation: [
-          { direction: 'outgoing', text: 'Подожди, там что, кто-то живет?' },
+          { direction: 'outgoing', text: 'Подожди, В ЭТОМ ДОМЕ что, кто-то живет?' },
           { direction: 'incoming', text: 'я сначала тоже думала, что дом заброшенный' },
         ],
       },
@@ -869,6 +866,49 @@ const SOCIAL_SCROLL_TERMINAL_TEXT = 'да, отдохни немного, рас
 const SOCIAL_SCROLL_TERMINAL_DELAY_MS = 10000;
 const SOCIAL_LOAD_THROTTLE_MS = 500;
 const SOCIAL_RENDER_WINDOW_SIZE = 60;
+const SHED_NARRATOR_TYPE_SPEED_MS = 28;
+const SHED_NARRATOR_SEQUENCE = [
+  {
+    id: 'dynamic-k-shed-narrator-question-1',
+    text: 'О, нет, на самом интересном месте!!!',
+    pauseAfterMs: 1000,
+  },
+  {
+    id: 'dynamic-k-shed-narrator-question-2',
+    text: 'Так хочется узнать, что будет дальше! Найдут ли мальчишки К.? Уволят ли Героя с работы? Могут ли вообще уволить с такой работы? И что это за Терминал, который нельзя закрыть?..',
+    pauseAfterMs: 1000,
+  },
+  {
+    id: 'dynamic-k-shed-narrator-question-3',
+    text: 'Купит ли герой билеты к маме? Помирится ли с Другом? А главное – быть ли детской книге, и о чем в ней будет сказка?',
+    pauseAfterMs: 1000,
+  },
+  {
+    id: 'dynamic-k-shed-narrator-question-4',
+    text: 'Очень интересно наблюдать за чужим приключением. Но у тебя, дорогой игрок, наверняка есть свой рабочий стол, за которым нужно присматривать.',
+    pauseAfterMs: 1000,
+  },
+  {
+    id: 'dynamic-k-shed-narrator-question-5',
+    text: 'Кто-то точно ждет ответа в чатах. Карьера сама себя не построит. Вперед! Столько всего в одном месте, такой власти еще не было ни у кого, кто жил до нас...',
+    pauseAfterMs: 2000,
+  },
+  {
+    id: 'dynamic-k-shed-narrator-question-6',
+    text: 'Только помни всегда.',
+    pauseAfterMs: 1000,
+  },
+  {
+    id: 'dynamic-k-shed-narrator-question-7',
+    text: 'Именно в этот момент кто-то засыпает в поезде.',
+    pauseAfterMs: 1000,
+  },
+  {
+    id: 'dynamic-k-shed-narrator-question-8',
+    text: 'Чух-чух, чух-чух…',
+    pauseAfterMs: 0,
+  },
+];
 
 const CONVEYOR_AMBIENT_NOTIFICATION_INTERVAL_MS = 30000;
 const CONVEYOR_AMBIENT_NOTIFICATION_COOLDOWN_MS = 60000;
@@ -1153,7 +1193,7 @@ const createFriendReconQueueEntry = () => ({
   conversation: [
     {
       direction: 'outgoing',
-      text: 'Я не знаю, что мне сказать.',
+      text: 'Я не придумал, что сказать.',
     },
     {
       direction: 'incoming',
@@ -1161,7 +1201,7 @@ const createFriendReconQueueEntry = () => ({
     },
     {
       direction: 'incoming',
-      text: 'В чем твоя проблема?',
+      text: 'в чем твоя проблема?',
     },
     {
       direction: 'outgoing',
@@ -1189,7 +1229,7 @@ const createFriendReconQueueEntry = () => ({
     },
     {
       direction: 'outgoing',
-      text: 'Потому что я не могу!',
+      text: 'Потому что я не могу.',
     },
     {
       direction: 'incoming',
@@ -1206,7 +1246,7 @@ const createFriendReconQueueEntry = () => ({
     },
     {
       direction: 'outgoing',
-      text: 'Не знаю...',
+      text: 'Я не уверен...',
     },
     {
       direction: 'incoming',
@@ -1214,7 +1254,7 @@ const createFriendReconQueueEntry = () => ({
     },
     {
       direction: 'outgoing',
-      text: 'Думаю, потому, что у меня свободный доступ в мир, а я просиживаю задницу',
+      text: 'Мне кажется, это потому, что у меня свободный доступ в мир, а я просиживаю задницу…',
     },
     {
       direction: 'incoming',
@@ -1222,7 +1262,11 @@ const createFriendReconQueueEntry = () => ({
     },
     {
       direction: 'outgoing',
-      text: 'Не знаю. Это не так просто',
+      text: 'Не знаю.',
+    },
+    {
+      direction: 'outgoing',
+      text: 'Это не так просто.',
     },
     {
       direction: 'incoming',
@@ -1230,15 +1274,15 @@ const createFriendReconQueueEntry = () => ({
     },
     {
       direction: 'outgoing',
-      text: 'Ты когда-нибудь задумывался, что такой всеобъемлющей власти еще никогда не было у людей? Ни у кого, кто жил до нас.',
+      text: 'Ты когда-нибудь задумывался, что такой огромной власти еще никогда не было у людей? Ни у кого, кто жил до нас.',
     },
     {
       direction: 'incoming',
-      text: 'какой власти??',
+      text: 'какой власти?',
     },
     {
       direction: 'outgoing',
-      text: 'Под моим указательным пальцем находится вся культурная история человечества.',
+      text: 'Под моим указательным пальцем находится вся культурная история человечества',
     },
     {
       direction: 'incoming',
@@ -1246,77 +1290,100 @@ const createFriendReconQueueEntry = () => ({
     },
     {
       direction: 'outgoing',
-      text: 'Я имею в виду что для нас нет вообще никаких ограничений, в пространстве, в информации.',
+      text: 'Я имею в виду, что для нас нет вообще никаких ограничений, в пространстве, в информации.',
+    },
+    {
+      direction: 'incoming',
+      text: 'таак',
     },
     {
       direction: 'outgoing',
-      text: 'Единственное ограничение - время. Каждая секунда важна, ими надо распоряжаться с умом',
+      text: 'Но есть одно большое ограничение',
+    },
+    {
+      direction: 'outgoing',
+      text: 'ОГРОМНОЕ',
+    },
+    {
+      direction: 'outgoing',
+      text: 'Это время.',
+    },
+    {
+      direction: 'incoming',
+      text: 'ага',
+    },
+    {
+      direction: 'outgoing',
+      text: 'Тебе не бывает страшно???',
+    },
+    {
+      direction: 'outgoing',
+      text: 'Я чувствую ответственность, как будто каждая секунда важна',
+    },
+    {
+      direction: 'outgoing',
+      text: 'ими надо распоряжаться с умом',
     },
     {
       direction: 'outgoing',
       text: 'а я физически чувствую, как трачу их впустую.',
-      sendBehavior: 'blocked_and_wiped',
-      blockedTerminalComment: '> > C:\\Users\\G> >> …',
-      blockedFollowupDelayMs: 3000,
-      blockedFinalTerminalComment: 'ну и ладно',
-      blockedFinalTerminalCommentDelayMs: 2200,
-      blockedPostConversationEntries: [
-        {
-          chatId: 'chat-k',
-          notificationTitle: 'К.',
-          entry: {
-            id: 'dynamic-k-house-return-1',
-            direction: 'incoming',
-            text: 'чай допит. Очень милый дед. Мне кажется, очень одинокий.',
-          },
-        },
-        {
-          chatId: 'chat-k',
-          notificationTitle: 'К.',
-          entry: {
-            id: 'dynamic-k-house-photo-1',
-            direction: 'incoming',
-            text: '',
-          },
-        },
-      ],
-      blockedFollowupEntries: [
-        {
-          id: 'dynamic-friend-recon-followup-2',
-          direction: 'incoming',
-          text: 'ладно, знаешь что',
-        },
-        {
-          id: 'dynamic-friend-recon-followup-3',
-          direction: 'incoming',
-          text: 'проблема не в том, что ты не пришел',
-        },
-        {
-          id: 'dynamic-friend-recon-followup-4',
-          direction: 'incoming',
-          text: 'проблема в том, что ты не считаешь нужным написать ДВА СЛОВА',
-        },
-        {
-          id: 'dynamic-friend-recon-followup-5',
-          direction: 'incoming',
-          text: 'все, что ты думаешь, все это можно обсудить вживую, я же всегда тут',
-        },
-        {
-          id: 'dynamic-friend-recon-followup-6',
-          direction: 'incoming',
-          text: 'ты ведешь себя так, как будто меня можно ставить на паузу и включать когда удобно',
-        },
-        {
-          id: 'dynamic-friend-recon-followup-7',
-          direction: 'incoming',
-          text: 'это не так',
-        },
-        {
-          id: 'dynamic-friend-recon-followup-8',
-          direction: 'incoming',
-          text: 'я больше так не хочу',
-        },
-      ],
+    },
+    {
+      id: 'dynamic-friend-recon-followup-0',
+      direction: 'incoming',
+      text: 'и встреча со мной типо входит в пустую трату времени?',
+    },
+    {
+      id: 'dynamic-friend-recon-followup-0a',
+      direction: 'outgoing',
+      text: 'Нет, дело не в этом',
+    },
+    {
+      id: 'dynamic-friend-recon-followup-0b',
+      direction: 'incoming',
+      text: 'окей',
+      allowDuplicate: true,
+    },
+    {
+      id: 'dynamic-friend-recon-followup-0c',
+      direction: 'incoming',
+      text: 'и что тебе кажется нужно с этим делать?',
+      allowDuplicate: true,
+    },
+    {
+      id: 'dynamic-friend-recon-followup-2',
+      direction: 'incoming',
+      text: 'ладно, знаешь что',
+    },
+    {
+      id: 'dynamic-friend-recon-followup-3',
+      direction: 'incoming',
+      text: 'проблема не в том, что ты не пришел',
+    },
+    {
+      id: 'dynamic-friend-recon-followup-4',
+      direction: 'incoming',
+      text: 'проблема в том, что ты не считаешь нужным написать ДВА СЛОВА',
+    },
+    {
+      id: 'dynamic-friend-recon-followup-5',
+      direction: 'incoming',
+      text: 'все, что ты думаешь, все это можно обсудить вживую, я же всегда тут',
+    },
+    {
+      id: 'dynamic-friend-recon-followup-6',
+      direction: 'incoming',
+      text: 'ты ведешь себя так, как будто меня можно ставить на паузу и включать когда удобно',
+    },
+    {
+      id: 'dynamic-friend-recon-followup-7',
+      direction: 'incoming',
+      text: 'это не так',
+    },
+    {
+      id: 'dynamic-friend-recon-followup-8',
+      direction: 'incoming',
+      text: 'я больше так не хочу',
     },
   ],
   terminalComment: '> C:\\Users\\G> активировать протокол «мои проблемы»',
@@ -1785,9 +1852,6 @@ function App() {
       app4: { x: 1550, y: 34 },
       app5: { x: 1818, y: 526 },
       app6: { x: 1816, y: 808 },
-      app8: { x: 34, y: 602 },
-      app9: { x: 122, y: 782 },
-      app10: { x: 90, y: 868 },
       exit: { x: 640, y: 930 },
       app7: { x: 220, y: 56 },
     };
@@ -2389,19 +2453,6 @@ function App() {
 
     const existingHistory = storyStateRef.current?.messenger?.historyByChat?.[chatId] || [];
     if (existingHistory.some((item) => item?.id === entry.id)) {
-      const visibleText = entry.text || notificationText || (entry.audioSrc ? 'Голосовое сообщение' : 'Фотография');
-      if (!notifiedIncomingEntryIdsRef.current.has(notifyKey) && !isMessengerChatFrontmost(chatId)) {
-        notifiedIncomingEntryIdsRef.current.add(notifyKey);
-        if (sound === 'k') playKNotificationSound(false);
-        if (sound === 'friend') playFriendNotificationSound();
-        if (sound === 'mama') playMamaNotificationSound();
-        pushPersistentNotif({
-          title,
-          text: visibleText,
-          appId: 'app3',
-          chatId,
-        });
-      }
       return 0;
     }
 
@@ -2687,7 +2738,7 @@ function App() {
     if (chatId !== 'chat-druk') return;
     if (!friendReconInputTerminalPendingRef.current) return;
     friendReconInputTerminalPendingRef.current = false;
-    appendTerminalLines([createTerminalProtocolLine('это потому, что ты отвлекся')]);
+    appendTerminalLines([createTerminalProtocolLine('это потому, что ты отвлекся...')]);
   }, [appendTerminalLines]);
 
   const scheduleFriendSilenceFollowup = useCallback((delayMs = 20000) => {
@@ -2883,7 +2934,10 @@ function App() {
       return !!baseText && historyText === baseText;
     });
     const missingFollowups = blockedFollowupEntries.filter((entry) => (
-      entry?.id && !isFollowupAlreadyInHistory(entry)
+      entry?.id
+      && !entry?.action
+      && (entry?.direction || 'incoming') === 'incoming'
+      && !isFollowupAlreadyInHistory(entry)
     ));
     if (missingFollowups.length === 0) return;
 
@@ -2951,6 +3005,34 @@ function App() {
     storyState.messenger?.historyByChat,
     storyState.messenger?.queuedPhotoRepliesByChat,
     storyState.messenger?.typingByChat,
+  ]);
+
+  useEffect(() => {
+    const friendChatId = 'chat-druk';
+    const kChatId = TERMINAL_ADVENTURE_CHAT_ID;
+    const friendHistory = storyState.messenger?.historyByChat?.[friendChatId] || [];
+    const hasFriendFinal = friendHistory.some((entry) => entry?.id === 'dynamic-friend-recon-followup-8');
+    if (!hasFriendFinal) return;
+
+    const kHistory = storyState.messenger?.historyByChat?.[kChatId] || [];
+    if (kHistory.some((entry) => entry?.id === 'dynamic-k-house-return-1')) return;
+
+    scheduleIncomingChatEntry({
+      chatId: kChatId,
+      entry: {
+        id: 'dynamic-k-house-return-1',
+        direction: 'incoming',
+        text: 'чай допит. Очень милый дед. Мне кажется, очень одинокий.',
+      },
+      title: 'К.',
+      notificationText: 'чай допит. Очень милый дед. Мне кажется, очень одинокий.',
+      sound: 'k',
+      delayMs: 600,
+      timerStoreRef: photoReplyTimersRef,
+    });
+  }, [
+    scheduleIncomingChatEntry,
+    storyState.messenger?.historyByChat,
   ]);
 
   useEffect(() => {
@@ -3936,6 +4018,43 @@ function App() {
     });
   }, [isMessengerChatFrontmost, persistRuntimeState]);
 
+  const schedulePostConversationEntries = useCallback((chatId, postConversationEntries = []) => {
+    if (!Array.isArray(postConversationEntries) || postConversationEntries.length === 0) return;
+
+    const immediatePostConversationEntries = postConversationEntries
+      .filter((entry) => Math.max(0, Number(entry?.delayMs || 0)) === 0);
+    const delayedPostConversationEntries = postConversationEntries
+      .filter((entry) => Math.max(0, Number(entry?.delayMs || 0)) > 0);
+
+    let postConversationOffsetMs = 0;
+    immediatePostConversationEntries.forEach((postEntry) => {
+      if (!postEntry?.id) return;
+      const { delayMs: _delayMs, notificationTitle: _notificationTitle, notificationText: _notificationText, ...historyEntry } = postEntry;
+      postConversationOffsetMs = scheduleIncomingChatEntry({
+        chatId,
+        entry: historyEntry,
+        title: postEntry.notificationTitle || (chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'К.' : 'Сообщение'),
+        notificationText: postEntry.notificationText || historyEntry.text || 'Фотография',
+        delayMs: postConversationOffsetMs,
+        sound: chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'k' : null,
+      }) + Number(editorConfig.timings.messageGapMs ?? 0);
+    });
+
+    delayedPostConversationEntries.forEach((postEntry) => {
+      if (!postEntry?.id) return;
+      const postDelayMs = Math.max(0, Number(postEntry.delayMs || 0));
+      const { delayMs: _delayMs, notificationTitle: _notificationTitle, notificationText: _notificationText, ...historyEntry } = postEntry;
+      scheduleIncomingChatEntry({
+        chatId,
+        entry: historyEntry,
+        title: postEntry.notificationTitle || (chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'К.' : 'Сообщение'),
+        notificationText: postEntry.notificationText || historyEntry.text || 'Фотография',
+        delayMs: postDelayMs,
+        sound: chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'k' : null,
+      });
+    });
+  }, [editorConfig.timings.messageGapMs, scheduleIncomingChatEntry]);
+
   const submitQueuedPhotoReply = useCallback((chatId, queuedReply) => {
     if (!chatId || !queuedReply?.id) return;
     if (chatId === 'chat-druk' && queuedReply.id === 'dynamic-friend-recon-prompt') {
@@ -4023,9 +4142,108 @@ function App() {
           : [];
 
       let timelineOffsetMs = Math.max(0, Number(firstEntry.blockedFollowupDelayMs || queuedReply.blockedFollowupDelayMs || 0));
+      let handoffToManualQueueDone = false;
+      const sentOutgoingTexts = new Set(
+        [
+          ...currentHistorySnapshot
+            .filter((historyEntry) => historyEntry?.direction === 'outgoing')
+            .map((historyEntry) => (historyEntry?.text || '').trim()),
+          (firstEntry.text || '').trim(),
+        ].filter(Boolean),
+      );
 
       blockedFollowupEntries.forEach((entry, index) => {
-        const typingDurationMs = Math.max(0, Math.ceil((entry?.text || '').length * PHOTO_REPLY_TYPING_SPEED_MS));
+        if (handoffToManualQueueDone) return;
+        if (entry?.direction === 'outgoing' && entry?.text) {
+          const outgoingText = (entry.text || '').trim();
+          const hasOutgoingAlreadyInHistory = !!outgoingText && sentOutgoingTexts.has(outgoingText);
+          if (hasOutgoingAlreadyInHistory) {
+            return;
+          }
+          const remainingConversation = blockedFollowupEntries
+            .slice(index)
+            .map((item) => ({
+              ...item,
+              direction: item?.direction === 'outgoing' ? 'outgoing' : 'incoming',
+            }))
+            .filter((item) => (
+              (typeof item?.text === 'string' && item.text.length > 0)
+              || item?.action === 'draft_erase'
+            ));
+
+          if (remainingConversation.length > 0) {
+            setStoryState((prev) => {
+              const nextState = {
+                ...prev,
+                messenger: {
+                  ...prev.messenger,
+                  photoReplyInFlightByChat: {
+                    ...(prev.messenger?.photoReplyInFlightByChat || {}),
+                    [chatId]: true,
+                  },
+                },
+              };
+              persistRuntimeState(nextState);
+              return nextState;
+            });
+
+            const handoffDelayMs = Math.max(0, Number(timelineOffsetMs || 0) - delayMs);
+            const handoffTimerId = window.setTimeout(() => {
+              setStoryState((prev) => {
+                const existingQueue = (prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [])
+                  .filter((item) => {
+                    const id = String(item?.id || '');
+                    if (chatId === 'chat-druk') {
+                      return !id.includes('dynamic-friend-recon') || !id.includes('blocked-handoff');
+                    }
+                    return !id.startsWith(`${queuedReply.id}-blocked-handoff`);
+                  });
+                const handoffEntry = {
+                  id: `${queuedReply.id}-blocked-handoff`,
+                  messageId: queuedReply.messageId || queuedReply.id,
+                  hotspotId: queuedReply.hotspotId || 'friend-recon-handoff',
+                  label: queuedReply.label || 'Друг',
+                  conversation: remainingConversation,
+                  postConversationEntries: [],
+                  terminalComment: '',
+                };
+                const nextState = {
+                  ...prev,
+                  messenger: {
+                    ...prev.messenger,
+                    queuedPhotoRepliesByChat: {
+                      ...(prev.messenger?.queuedPhotoRepliesByChat || {}),
+                      [chatId]: dedupePhotoReplyQueue([
+                        ...existingQueue,
+                        handoffEntry,
+                      ]),
+                    },
+                    photoReplyInFlightByChat: {
+                      ...(prev.messenger?.photoReplyInFlightByChat || {}),
+                      [chatId]: false,
+                    },
+                    typingByChat: {
+                      ...(prev.messenger?.typingByChat || {}),
+                      [chatId]: {
+                        active: false,
+                        durationMs: 0,
+                      },
+                    },
+                  },
+                };
+                persistRuntimeState(nextState);
+                return nextState;
+              });
+            }, handoffDelayMs);
+            photoReplyTimersRef.current.push(handoffTimerId);
+          }
+
+          handoffToManualQueueDone = true;
+          return;
+        }
+
+        const entryText = entry?.action === 'draft_erase' ? (entry?.draftText || '') : (entry?.text || '');
+        const typingDurationMs = Math.max(0, Math.ceil(entryText.length * PHOTO_REPLY_TYPING_SPEED_MS));
         const typingTimerId = window.setTimeout(() => {
           setStoryState((prev) => {
             const nextState = {
@@ -4048,17 +4266,95 @@ function App() {
         photoReplyTimersRef.current.push(typingTimerId);
 
         const messageTimerId = window.setTimeout(() => {
+          if (entry?.action === 'draft_erase') {
+            const draftText = String(entry?.draftText || '');
+            setTypedByChat((prev) => ({
+              ...prev,
+              [chatId]: draftText,
+            }));
+            const eraseDelayMs = Math.max(0, Number(entry?.delayMs || 0));
+            const eraseTimerId = window.setTimeout(() => {
+              let currentLength = draftText.length;
+              const eraseIntervalId = window.setInterval(() => {
+                currentLength -= 1;
+                if (currentLength <= 0) {
+                  setTypedByChat((prev) => ({
+                    ...prev,
+                    [chatId]: '',
+                  }));
+                  window.clearInterval(eraseIntervalId);
+                  terminalPromptTimersRef.current = terminalPromptTimersRef.current.filter((timerId) => timerId !== eraseIntervalId);
+
+                  const kPingText = (entry?.kPingText || '').trim();
+                  if (kPingText) {
+                    const kChatId = TERMINAL_ADVENTURE_CHAT_ID;
+                    const kPingMessageId = entry?.kPingMessageId || `dynamic-k-ping-${Date.now()}`;
+                    setStoryState((prev) => {
+                      const kHistory = prev.messenger?.historyByChat?.[kChatId] || [];
+                      if (kHistory.some((historyEntry) => historyEntry?.id === kPingMessageId)) {
+                        return prev;
+                      }
+                      const shouldSuppressAttention = isMessengerChatFrontmost(kChatId);
+                      const nextUnreadChatIds = shouldSuppressAttention
+                        ? (prev.messenger?.unreadChatIds || []).filter((id) => id !== kChatId)
+                        : Array.from(new Set([...(prev.messenger?.unreadChatIds || []), kChatId]));
+                      const nextState = {
+                        ...prev,
+                        messenger: {
+                          ...prev.messenger,
+                          historyByChat: {
+                            ...(prev.messenger?.historyByChat || {}),
+                            [kChatId]: [
+                              ...kHistory,
+                              {
+                                id: kPingMessageId,
+                                direction: 'incoming',
+                                text: kPingText,
+                              },
+                            ],
+                          },
+                          unreadChatIds: nextUnreadChatIds,
+                        },
+                      };
+                      persistRuntimeState(nextState);
+                      return nextState;
+                    });
+                    notifyIncomingMessage({
+                      chatId: kChatId,
+                      title: 'К.',
+                      text: kPingText,
+                      sound: 'k',
+                    });
+                  }
+                  return;
+                }
+
+                setTypedByChat((prev) => ({
+                  ...prev,
+                  [chatId]: draftText.slice(0, currentLength),
+                }));
+              }, 70);
+              terminalPromptTimersRef.current.push(eraseIntervalId);
+            }, eraseDelayMs);
+            photoReplyTimersRef.current.push(eraseTimerId);
+            return;
+          }
+
           let appendedFollowupText = entry.text || 'Новое сообщение';
           let didAppendFollowup = false;
           setStoryState((prev) => {
             const currentHistory = prev.messenger?.historyByChat?.[chatId] || [];
+            const entryDirection = entry?.direction === 'outgoing' ? 'outgoing' : 'incoming';
             const incomingText = (entry.text || '').trim();
             const hasSameFollowup = currentHistory.some((item) => (
-              item?.direction === 'incoming'
+              item?.direction === entryDirection
               && (
-                item?.id === entry.id
-                || (typeof item?.id === 'string' && typeof entry?.id === 'string' && item.id.startsWith(`${entry.id}-`))
-                || (!!incomingText && (item?.text || '').trim() === incomingText)
+                (entry?.id
+                  ? (
+                    item?.id === entry.id
+                    || (typeof item?.id === 'string' && item.id.startsWith(`${entry.id}-`))
+                  )
+                  : (!!incomingText && (item?.text || '').trim() === incomingText))
               )
             ));
             if (hasSameFollowup) {
@@ -4069,12 +4365,15 @@ function App() {
             const nextHistoryEntry = {
               ...entry,
               id: nextEntryId,
+              direction: entryDirection,
             };
             appendedFollowupText = nextHistoryEntry.text || appendedFollowupText;
             const shouldSuppressAttention = isMessengerChatFrontmost(chatId);
             const nextUnreadChatIds = shouldSuppressAttention
               ? (prev.messenger?.unreadChatIds || []).filter((id) => id !== chatId)
-              : Array.from(new Set([...(prev.messenger?.unreadChatIds || []), chatId]));
+              : (entryDirection === 'incoming'
+                ? Array.from(new Set([...(prev.messenger?.unreadChatIds || []), chatId]))
+                : (prev.messenger?.unreadChatIds || []));
             const nextState = {
               ...prev,
               messenger: {
@@ -4100,7 +4399,7 @@ function App() {
             return nextState;
           });
 
-          if (didAppendFollowup) {
+          if (didAppendFollowup && (entry?.direction || 'incoming') !== 'outgoing') {
             notifyIncomingMessage({
               chatId,
               title: 'Друг',
@@ -4277,13 +4576,16 @@ function App() {
         setStoryState((prev) => {
           const currentHistory = prev.messenger?.historyByChat?.[chatId] || [];
           const incomingText = (entry.text || '').trim();
-          const hasSameIncoming = currentHistory.some((item) => (
-            item?.direction === 'incoming'
-            && (
-              (entry?.id && item?.id === entry.id)
-              || (!!incomingText && (item?.text || '').trim() === incomingText)
-            )
-          ));
+          const hasSameIncoming = entry?.allowDuplicate
+            ? false
+            : currentHistory.some((item) => (
+              item?.direction === 'incoming'
+              && (
+                entry?.id
+                  ? item?.id === entry.id
+                  : (!!incomingText && (item?.text || '').trim() === incomingText)
+              )
+            ));
           if (hasSameIncoming) {
             const existingQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
             const nextState = {
@@ -4376,39 +4678,8 @@ function App() {
           return nextState;
         });
         if (!didAppendIncoming) {
-          if (isLastAutoIncoming && Array.isArray(queuedReply.postConversationEntries) && queuedReply.postConversationEntries.length > 0) {
-            const immediatePostConversationEntries = queuedReply.postConversationEntries
-              .filter((entry) => Math.max(0, Number(entry?.delayMs || 0)) === 0);
-            const delayedPostConversationEntries = queuedReply.postConversationEntries
-              .filter((entry) => Math.max(0, Number(entry?.delayMs || 0)) > 0);
-
-            let postConversationOffsetMs = 0;
-            immediatePostConversationEntries.forEach((postEntry) => {
-              if (!postEntry?.id) return;
-              const { delayMs: _delayMs, notificationTitle: _notificationTitle, notificationText: _notificationText, ...historyEntry } = postEntry;
-              postConversationOffsetMs = scheduleIncomingChatEntry({
-                chatId,
-                entry: historyEntry,
-                title: postEntry.notificationTitle || (chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'К.' : 'Сообщение'),
-                notificationText: postEntry.notificationText || historyEntry.text || 'Фотография',
-                delayMs: postConversationOffsetMs,
-                sound: chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'k' : null,
-              }) + Number(editorConfig.timings.messageGapMs ?? 0);
-            });
-
-            delayedPostConversationEntries.forEach((postEntry) => {
-              if (!postEntry?.id) return;
-              const postDelayMs = Math.max(0, Number(postEntry.delayMs || 0));
-              const { delayMs: _delayMs, notificationTitle: _notificationTitle, notificationText: _notificationText, ...historyEntry } = postEntry;
-              scheduleIncomingChatEntry({
-                chatId,
-                entry: historyEntry,
-                title: postEntry.notificationTitle || (chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'К.' : 'Сообщение'),
-                notificationText: postEntry.notificationText || historyEntry.text || 'Фотография',
-                delayMs: postDelayMs,
-                sound: chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'k' : null,
-              });
-            });
+          if (isLastAutoIncoming) {
+            schedulePostConversationEntries(chatId, queuedReply.postConversationEntries);
           }
           if (entry.terminalComment) {
             const entryDelayMs = Math.max(0, Number(entry.terminalCommentDelayMs || 0));
@@ -4426,39 +4697,8 @@ function App() {
           }
           return;
         }
-        if (isLastAutoIncoming && Array.isArray(queuedReply.postConversationEntries) && queuedReply.postConversationEntries.length > 0) {
-          const immediatePostConversationEntries = queuedReply.postConversationEntries
-            .filter((entry) => Math.max(0, Number(entry?.delayMs || 0)) === 0);
-          const delayedPostConversationEntries = queuedReply.postConversationEntries
-            .filter((entry) => Math.max(0, Number(entry?.delayMs || 0)) > 0);
-
-          let postConversationOffsetMs = 0;
-          immediatePostConversationEntries.forEach((postEntry) => {
-            if (!postEntry?.id) return;
-            const { delayMs: _delayMs, notificationTitle: _notificationTitle, notificationText: _notificationText, ...historyEntry } = postEntry;
-            postConversationOffsetMs = scheduleIncomingChatEntry({
-              chatId,
-              entry: historyEntry,
-              title: postEntry.notificationTitle || (chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'К.' : 'Сообщение'),
-              notificationText: postEntry.notificationText || historyEntry.text || 'Фотография',
-              delayMs: postConversationOffsetMs,
-              sound: chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'k' : null,
-            }) + Number(editorConfig.timings.messageGapMs ?? 0);
-          });
-
-          delayedPostConversationEntries.forEach((postEntry) => {
-            if (!postEntry?.id) return;
-            const postDelayMs = Math.max(0, Number(postEntry.delayMs || 0));
-            const { delayMs: _delayMs, notificationTitle: _notificationTitle, notificationText: _notificationText, ...historyEntry } = postEntry;
-            scheduleIncomingChatEntry({
-              chatId,
-              entry: historyEntry,
-              title: postEntry.notificationTitle || (chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'К.' : 'Сообщение'),
-              notificationText: postEntry.notificationText || historyEntry.text || 'Фотография',
-              delayMs: postDelayMs,
-              sound: chatId === TERMINAL_ADVENTURE_CHAT_ID ? 'k' : null,
-            });
-          });
+        if (isLastAutoIncoming) {
+          schedulePostConversationEntries(chatId, queuedReply.postConversationEntries);
         }
         if (entry.terminalComment) {
           const entryDelayMs = Math.max(0, Number(entry.terminalCommentDelayMs || 0));
@@ -4509,7 +4749,7 @@ function App() {
         return nextState;
       });
     }
-  }, [appendTerminalLines, clearFriendReconTimers, editorConfig.timings.messageGapMs, isMessengerChatFrontmost, notifyIncomingMessage, persistRuntimeState, playMessageSendSound, scheduleIncomingChatEntry]);
+  }, [appendTerminalLines, clearFriendReconTimers, editorConfig.timings.messageGapMs, isMessengerChatFrontmost, notifyIncomingMessage, persistRuntimeState, playMessageSendSound, scheduleIncomingChatEntry, schedulePostConversationEntries]);
 
   const handleMessengerPhotoPointerMove = useCallback((event) => {
     if (!activeMessengerPhoto) return;
@@ -4864,49 +5104,10 @@ function App() {
 
   useEffect(() => {
     const history = storyState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [];
-    const coauthorMessage = history.find((entry) => (
-      entry?.id === 'k_060a' && entry?.direction === 'incoming'
-    ));
-    if (!coauthorMessage?.text) return;
     if (history[history.length - 1]?.id !== 'k_060a') return;
     if (coauthorFlashMessageSeenRef.current) return;
     coauthorFlashMessageSeenRef.current = true;
-    if (storyState.flags?.kCoauthorFullscreenFlashShown) return;
-
-    if (storyMessageFlashStartTimerRef.current) {
-      window.clearTimeout(storyMessageFlashStartTimerRef.current);
-      storyMessageFlashStartTimerRef.current = null;
-    }
-    if (storyMessageFlashTimerRef.current) {
-      window.clearTimeout(storyMessageFlashTimerRef.current);
-      storyMessageFlashTimerRef.current = null;
-    }
-    storyMessageFlashStartTimerRef.current = window.setTimeout(() => {
-      setStoryMessageFlashText(coauthorMessage.text);
-      storyMessageFlashStartTimerRef.current = null;
-      storyMessageFlashTimerRef.current = window.setTimeout(() => {
-        setStoryMessageFlashText('');
-        storyMessageFlashTimerRef.current = null;
-      }, 950);
-    }, 1000);
-
-    setStoryState((prev) => {
-      if (prev.flags?.kCoauthorFullscreenFlashShown) return prev;
-      const nextState = {
-        ...prev,
-        flags: {
-          ...(prev.flags || {}),
-          kCoauthorFullscreenFlashShown: true,
-        },
-      };
-      persistRuntimeState(nextState);
-      return nextState;
-    });
-  }, [
-    persistRuntimeState,
-    storyState.flags?.kCoauthorFullscreenFlashShown,
-    storyState.messenger?.historyByChat,
-  ]);
+  }, [storyState.messenger?.historyByChat]);
 
   useEffect(() => {
     const allTasks = getUniqueWorkTasks(
@@ -6198,6 +6399,7 @@ function App() {
     shedConveyorNudgeAnchorSeenRef.current = (
       nextStoryState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || []
     ).some((entry) => entry?.id === 'dynamic-k-shed-seq-1');
+    queuedReplyResumeKeysRef.current = new Set();
     terminalPromptTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
     terminalPromptTimersRef.current = [];
     if (storyMessageFlashTimerRef.current) {
@@ -6493,6 +6695,38 @@ function App() {
             && !(pendingChoiceState?.disabledOptionIds || []).includes(option.id)
           )) || null
           : null;
+        const getNextQueuedOutgoingText = (queuedReply, chatHistory) => {
+          if (!queuedReply || !Array.isArray(queuedReply.conversation)) return '';
+          const outgoingEntries = queuedReply.conversation.filter((entry) => (
+            entry?.direction === 'outgoing' && !!entry?.text
+          ));
+          if (outgoingEntries.length === 0) return '';
+
+          let historyCursor = 0;
+          let matchedOutgoingCount = 0;
+          while (matchedOutgoingCount < outgoingEntries.length) {
+            const outgoingText = (outgoingEntries[matchedOutgoingCount]?.text || '').trim();
+            if (!outgoingText) {
+              matchedOutgoingCount += 1;
+              continue;
+            }
+            const foundIndex = chatHistory.findIndex((entry, idx) => (
+              idx >= historyCursor
+              && entry?.direction === 'outgoing'
+              && (entry?.text || '').trim() === outgoingText
+            ));
+            if (foundIndex === -1) {
+              break;
+            }
+            matchedOutgoingCount += 1;
+            historyCursor = foundIndex + 1;
+          }
+
+          return outgoingEntries[matchedOutgoingCount]?.text || '';
+        };
+        const queuedReplyTargetText = pendingQueuedPhotoReply
+          ? getNextQueuedOutgoingText(pendingQueuedPhotoReply, history)
+          : '';
         const typedMessengerText = pendingPlayerEvent || pendingQueuedPhotoReply ? (typedByChat[active.id] || '') : '';
         const isAdventureDeclineTextComplete = typedMessengerText.length >= TERMINAL_ADVENTURE_DECLINE_TEXT.length;
         const isAdventureDeclineBufferComplete = isAdventureDeclineTextComplete && adventureDeclineExtraTapsRemaining === 0;
@@ -6504,10 +6738,10 @@ function App() {
           ? (selectedChoiceOption?.resultText || selectedChoiceOption?.label || '')
           : pendingPlayerEvent
           ? (pendingPlayerEvent.text || '')
-          : (pendingQueuedPhotoReply?.conversation?.[0]?.text || '');
+          : queuedReplyTargetText;
         const isMessengerInputBlockedByTerminalPrompt = isAdventureTerminalPrompt
           && terminalPrompt?.allowMessengerInput === false;
-        const hasPendingPlayerInput = !!pendingPlayerEvent || !!pendingQueuedPhotoReply;
+        const hasPendingPlayerInput = !!pendingPlayerEvent || !!queuedReplyTargetText;
         const isPendingTapComplete = hasPendingPlayerInput
           ? typedMessengerText.length >= targetText.length && targetText.length > 0
           : false;
@@ -8309,65 +8543,21 @@ function App() {
     ));
     if (!narratorLine || narratorLine.status !== 'done') return;
 
-    const narratorSequence = [
-      {
-        id: 'dynamic-k-shed-narrator-question-1',
-        text: 'О, нет, на самом интересном месте!!!',
-        pauseAfterMs: 1000,
-      },
-      {
-        id: 'dynamic-k-shed-narrator-question-2',
-        text: 'Так хочется узнать, что будет дальше! Найдут ли мальчишки К.? Уволят ли Героя с работы? Могут ли вообще уволить с такой работы? И что это за Терминал, который нельзя закрыть?..',
-        pauseAfterMs: 1000,
-      },
-      {
-        id: 'dynamic-k-shed-narrator-question-3',
-        text: 'Купит ли герой билеты к маме? Помирится ли с Другом? А главное – быть ли детской книге, и о чем в ней будет сказка?',
-        pauseAfterMs: 1000,
-      },
-      {
-        id: 'dynamic-k-shed-narrator-question-4',
-        text: 'Очень интересно наблюдать за чужим приключением. Но у тебя, дорогой игрок, наверняка есть свой рабочий стол, за которым нужно присматривать.',
-        pauseAfterMs: 1000,
-      },
-      {
-        id: 'dynamic-k-shed-narrator-question-5',
-        text: 'Кто-то точно ждет ответа в чатах. Карьера сама себя не построит. Вперед! Столько всего в одном месте, такой власти еще не было ни у кого, кто жил до нас...',
-        pauseAfterMs: 2000,
-      },
-      {
-        id: 'dynamic-k-shed-narrator-question-6',
-        text: 'Только помни всегда.',
-        pauseAfterMs: 1000,
-      },
-      {
-        id: 'dynamic-k-shed-narrator-question-7',
-        text: 'Именно в этот момент кто-то засыпает в поезде.',
-        pauseAfterMs: 1000,
-      },
-      {
-        id: 'dynamic-k-shed-narrator-question-8',
-        text: 'Чух-чух, чух-чух…',
-        pauseAfterMs: 0,
-      },
-    ];
-
-    const narratorTypeSpeedMs = 28;
     let sequenceOffsetMs = 0;
-    narratorSequence.forEach((step, index) => {
+    SHED_NARRATOR_SEQUENCE.forEach((step, index) => {
       const delayMs = sequenceOffsetMs;
       const timerId = window.setTimeout(() => {
         appendTerminalLines([
           createTerminalProtocolLine(step.text, {
             id: step.id,
             promptText: '',
-            typeSpeedMs: narratorTypeSpeedMs,
+            typeSpeedMs: SHED_NARRATOR_TYPE_SPEED_MS,
           }),
         ]);
       }, delayMs);
       kHouseSequenceTimersRef.current.push(timerId);
 
-      const typingDurationMs = Math.max(0, step.text.length * narratorTypeSpeedMs);
+      const typingDurationMs = Math.max(0, step.text.length * SHED_NARRATOR_TYPE_SPEED_MS);
       sequenceOffsetMs += typingDurationMs + step.pauseAfterMs;
     });
 
@@ -8389,6 +8579,50 @@ function App() {
     setStoryState,
     storyState.flags?.kShedNarratorIntroStarted,
     storyState.flags?.kShedNarratorQuestionShown,
+    storyState.terminal?.lines,
+  ]);
+
+  useEffect(() => {
+    if (!storyState.flags?.kShedNarratorIntroStarted) return;
+    if (!storyState.flags?.kShedNarratorQuestionShown) return;
+    if (storyState.flags?.kTerminalCloseChoiceShown) return;
+
+    const terminalLines = storyState.terminal?.lines || [];
+    const hasPendingNarratorLine = terminalLines.some((line) => (
+      typeof line?.id === 'string'
+      && line.id.startsWith('dynamic-k-shed-narrator-question-')
+      && line.status === 'pending'
+    ));
+    if (hasPendingNarratorLine) return;
+
+    const firstMissingIndex = SHED_NARRATOR_SEQUENCE.findIndex((step) => (
+      !terminalLines.some((line) => line?.id === step.id)
+    ));
+    if (firstMissingIndex === -1) return;
+
+    const prevStep = firstMissingIndex > 0 ? SHED_NARRATOR_SEQUENCE[firstMissingIndex - 1] : null;
+    if (prevStep) {
+      const prevLine = terminalLines.find((line) => line?.id === prevStep.id);
+      if (!prevLine || prevLine.status !== 'done') return;
+    }
+
+    const nextStep = SHED_NARRATOR_SEQUENCE[firstMissingIndex];
+    const delayMs = firstMissingIndex > 0 ? (prevStep?.pauseAfterMs || 0) : 0;
+    const timerId = window.setTimeout(() => {
+      appendTerminalLines([
+        createTerminalProtocolLine(nextStep.text, {
+          id: nextStep.id,
+          promptText: '',
+          typeSpeedMs: SHED_NARRATOR_TYPE_SPEED_MS,
+        }),
+      ]);
+    }, delayMs);
+    kHouseSequenceTimersRef.current.push(timerId);
+  }, [
+    appendTerminalLines,
+    storyState.flags?.kShedNarratorIntroStarted,
+    storyState.flags?.kShedNarratorQuestionShown,
+    storyState.flags?.kTerminalCloseChoiceShown,
     storyState.terminal?.lines,
   ]);
 
@@ -8827,10 +9061,6 @@ function App() {
       entry?.direction === 'outgoing' && (entry.text || '').trim() === (firstEntry.text || '').trim()
     ));
     if (!hasOutgoingAlreadyInHistory) return;
-
-    const resumeKey = `${chatId}:${queuedReply.id}:${friendHistory.length}`;
-    if (queuedReplyResumeKeysRef.current.has(resumeKey)) return;
-    queuedReplyResumeKeysRef.current.add(resumeKey);
 
     submitQueuedPhotoReply(chatId, queuedReply);
   }, [
