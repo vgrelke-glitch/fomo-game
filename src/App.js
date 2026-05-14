@@ -1262,7 +1262,7 @@ const createFriendReconQueueEntry = () => ({
     },
     {
       direction: 'outgoing',
-      text: 'Мне страшно. Я все время думаю о том, что у меня свободный доступ в мир, а я просиживаю задницу…',
+      text: 'Я все время думаю о том, что у меня свободный доступ в мир, а я просиживаю задницу…',
     },
     {
       direction: 'incoming',
@@ -3225,6 +3225,17 @@ function App() {
     const kHistory = storyState.messenger?.historyByChat?.[kChatId] || [];
     if (kHistory.some((entry) => entry?.id === 'dynamic-k-house-return-1')) return;
 
+    const terminalLines = storyState.terminal?.lines || [];
+    const hasFriendFinalTerminalComment = terminalLines.some((line) => line?.id === 'dynamic-friend-recon-final-terminal');
+    if (!hasFriendFinalTerminalComment) {
+      appendTerminalLines([
+        {
+          ...createTerminalProtocolLine('ну и ладно'),
+          id: 'dynamic-friend-recon-final-terminal',
+        },
+      ]);
+    }
+
     scheduleIncomingChatEntry({
       chatId: kChatId,
       entry: {
@@ -3235,12 +3246,14 @@ function App() {
       title: 'К.',
       notificationText: 'чай допит. Очень милый дед. Мне кажется, очень одинокий.',
       sound: 'k',
-      delayMs: 600,
+      delayMs: 1800,
       timerStoreRef: photoReplyTimersRef,
     });
   }, [
+    appendTerminalLines,
     scheduleIncomingChatEntry,
     storyState.messenger?.historyByChat,
+    storyState.terminal?.lines,
   ]);
 
   useEffect(() => {
