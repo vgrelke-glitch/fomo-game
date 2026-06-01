@@ -30,5 +30,5 @@ public/files/kitchen_v2.mov
 
 # local working artifacts
 backups/
-files/
+/files/
 fomo-game-netlify-build.zip
