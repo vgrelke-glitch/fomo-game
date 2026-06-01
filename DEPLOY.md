@@ -1,32 +1,33 @@
 # Deploy
 
-Проект подготовлен под `GitHub -> Vercel`.
+Проект подготовлен под Netlify, сайт `фомо-гейм`.
 
-## Первый запуск
+## Конфиг
 
-1. Создай репозиторий на GitHub.
-2. Запушь в него этот проект.
-3. Зайди на `vercel.com`.
-4. Нажми `Add New -> Project`.
-5. Выбери нужный GitHub-репозиторий.
-6. Убедись, что Vercel видит:
-   `Build Command`: `npm run build`
-   `Output Directory`: `build`
-7. Нажми `Deploy`.
+Netlify берет настройки из `netlify.toml`:
 
-## Дальше
+- `Build command`: `npm run build`
+- `Publish directory`: `build`
+- SPA-роуты перенаправляются на `/index.html`
+- `/static/*` и `/files/*` получают cache headers
 
-После этого ссылка будет постоянной. Когда ты меняешь проект:
+Локальная привязка Netlify уже есть в `.netlify/state.json`.
 
-1. коммитишь изменения
-2. пушишь их в GitHub
-3. Vercel автоматически пересобирает сайт
+## Перед отгрузкой
 
-## Почему добавлен `vercel.json`
+```bash
+npm run story:check
+npm run build
+```
 
-Он нужен, чтобы:
+Готовая production-сборка лежит в `build`.
 
-- Vercel собирал проект как обычный CRA-build
-- любые URL приложения открывались корректно через `index.html`
+## Отгрузка
 
-Это важно для SPA-маршрутов вроде `/dev`.
+Если Netlify CLI установлен и авторизован:
+
+```bash
+netlify deploy --prod --dir=build
+```
+
+Если CLI не установлен, можно загрузить папку `build` вручную через Netlify Deploys для проекта `фомо-гейм`.
