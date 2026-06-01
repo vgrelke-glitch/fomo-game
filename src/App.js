@@ -46,12 +46,14 @@ const DevEditorPanel = React.lazy(() => import('./components/DevEditorPanel'));
 const INITIAL_EDITOR_CONTENT = normalizeEditorContent(STORY_CONTENT, STORY_CONTENT);
 const INITIAL_EDITOR_CONFIG = normalizeEditorConfig(STORY_EDITOR_CONFIG, STORY_EDITOR_CONFIG);
 const PROLOGUE_AUDIO_SRC = '/files/audio/intro.mp3';
-const CHAPTER1_AUDIO_SRC = '/files/audio/chapter1.mp3';
+const CHAPTER1_AUDIO_SRC = '/files/audio/im%20in!.mp3';
+const FRIEND_FIGHT_AUDIO_SRC = '/files/audio/D%20fight.mp3';
+const K_SHED_BASE_AUDIO_SRC = '/files/audio/base!.mp3';
 const K_HOUSE_VOICE_AUDIO_SRC = '/files/audio/voice.ogg';
 const K_SHED_BOYS_AUDIO_SRC = '/files/audio/boys.dialog.m4a';
 const MAMA_NOTIFICATION_AUDIO_SRC = '/files/audio/M_not.mp3';
 const FRIEND_NOTIFICATION_AUDIO_SRC = '/files/audio/D_not.mp3';
-const K_FIRST_NOTIFICATION_AUDIO_SRC = '/files/audio/K_first_not.mp3';
+const K_FIRST_NOTIFICATION_AUDIO_SRC = '/files/audio/K_first_not%20(new).mp3';
 const K_NOTIFICATION_AUDIO_SRC = '/files/audio/K_not.mp3';
 const MESSAGE_SEND_AUDIO_SRC = '/files/audio/sendmessage.mp3';
 const PRINT_KEY_SOUND_SRCS = [
@@ -61,6 +63,21 @@ const PRINT_KEY_SOUND_SRCS = [
   '/files/audio/prin4.mp3',
 ];
 const PRINT_KEY_SOUND_POOL_SIZE = 2;
+const FRIEND_FIGHT_TERMINAL_TRIGGER_TEXT = 'АКТИВИРОВАТЬ ПРОТОКОЛ «мои проблемы»';
+const K_SHED_BASE_TRIGGER_MESSAGE_ID = 'dynamic-k-shed-seq-6';
+const K_SHED_BASE_STOP_TRIGGER_MESSAGE_ID = 'dynamic-k-shed-range-seq-3';
+const K_SHED_PANIC_MUSIC_TRIGGER_MESSAGE_ID = 'dynamic-k-shed-range-seq-4';
+const K_SHED_BASE_FADE_IN_MS = 4000;
+const K_SHED_BASE_TARGET_VOLUME = 1;
+const CONVEYOR_FOCUS_LOCK_INTRO_LINE_ID = 'terminal-conveyor-focus-lock-intro';
+const CONVEYOR_FOCUS_LOCK_COMPLETE_LINE_1_ID = 'terminal-conveyor-focus-lock-complete-1';
+const CONVEYOR_FOCUS_LOCK_COMPLETE_LINE_2_ID = 'terminal-conveyor-focus-lock-complete-2';
+const CONVEYOR_FOCUS_LOCK_INTRO_TEXT = 'выполни по крайней мере пару задач';
+const CONVEYOR_FOCUS_LOCK_BLOCKED_TEXT = 'так не пойдет, выполни по крайней мере пару задач';
+const CONVEYOR_FOCUS_LOCK_COMPLETE_TEXT_1 = 'ок, выполнен базовый минимум';
+const CONVEYOR_FOCUS_LOCK_COMPLETE_TEXT_2 = 'но надолго этого не хватит';
+const CONVEYOR_FOCUS_LOCK_NUDGE_DEDUPE_MS = 180;
+const CONVEYOR_FOCUS_LOCK_COMPLETION_BUFFER_MS = 250;
 
 const ICON_IMAGE_BY_ID = {
   app1: iconNotes,
@@ -296,7 +313,7 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         width: 0.08,
         height: 0.09,
         conversation: [
-          { direction: 'outgoing', text: 'А, это вот дыра от метеорита? Как будто бы небольшая' },
+          { direction: 'outgoing', text: 'А, это вот дыра от метеорита?' },
           { direction: 'incoming', text: 'ага, надо поближе рассмотреть!' },
           { direction: 'outgoing', text: 'Я думаю, первое что тебе нужно сделать - это поболтать с дедом.' },
           { direction: 'incoming', text: 'окей! есть поболтать с дедом' },
@@ -316,40 +333,24 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         width: 0.16,
         height: 0.60,
         conversation: [
-          { direction: 'outgoing', text: 'Это он?' },
+          { direction: 'outgoing', text: 'Это наш герой?' },
           { direction: 'incoming', text: 'ага' },
           { direction: 'incoming', text: 'он так рад вниманию' },
           { direction: 'outgoing', text: 'Выглядит добрым' },
           { direction: 'incoming', text: 'очень' },
+          { direction: 'incoming', text: 'уже пообещал мне малину' },
         ],
       },
       {
         id: 'roof',
-        label: 'Крыша',
+        label: 'Дыра',
         left: 0.08,
         top: 0.06,
         width: 0.73,
         height: 0.24,
         conversation: [
-          { direction: 'outgoing', text: 'Отсюда дырку не видно.' },
-          { direction: 'incoming', text: 'сейчас сниму поближе' },
-        ],
-      },
-      {
-        id: 'porch-wall',
-        label: 'Крыльцо / стена дома',
-        left: 0.33,
-        top: 0.22,
-        width: 0.43,
-        height: 0.47,
-        conversation: [
-          { direction: 'outgoing', text: 'У него дом как из сказки. Или из воспоминания...' },
-          { direction: 'incoming', text: 'да' },
-          { direction: 'incoming', text: 'он очень старый' },
-          { direction: 'outgoing', text: 'Внутри тоже?' },
-          { direction: 'incoming', text: 'ага. Он его я думаю непереставая чинит' },
-          { direction: 'incoming', text: 'тут и молодой бы устал чинить' },
-          { direction: 'incoming', text: 'сейчас, секунду' },
+          { direction: 'outgoing', text: 'А снимешь дыру поближе?' },
+          { direction: 'incoming', text: 'ага, сейчас' },
         ],
         postConversationEntries: [
           {
@@ -358,6 +359,25 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
             text: '',
             delayMs: 10000,
           },
+        ],
+      },
+      {
+        id: 'porch-wall',
+        label: 'Дом',
+        left: 0.33,
+        top: 0.22,
+        width: 0.43,
+        height: 0.47,
+        conversation: [
+          { direction: 'outgoing', text: 'Дом сказочный.' },
+          { direction: 'incoming', text: 'да' },
+          { direction: 'incoming', text: 'и очень ветхий' },
+          { direction: 'outgoing', text: 'Это такая избушка с добрым духом.' },
+          { direction: 'incoming', text: 'избушка на курьих ножках?' },
+          { direction: 'outgoing', text: 'Баба Яга, между прочим, архетип мудрости и связи с землей. А костяная нога означает, что она наполовину «по ту сторону».' },
+          { direction: 'incoming', text: 'о вау. но она злая в сказках' },
+          { direction: 'outgoing', text: 'Она не злая, просто она - проводник. У нее довольно суровая работа.' },
+          { direction: 'incoming', text: 'любопытно! Запомню' },
         ],
       },
     ],
@@ -374,38 +394,30 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         width: 0.24,
         height: 0.22,
         conversation: [
-          { direction: 'outgoing', text: 'С земли она выглядит больше.' },
-          { direction: 'incoming', text: 'да' },
+          { direction: 'outgoing', text: 'Дед сказал, она сквозная?' },
+          { direction: 'incoming', text: 'да', allowDuplicate: true },
+          { direction: 'outgoing', text: 'А камень не мог куда-нибудь в доме завалиться?' },
+          { direction: 'incoming', text: 'нет. Его выставили на всеобщее обозрение. Он вчера всем его показывал, говорит, журналисты приезжали' },
+          { direction: 'incoming', text: 'и камень убрали в коробку. а сегодня коробка пропала' },
           { direction: 'incoming', text: 'какая-то она странная' },
-          { direction: 'outgoing', text: 'В смысле?' },
-          { direction: 'incoming', text: 'ну… как будто не очень метеоритная' },
+          { direction: 'outgoing', text: 'Дыра?' },
+          { direction: 'incoming', text: 'ага' },
+          { direction: 'incoming', text: 'как будто не очень метеоритная' },
           { direction: 'outgoing', text: 'Почему?' },
           { direction: 'incoming', text: 'не знаю, наверно представляла себе по-другому' },
         ],
       },
       {
-        id: 'rusted-sheets',
-        label: 'Ржавые листы',
-        left: 0.53,
-        top: 0.36,
-        width: 0.34,
-        height: 0.22,
-        conversation: [
-          { direction: 'outgoing', text: 'Мда, ну тут и до метеорита нужен был ремонт' },
-          { direction: 'incoming', text: 'ага, это точно' },
-        ],
-      },
-      {
         id: 'impact-direction',
-        label: 'Направление пробоины / скат',
+        label: 'Скат',
         left: 0.16,
         top: 0.25,
         width: 0.38,
         height: 0.26,
         conversation: [
-          { direction: 'incoming', text: 'сложно понять, откуда прилетело.' },
-          { direction: 'outgoing', text: 'Сверху?' },
-          { direction: 'incoming', text: 'ага, но дед как будто путается в показаниях' },
+          { direction: 'incoming', text: 'сложно понять, откуда прилетело' },
+          { direction: 'outgoing', text: 'Дед как будто путается в показаниях?' },
+          { direction: 'incoming', text: 'не понимаю. Как будто смущается немного.' },
         ],
       },
     ],
@@ -416,19 +428,30 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
     hotspots: [
       {
         id: 'garden-beds',
-        label: 'Грядка',
+        label: 'Кусты малины',
         left: 0.04,
         top: 0.62,
         width: 0.58,
         height: 0.34,
         conversation: [
-          { direction: 'outgoing', text: 'Грядки?' },
-          { direction: 'incoming', text: 'да, загляденье' },
+          { direction: 'outgoing', text: 'Кусты малины?' },
+          { direction: 'incoming', text: 'жалко я не могу отправить тебе запах………..' },
+          { direction: 'outgoing', text: 'Я забыл, что такие вещи существуют взаправду' },
           { direction: 'incoming', text: 'боже я бы так хотела растить свой сад' },
           {
             direction: 'outgoing',
             text: 'Я бы не смог, такая однообразная работа',
-            terminalComment: '> > C:\\Users\\G> ...а твоя работа очень разнообразная',
+            terminalComment: '...а твоя работа очень разнообразная',
+          },
+          { direction: 'outgoing', text: 'Жалко выделять на это время' },
+          { direction: 'incoming', text: 'а на что не жалко?' },
+          { direction: 'outgoing', text: 'Не знаю. Рабочие победы?' },
+          { direction: 'incoming', text: 'я больше в это не верю…' },
+          { direction: 'outgoing', text: '?' },
+          {
+            direction: 'incoming',
+            text: 'это все не взаправду)',
+            terminalComment: 'а что взаправду????',
           },
         ],
       },
@@ -440,11 +463,10 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         width: 0.21,
         height: 0.21,
         conversation: [
-          { direction: 'outgoing', text: 'у деда есть внуки?' },
+          { direction: 'outgoing', text: 'У деда есть внуки?' },
           { direction: 'incoming', text: 'нет, говорю же, он совсем один.' },
-          { direction: 'outgoing', text: 'Странно, а велик как будто детский.' },
-          { direction: 'incoming', text: 'может он там много лет валяется' },
-          { direction: 'outgoing', text: 'Не бывает бесхозных великов в деревне' },
+          { direction: 'outgoing', text: 'Просто рядом ошиваются мальчишки?' },
+          { direction: 'incoming', text: 'ага. Думаю, им тоже достается малина с кустов' },
         ],
       },
       {
@@ -456,10 +478,8 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         height: 0.46,
         conversation: [
           { direction: 'outgoing', text: 'Это его сарай?' },
-          { direction: 'incoming', text: 'он сказал он заброшенный' },
-          { direction: 'outgoing', text: 'Сходи туда?' },
-          { direction: 'incoming', text: 'он тебе кажется примечательным?' },
-          { direction: 'outgoing', text: 'ну, у нас же прогулка' },
+          { direction: 'incoming', text: 'он сказал он заброшенный. И что там мальчишки тусуются' },
+          { direction: 'outgoing', text: 'Посмотришь что там?' },
           { direction: 'incoming', text: 'окей!' },
         ],
       },
@@ -468,7 +488,40 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
   'dynamic-k-shed-mid-photo-2': {
     image: fromKShedMidPhoto2,
     alt: 'Сарай 2',
-    hotspots: [],
+    hotspots: [
+      {
+        id: 'ladder',
+        label: 'Лестница',
+        left: 0.40,
+        top: 0.18,
+        width: 0.28,
+        height: 0.76,
+        conversation: [
+          { direction: 'outgoing', text: 'Безумно предлагать тебе залезть наверх?' },
+          { direction: 'incoming', text: 'шутишь?? Это самое интересное' },
+        ],
+        postConversationEntries: [
+          {
+            id: 'dynamic-k-shed-seq-5b',
+            direction: 'incoming',
+            text: 'ты не поверишь………………….',
+            delayMs: 15000,
+          },
+          {
+            id: 'dynamic-k-shed-video-1',
+            direction: 'incoming',
+            text: '',
+            delayMs: 15900,
+          },
+          {
+            id: 'dynamic-k-shed-seq-6',
+            direction: 'incoming',
+            text: 'ЭТО ШТАБ!!!!!!!!!!!',
+            delayMs: 17100,
+          },
+        ],
+      },
+    ],
   },
   'dynamic-k-shed-mid-photo-1': {
     image: fromKShedMidPhoto1,
@@ -492,10 +545,14 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         width: 0.34,
         height: 0.20,
         conversation: [
-          { direction: 'outgoing', text: 'Они тут что, спят?' },
-          { direction: 'incoming', text: 'надеюсь, нет' },
-          { direction: 'incoming', text: 'хотя выглядит уютно' },
-          { direction: 'outgoing', text: 'Это уже не штаб, это дача внутри сарая' },
+          { direction: 'outgoing', text: 'Это… стильно даже…' },
+          { direction: 'incoming', text: 'место, куда приятно сбегать от родителей' },
+          {
+            direction: 'incoming',
+            text: 'у тебя было такое в детстве?',
+            terminalComment: 'воспоминание… заблокировано',
+          },
+          { direction: 'outgoing', text: 'Нет, никогда...' },
         ],
       },
       {
@@ -509,7 +566,7 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
           { direction: 'outgoing', text: 'Велосипед чинят?' },
           { direction: 'incoming', text: 'похоже на то' },
           { direction: 'incoming', text: 'колесо отдельно, цепь отдельно, все как положено' },
-          { direction: 'outgoing', text: 'Мастерская…' },
+          { direction: 'outgoing', text: 'Рукастые…' },
         ],
       },
       {
@@ -521,9 +578,12 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         height: 0.25,
         conversation: [
           { direction: 'outgoing', text: 'Это у них флаг?' },
-          { direction: 'incoming', text: 'кажется да' },
-          { direction: 'incoming', text: 'очень серьезная организация' },
-          { direction: 'incoming', text: 'без флага не считается' },
+          { direction: 'incoming', text: 'какой-то кусок ткани' },
+          { direction: 'incoming', text: 'на ощупь приятная' },
+          { direction: 'incoming', text: 'я думаю, она тут на случай чего' },
+          { direction: 'incoming', text: 'знаешь, если пригодится' },
+          { direction: 'outgoing', text: 'Все в дом?' },
+          { direction: 'incoming', text: 'это самое приятное' },
         ],
       },
       {
@@ -534,10 +594,8 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         width: 0.25,
         height: 0.56,
         conversation: [
-          { direction: 'outgoing', text: 'У них тут запасы на все случаи жизни.' },
-          { direction: 'incoming', text: 'ну вдруг надо кого-то спасать' },
-          { direction: 'incoming', text: 'или куда-нибудь залезть' },
-          { direction: 'outgoing', text: 'Второе как будто бы наиболее вероятно' },
+          { direction: 'outgoing', text: 'Тут инструменты на все случаи жизни.' },
+          { direction: 'incoming', text: 'очень интересно. Вроде бы хаос, но все на местах' },
         ],
       },
       {
@@ -548,13 +606,30 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         width: 0.24,
         height: 0.22,
         conversation: [
-          { direction: 'outgoing', text: 'Красиво тут.' },
+          { direction: 'outgoing', text: 'Здесь так красиво…' },
           { direction: 'incoming', text: 'да' },
           { direction: 'incoming', text: 'пыль летает в лучах' },
-          { direction: 'outgoing', text: 'Как там запах?' },
+          {
+            direction: 'outgoing',
+            text: 'Как там запах?',
+            terminalComment: '«как там запах???»',
+          },
           { direction: 'incoming', text: 'пахнет сеном и старым деревом' },
-          { direction: 'outgoing', text: 'Вообще-то звучит идеально' },
-          { direction: 'incoming', text: 'так и есть. Я хочу сюда переехать))' },
+          { direction: 'outgoing', text: 'Почему это так волнительно?' },
+          { direction: 'incoming', text: 'потому что это мечта каждого человека' },
+          { direction: 'outgoing', text: 'Я не знал, что у меня есть такая мечта' },
+          { direction: 'outgoing', text: 'Мне кажется, она только что появилась' },
+          {
+            direction: 'incoming',
+            text: 'что будешь делать?)',
+            terminalComment: 'успокаиваться и работать',
+          },
+          { direction: 'outgoing', text: 'А что сделать?' },
+          {
+            direction: 'incoming',
+            text: 'поезжай в деревню',
+            terminalComment: 'так это и происходит',
+          },
         ],
       },
     ],
@@ -573,8 +648,8 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         conversation: [
           { direction: 'outgoing', text: 'Похоже на карту?' },
           { direction: 'incoming', text: 'слушай, что-то знакомое, секунду' },
-          { direction: 'incoming', text: 'я подумала, что вот это синее пятно мне что-то напоминает. Залезла в карты, а тут есть такое озеро рядом!', delayMs: 30000 },
-          { direction: 'incoming', text: 'Мы в детстве тоже такие рисовали... Может они украли камень и спрятали его здесь?' },
+          { direction: 'incoming', text: 'я подумала, что вот это синее пятно мне что-то напоминает. Залезла в карты, а тут есть такое озеро рядом!', delayMs: 5000 },
+          { direction: 'incoming', text: 'мы в детстве тоже такие рисовали... Может они украли камень и спрятали его здесь?' },
           { direction: 'outgoing', text: 'Крестик выглядит важным' },
           { direction: 'incoming', text: 'Считаешь нужно пойти по крестику?' },
           { direction: 'outgoing', text: 'Только если хочешь найти СОКРОВИЩА' },
@@ -582,11 +657,11 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
           { direction: 'outgoing', text: 'Тогда забирай карту!' },
           { direction: 'incoming', text: 'зачем? Я же сфоткала…' },
           { direction: 'outgoing', text: 'Это волшебный артефакт, он тебе пригодится!!' },
+          { direction: 'incoming', text: 'хахахха' },
           {
             direction: 'incoming',
-            text: 'Я смотрю ты втянулся! Окей, забираю карту',
-            terminalComment: 'получен волшебный артефакт: Карта Чердачных Сокровищ',
-            terminalCommentDelayMs: 2200,
+            text: 'Окей, забираю карту',
+            terminalComment: 'Получен артефакт: Карта Волшебных Сокровищ',
           },
         ],
       },
@@ -602,7 +677,11 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
           { direction: 'incoming', text: 'как ты понял?' },
           { direction: 'outgoing', text: 'Синий карандаш тут прямо валяется.' },
           { direction: 'incoming', text: 'ты что из школы детективов??' },
-          { direction: 'outgoing', text: 'Нет я из школы фей' },
+          {
+            direction: 'outgoing',
+            text: 'Просто наблюдение',
+            terminalComment: 'отличное применение наблюдательности',
+          },
         ],
       },
       {
@@ -613,12 +692,17 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         width: 0.09,
         height: 0.10,
         conversation: [
-          { direction: 'outgoing', text: 'Сколько же всего тут нужного и важного…' },
-          { direction: 'incoming', text: 'да тут хватит собрать отряд в поход' },
-          { direction: 'incoming', text: 'и мастерскую' },
-          { direction: 'incoming', text: 'и что угодно вообще' },
-          { direction: 'incoming', text: 'не хватает только бутербродов' },
-          { direction: 'outgoing', text: 'И взрослого, который скажет: «никуда не ходите»' },
+          { direction: 'outgoing', text: 'Интересно, есть что-то, чего тут НЕТ?' },
+          { direction: 'incoming', text: 'у меня такое чувство, как будто здесь собрали самые полезные вещи' },
+          { direction: 'outgoing', text: 'Маленькие чудики, которые хранят все важности человечества' },
+          { direction: 'incoming', text: 'домик эльфов?' },
+          { direction: 'outgoing', text: 'Да. Или нет, не эльфов. Я пока не понимаю. Но это такие существа, котрые собирают хлам, и могут построить из него что угодно' },
+          { direction: 'incoming', text: 'в любом месте, где они оказываются, у них есть дом' },
+          {
+            direction: 'outgoing',
+            text: 'Они никогда не чувствуют лишений, потому что если находят пустое место, они всегда найдут, чем его заполнить',
+            terminalComment: '…',
+          },
         ],
       },
       {
@@ -629,16 +713,12 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         width: 0.18,
         height: 0.10,
         conversation: [
-          { direction: 'outgoing', text: 'А есть приемник?' },
+          { direction: 'outgoing', text: 'А там есть приемник?' },
           { direction: 'incoming', text: 'для кассет?' },
           { direction: 'incoming', text: 'ага, какой-то пыльный есть' },
-          { direction: 'outgoing', text: 'Интересно, они вообще знают, как ее включать?' },
-          { direction: 'incoming', text: 'а ты знаешь как ее включать?)' },
-          { direction: 'outgoing', text: 'мне кажется еще да…' },
-          { direction: 'incoming', text: 'может, это древний артефакт' },
-          { direction: 'incoming', text: 'как карта' },
-          { direction: 'outgoing', text: 'Как мы' },
-          { direction: 'incoming', text: 'да брось))' },
+          { direction: 'outgoing', text: 'Интересно, они вообще знают, как его включать?' },
+          { direction: 'incoming', text: 'я уверена, что они знают даже как его СОБРАТЬ' },
+          { direction: 'outgoing', text: 'Причем из палок и веток' },
         ],
       },
       {
@@ -652,7 +732,10 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
           { direction: 'outgoing', text: 'А что в банке?' },
           { direction: 'incoming', text: 'гайки, стеклышки, монетки' },
           { direction: 'incoming', text: 'это валюта. Валюта В БАНКЕ' },
-          { direction: 'outgoing', text: 'Курс нестабильный…' },
+          { direction: 'outgoing', text: 'Хахахаххаха' },
+          { direction: 'incoming', text: 'нет, правда. Это их деньги' },
+          { direction: 'outgoing', text: 'Интересно, как определяется курс?' },
+          { direction: 'incoming', text: 'любопытством! Любая любопытная штучка сойдет' },
         ],
       },
     ],
@@ -669,10 +752,9 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         width: 0.20,
         height: 0.42,
         conversation: [
-          { direction: 'outgoing', text: 'Подожди.' },
-          { direction: 'outgoing', text: 'Это рогатка?' },
+          { direction: 'outgoing', text: 'Рогатка - оборонительное орудие?' },
           { direction: 'incoming', text: 'типа того' },
-          { direction: 'incoming', text: 'только огромная' },
+          { direction: 'incoming', text: 'она… огромная' },
           { direction: 'outgoing', text: 'Они стреляют из нее? В птиц?..' },
           { direction: 'incoming', text: 'ужас' },
           { direction: 'incoming', text: 'я не верю, это все выглядит намного добрее' },
@@ -686,9 +768,9 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         width: 0.26,
         height: 0.22,
         conversation: [
-          { direction: 'outgoing', text: 'Тут даже резина натянута.' },
+          { direction: 'outgoing', text: 'Я в шоке! Такая продуманная конструкция…' },
           { direction: 'incoming', text: 'да' },
-          { direction: 'incoming', text: 'она самодельная, но рабочая' },
+          { direction: 'incoming', text: 'у рогатки? да, и она точно рабочая' },
           { direction: 'outgoing', text: 'Мне это не нравится.' },
           { direction: 'incoming', text: 'мне тоже, но она смешная' },
           { direction: 'outgoing', text: 'Смешная опасная штука' },
@@ -716,10 +798,10 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         width: 0.36,
         height: 0.28,
         conversation: [
-          { direction: 'outgoing', text: 'Они тут все сами строят?' },
-          { direction: 'incoming', text: 'похоже' },
-          { direction: 'outgoing', text: 'Криво, но с душой' },
-          { direction: 'incoming', text: 'лучший стиль архитектуры' },
+          { direction: 'outgoing', text: 'Эти маленькие чудики, они всегда в движении' },
+          { direction: 'incoming', text: 'и у них всегда что-нибудь в карманах' },
+          { direction: 'outgoing', text: 'Да, и очень много карманов. Или волшебные тюки, в которых появляется все, что им нужно' },
+          { direction: 'incoming', text: 'самые полезные духи' },
         ],
       },
       {
@@ -730,10 +812,11 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         width: 0.38,
         height: 0.21,
         conversation: [
-          { direction: 'outgoing', text: 'Тут снова велосипедные штуки.' },
-          { direction: 'incoming', text: 'да, насос, камера, какие-то гайки' },
-          { direction: 'outgoing', text: 'У них не штаб, а сервисный центр' },
-          { direction: 'incoming', text: 'деревенский стартап' },
+          { direction: 'outgoing', text: 'Интересно, какая сказочная альтернатива велосипеду?' },
+          { direction: 'incoming', text: 'колесница?..' },
+          { direction: 'outgoing', text: 'Слишком пафосно' },
+          { direction: 'incoming', text: 'велосипед тоже может быть сказочным' },
+          { direction: 'outgoing', text: 'Надо еще подумать' },
         ],
       },
       {
@@ -744,11 +827,11 @@ const MESSENGER_PHOTO_ATTACHMENT_BY_MESSAGE_ID = {
         width: 0.34,
         height: 0.30,
         conversation: [
-          { direction: 'outgoing', text: 'Отсюда хорошо видно двор.' },
-          { direction: 'incoming', text: 'ага' },
-          { direction: 'incoming', text: 'можно сидеть и смотреть, кто идет' },
-          { direction: 'outgoing', text: 'Наблюдательный пункт' },
-          { direction: 'incoming', text: 'это база мечты' },
+          { direction: 'outgoing', text: 'Окно – наблюдательный пункт' },
+          { direction: 'incoming', text: 'и всегда кто-нибудь дежурит' },
+          { direction: 'incoming', text: 'чьего нападения они ждут?' },
+          { direction: 'outgoing', text: 'Не думаю, что они с кем-нибудь враждуют' },
+          { direction: 'incoming', text: 'ага, в их мире враги только игрушечные' },
         ],
       },
     ],
@@ -1614,25 +1697,26 @@ const createDevAtBoysVoiceState = () => {
 
   nextState = appendChatHistoryEntries(nextState, chatId, [
     { id: 'dynamic-k-shed-seq-1', direction: 'incoming', text: 'иду в сарай' },
-    { id: 'dynamic-k-shed-seq-2', direction: 'incoming', text: 'окей, я в сарае. Тут ничего интересного.' },
+    { id: 'dynamic-k-shed-seq-2', direction: 'incoming', text: 'окей, я в сарае.' },
+    { id: 'dynamic-k-shed-seq-2b', direction: 'incoming', text: 'тут пахнет сеном' },
+    { id: 'dynamic-k-shed-seq-4', direction: 'incoming', text: 'не вижу следов мальчишек' },
     { id: 'dynamic-k-shed-mid-photo-2', direction: 'incoming', text: '' },
     { id: 'dynamic-k-shed-mid-photo-1', direction: 'incoming', text: '' },
-    { id: 'dynamic-k-shed-seq-3', direction: 'incoming', text: 'дед говорил, что тут шарится банда местных мальчишек. Романтично по-моему.' },
-    { id: 'dynamic-k-shed-seq-4', direction: 'incoming', text: 'только я не вижу никаких следов мальчишек' },
-    { id: 'dynamic-k-shed-seq-5', direction: 'incoming', text: 'сейчас еще по лестнице залезу' },
+    { id: 'dynamic-k-shed-ladder-reply', direction: 'outgoing', text: 'Безумно предлагать тебе залезть наверх?' },
+    { id: 'dynamic-k-shed-ladder-answer', direction: 'incoming', text: 'шутишь?? Это самое интересное' },
     { id: 'dynamic-k-shed-seq-5b', direction: 'incoming', text: 'ты не поверишь………………….' },
     { id: 'dynamic-k-shed-video-1', direction: 'incoming', text: '' },
-    { id: 'dynamic-k-shed-seq-6', direction: 'incoming', text: 'ЭТО НАСТОЯЩИЙ ШТАБ.' },
+    { id: 'dynamic-k-shed-seq-6', direction: 'incoming', text: 'ЭТО ШТАБ!!!!!!!!!!!' },
     { id: 'dynamic-k-shed-seq-9', direction: 'incoming', text: 'так, ну здесь никого нет, но повсюду куча приколов.' },
     { id: 'dynamic-k-shed-hq-photo-1', direction: 'incoming', text: '' },
     { id: 'dynamic-k-shed-hq-photo-2', direction: 'incoming', text: '' },
     { id: 'dynamic-k-shed-hq-photo-3', direction: 'incoming', text: '' },
     { id: 'dynamic-k-shed-hq-photo-4', direction: 'incoming', text: '' },
-    { id: 'dynamic-k-shed-range-seq-1', direction: 'incoming', text: 'видишь, они просто играют.' },
-    { id: 'dynamic-k-shed-range-seq-2', direction: 'incoming', text: 'аааа, слушай, я как-то даже не заметила, когда сюда шла. Это у них тир' },
+    { id: 'dynamic-k-shed-range-seq-1', direction: 'incoming', text: 'я не заметила этого, когда шла.' },
+    { id: 'dynamic-k-shed-range-seq-2', direction: 'incoming', text: 'у них тут тир' },
     { id: 'dynamic-k-shed-range-seq-3', direction: 'incoming', text: 'стой я что-то слышу' },
     { id: 'dynamic-k-shed-range-seq-4', direction: 'incoming', text: 'Кто-то пришел!!' },
-    { id: 'dynamic-k-shed-range-seq-5', direction: 'incoming', text: 'ЗАЧЕМ??' },
+    { id: 'dynamic-k-shed-range-seq-5', direction: 'incoming', text: '????????' },
     { id: 'dynamic-k-shed-range-seq-7', direction: 'incoming', text: 'ААААААА' },
     {
       id: 'dynamic-k-shed-boys-voice',
@@ -1723,6 +1807,7 @@ function App() {
   const [editorContent, setEditorContent] = useState(INITIAL_EDITOR_CONTENT);
   const [editorConfig, setEditorConfig] = useState(INITIAL_EDITOR_CONFIG);
   const [storyState, setStoryState] = useState(() => loadStoryState(INITIAL_EDITOR_CONTENT, runtimeSlot));
+  const isConveyorFocusLockActive = !!storyState.flags?.conveyorFocusLockActive;
   const [editorVisible, setEditorVisible] = useState(false);
   const [editorDraftSavedAt, setEditorDraftSavedAt] = useState(null);
   const [editorAutoSavedAt, setEditorAutoSavedAt] = useState(null);
@@ -1880,6 +1965,7 @@ function App() {
   const friendReconTimersRef = useRef([]);
   const conveyorNotifTimersRef = useRef([]);
   const conveyorTerminalTimersRef = useRef([]);
+  const conveyorFocusLockNudgeRef = useRef({ key: '', at: 0 });
   const scheduledIncomingEntryIdsRef = useRef(new Set());
   const terminalLineCountRef = useRef(null);
   const messengerThreadRef = useRef(null);
@@ -2001,6 +2087,10 @@ function App() {
     (storyState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [])
       .some((entry) => entry?.id === 'dynamic-k-shed-seq-1')
   );
+  const kShedPanicMusicTriggerSeenRef = useRef(
+    (storyState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [])
+      .some((entry) => entry?.id === K_SHED_PANIC_MUSIC_TRIGGER_MESSAGE_ID)
+  );
   const screenFlashTimerRef = useRef(null);
   const storyMessageFlashStartTimerRef = useRef(null);
   const storyMessageFlashTimerRef = useRef(null);
@@ -2010,6 +2100,13 @@ function App() {
   const prologueTypingTimerRef = useRef(null);
   const chapter1AudioRef = useRef(null);
   const chapter1AudioStartedRef = useRef(false);
+  const friendFightAudioRef = useRef(null);
+  const friendFightAudioStartedRef = useRef(false);
+  const kShedBaseAudioRef = useRef(null);
+  const kShedBaseAudioStartedRef = useRef(false);
+  const kShedBaseFadeFrameRef = useRef(null);
+  const kShedPanicMusicAudioRef = useRef(null);
+  const kShedPanicMusicStartedRef = useRef(false);
   const mamaNotificationAudioRef = useRef(null);
   const friendNotificationAudioRef = useRef(null);
   const kFirstNotificationAudioRef = useRef(null);
@@ -2127,6 +2224,105 @@ function App() {
       playPromise.catch(() => {});
     }
   }, []);
+  const playFriendFightBackground = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    if (!friendFightAudioRef.current) {
+      const audio = new Audio(FRIEND_FIGHT_AUDIO_SRC);
+      audio.preload = 'auto';
+      audio.loop = false;
+      friendFightAudioRef.current = audio;
+    }
+    if (friendFightAudioStartedRef.current) return;
+    friendFightAudioStartedRef.current = true;
+    const audio = friendFightAudioRef.current;
+    audio.currentTime = 0;
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(() => {
+        friendFightAudioStartedRef.current = false;
+      });
+    }
+  }, []);
+  const playKShedBaseBackground = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    if (!kShedBaseAudioRef.current) {
+      const audio = new Audio(K_SHED_BASE_AUDIO_SRC);
+      audio.preload = 'auto';
+      audio.loop = true;
+      kShedBaseAudioRef.current = audio;
+    }
+    if (kShedBaseAudioStartedRef.current) return;
+    kShedBaseAudioStartedRef.current = true;
+    const audio = kShedBaseAudioRef.current;
+    audio.currentTime = 0;
+    audio.volume = 0;
+    if (kShedBaseFadeFrameRef.current) {
+      window.cancelAnimationFrame(kShedBaseFadeFrameRef.current);
+      kShedBaseFadeFrameRef.current = null;
+    }
+    const startFadeIn = () => {
+      const startedAt = window.performance?.now?.() || Date.now();
+      const step = () => {
+        const now = window.performance?.now?.() || Date.now();
+        const progress = Math.min(1, (now - startedAt) / K_SHED_BASE_FADE_IN_MS);
+        audio.volume = K_SHED_BASE_TARGET_VOLUME * progress;
+        if (progress < 1 && !audio.paused && !audio.ended) {
+          kShedBaseFadeFrameRef.current = window.requestAnimationFrame(step);
+        } else {
+          kShedBaseFadeFrameRef.current = null;
+        }
+      };
+      step();
+    };
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise
+        .then(startFadeIn)
+        .catch(() => {
+          kShedBaseAudioStartedRef.current = false;
+          audio.volume = K_SHED_BASE_TARGET_VOLUME;
+        });
+      return;
+    }
+    startFadeIn();
+  }, []);
+  const stopKShedBaseBackground = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    if (kShedBaseFadeFrameRef.current) {
+      window.cancelAnimationFrame(kShedBaseFadeFrameRef.current);
+      kShedBaseFadeFrameRef.current = null;
+    }
+    if (kShedBaseAudioRef.current) {
+      kShedBaseAudioRef.current.pause();
+      kShedBaseAudioRef.current.src = '';
+      kShedBaseAudioRef.current = null;
+      kShedBaseAudioStartedRef.current = false;
+    }
+  }, []);
+  const playKShedPanicMusic = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    if (!kShedPanicMusicAudioRef.current) {
+      const audio = new Audio(CHAPTER1_AUDIO_SRC);
+      audio.preload = 'auto';
+      audio.loop = false;
+      kShedPanicMusicAudioRef.current = audio;
+    }
+    if (kShedPanicMusicStartedRef.current) return;
+    kShedPanicMusicStartedRef.current = true;
+    const audio = kShedPanicMusicAudioRef.current;
+    audio.currentTime = 0;
+    audio.volume = 1;
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise
+        .then(stopKShedBaseBackground)
+        .catch(() => {
+          kShedPanicMusicStartedRef.current = false;
+        });
+      return;
+    }
+    stopKShedBaseBackground();
+  }, [stopKShedBaseBackground]);
   const clearFriendReconTimers = useCallback(() => {
     friendReconTimersRef.current.forEach((id) => window.clearTimeout(id));
     friendReconTimersRef.current = [];
@@ -2167,6 +2363,33 @@ function App() {
     setOpen((p) => ({ ...p, [id]: true }));
     setMinimized((p) => ({ ...p, [id]: false }));
   }, [bringToFront]);
+
+  const forceConveyorFocusWindow = useCallback(() => {
+    focusedWindowAppIdRef.current = 'app5';
+    setOpen((prev) => ({
+      ...prev,
+      app5: true,
+      app7: true,
+    }));
+    setMinimized((prev) => ({
+      ...prev,
+      app5: false,
+      app7: false,
+    }));
+    setWinState((prev) => {
+      const maxZ = Math.max(0, ...Object.values(prev || {}).map((windowItem) => windowItem?.z || 0));
+      const app5State = prev.app5 || {};
+      return {
+        ...prev,
+        app5: {
+          ...app5State,
+          size: app5State.size || getDefaultWindowSize('app5'),
+          pos: app5State.pos || { x: 160, y: 100 },
+          z: Math.max(maxZ, PHOTO_VIEWER_Z_INDEX) + 1,
+        },
+      };
+    });
+  }, []);
 
   const getDragBounds = useCallback(() => {
     const size = iconSizeRef.current;
@@ -2583,6 +2806,16 @@ function App() {
       });
       scheduledIncomingEntryIdsRef.current.delete(scheduleKey);
 
+      if (didAppend && entry.id === K_SHED_BASE_TRIGGER_MESSAGE_ID) {
+        playKShedBaseBackground();
+      }
+      if (didAppend && entry.id === K_SHED_BASE_STOP_TRIGGER_MESSAGE_ID) {
+        stopKShedBaseBackground();
+      }
+      if (didAppend && entry.id === K_SHED_PANIC_MUSIC_TRIGGER_MESSAGE_ID) {
+        playKShedPanicMusic();
+      }
+
       if (didAppend && !isMessengerChatFrontmost(chatId)) {
         emitEntryNotification();
       }
@@ -2595,8 +2828,11 @@ function App() {
     persistRuntimeState,
     playFriendNotificationSound,
     playKNotificationSound,
+    playKShedBaseBackground,
+    playKShedPanicMusic,
     playMamaNotificationSound,
     pushPersistentNotif,
+    stopKShedBaseBackground,
   ]);
 
   useEffect(() => {
@@ -2839,7 +3075,6 @@ function App() {
         autoDismiss: !(chatId === 'chat-k' && eventId === 'k_001'),
       });
     }
-
     if (chatId === 'chat-k' && eventId === 'k_017a' && isIncomingMessage) {
       const appendMamaFollowup = (entry, notifText) => {
         setStoryState((prev) => {
@@ -2939,22 +3174,60 @@ function App() {
   const appendTerminalLines = useCallback((lines = []) => {
     const safeLines = lines.filter(Boolean);
     if (safeLines.length === 0) return;
+    const shouldPlayFriendFightBackground = safeLines.some((line) => (
+      line?.text === FRIEND_FIGHT_TERMINAL_TRIGGER_TEXT
+    ));
 
     setStoryState((prev) => {
+      const existingLines = prev.terminal?.lines || [];
+      const existingIds = new Set(existingLines.map((line) => line?.id).filter(Boolean));
+      const nextLinesToAppend = [];
+      safeLines.forEach((line) => {
+        if (line?.id && existingIds.has(line.id)) return;
+        nextLinesToAppend.push(line);
+        if (line?.id) existingIds.add(line.id);
+      });
+      if (nextLinesToAppend.length === 0) return prev;
+
       const nextState = {
         ...prev,
         terminal: {
           ...prev.terminal,
           lines: [
-            ...(prev.terminal?.lines || []),
-            ...safeLines,
+            ...existingLines,
+            ...nextLinesToAppend,
           ],
         },
       };
       persistRuntimeState(nextState);
       return nextState;
     });
-  }, [persistRuntimeState]);
+
+    if (shouldPlayFriendFightBackground) {
+      playFriendFightBackground();
+    }
+  }, [persistRuntimeState, playFriendFightBackground]);
+
+  const requestConveyorFocusLockNudge = useCallback((sourceKey = 'outside-conveyor') => {
+    if (!isConveyorFocusLockActive) return false;
+    const now = Date.now();
+    const lastNudge = conveyorFocusLockNudgeRef.current;
+    if (
+      lastNudge.key === sourceKey
+      && now - lastNudge.at < CONVEYOR_FOCUS_LOCK_NUDGE_DEDUPE_MS
+    ) {
+      forceConveyorFocusWindow();
+      return true;
+    }
+    conveyorFocusLockNudgeRef.current = { key: sourceKey, at: now };
+    appendTerminalLines([createTerminalProtocolLine(CONVEYOR_FOCUS_LOCK_BLOCKED_TEXT)]);
+    forceConveyorFocusWindow();
+    return true;
+  }, [
+    appendTerminalLines,
+    forceConveyorFocusWindow,
+    isConveyorFocusLockActive,
+  ]);
 
   const flushFriendReconInputTerminalComment = useCallback((chatId) => {
     if (chatId !== 'chat-druk') return;
@@ -2962,6 +3235,177 @@ function App() {
     friendReconInputTerminalPendingRef.current = false;
     appendTerminalLines([createTerminalProtocolLine('это потому, что ты отвлекся...')]);
   }, [appendTerminalLines]);
+
+  useEffect(() => {
+    const terminalLines = storyState.terminal?.lines || [];
+    const seenIds = new Set();
+    let hasDuplicateLineId = false;
+    const dedupedLines = [];
+
+    terminalLines.forEach((line) => {
+      if (line?.id) {
+        if (seenIds.has(line.id)) {
+          hasDuplicateLineId = true;
+          return;
+        }
+        seenIds.add(line.id);
+      }
+      dedupedLines.push(line);
+    });
+
+    if (!hasDuplicateLineId) return;
+    setStoryState((prev) => {
+      const nextState = {
+        ...prev,
+        terminal: {
+          ...prev.terminal,
+          lines: dedupedLines,
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+  }, [persistRuntimeState, storyState.terminal?.lines]);
+
+  useEffect(() => {
+    const flags = storyState.flags || {};
+    if (flags.conveyorFocusLockResolved) return;
+    if (flags.conveyorFocusLockActive || flags.conveyorFocusLockStartedAt) return;
+    const introLine = (storyState.terminal?.lines || [])
+      .find((line) => line?.id === CONVEYOR_FOCUS_LOCK_INTRO_LINE_ID);
+    if (introLine?.status !== 'done') return;
+
+    setStoryState((prev) => {
+      const prevFlags = prev.flags || {};
+      if (
+        prevFlags.conveyorFocusLockResolved
+        || prevFlags.conveyorFocusLockActive
+        || prevFlags.conveyorFocusLockStartedAt
+      ) {
+        return prev;
+      }
+      const nextState = {
+        ...prev,
+        flags: {
+          ...prevFlags,
+          conveyorFocusLockActive: true,
+          conveyorFocusLockStartedAt: Date.now(),
+          conveyorFocusLockSubmittedTaskIds: [],
+          conveyorFocusLockCompletionQueued: false,
+          conveyorFocusLockFinalLinesQueued: false,
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+    forceConveyorFocusWindow();
+  }, [
+    forceConveyorFocusWindow,
+    persistRuntimeState,
+    storyState.flags,
+    storyState.terminal?.lines,
+  ]);
+
+  useEffect(() => {
+    if (!isConveyorFocusLockActive) return;
+    const isConveyorVisible = !!open.app5 && !minimized.app5;
+    const isTerminalVisible = !!open.app7 && !minimized.app7;
+    const maxZ = Math.max(0, ...Object.values(winState || {}).map((windowItem) => windowItem?.z || 0));
+    const isConveyorFrontmost = isConveyorVisible && (winState.app5?.z || 0) >= maxZ;
+    if (isConveyorFrontmost && isTerminalVisible) return;
+    forceConveyorFocusWindow();
+  }, [
+    forceConveyorFocusWindow,
+    isConveyorFocusLockActive,
+    minimized.app7,
+    minimized.app5,
+    open.app7,
+    open.app5,
+    winState.app5?.z,
+    winState,
+  ]);
+
+  useEffect(() => {
+    const flags = storyState.flags || {};
+    if (!flags.conveyorFocusLockActive) return undefined;
+    if (!flags.conveyorFocusLockCompletionQueued) return undefined;
+    if (flags.conveyorFocusLockFinalLinesQueued) return undefined;
+
+    const readyAt = Number(flags.conveyorFocusLockCompletionReadyAt || 0);
+    const delayMs = Math.max(0, readyAt - Date.now());
+    const timerId = window.setTimeout(() => {
+      const completionLines = [
+        createTerminalProtocolLine(CONVEYOR_FOCUS_LOCK_COMPLETE_TEXT_1, {
+          id: CONVEYOR_FOCUS_LOCK_COMPLETE_LINE_1_ID,
+        }),
+        createTerminalProtocolLine(CONVEYOR_FOCUS_LOCK_COMPLETE_TEXT_2, {
+          id: CONVEYOR_FOCUS_LOCK_COMPLETE_LINE_2_ID,
+        }),
+      ];
+
+      setStoryState((prev) => {
+        const prevFlags = prev.flags || {};
+        if (!prevFlags.conveyorFocusLockActive || prevFlags.conveyorFocusLockFinalLinesQueued) {
+          return prev;
+        }
+        const existingLines = prev.terminal?.lines || [];
+        const existingLineIds = new Set(existingLines.map((line) => line?.id).filter(Boolean));
+        const nextState = {
+          ...prev,
+          flags: {
+            ...prevFlags,
+            conveyorFocusLockFinalLinesQueued: true,
+          },
+          terminal: {
+            ...prev.terminal,
+            lines: [
+              ...existingLines,
+              ...completionLines.filter((line) => !existingLineIds.has(line.id)),
+            ],
+          },
+        };
+        persistRuntimeState(nextState);
+        return nextState;
+      });
+    }, delayMs);
+
+    return () => window.clearTimeout(timerId);
+  }, [
+    persistRuntimeState,
+    storyState.flags,
+  ]);
+
+  useEffect(() => {
+    const flags = storyState.flags || {};
+    if (!flags.conveyorFocusLockActive || !flags.conveyorFocusLockFinalLinesQueued) return;
+    const terminalLines = storyState.terminal?.lines || [];
+    const firstLineDone = terminalLines.some((line) => (
+      line?.id === CONVEYOR_FOCUS_LOCK_COMPLETE_LINE_1_ID && line.status === 'done'
+    ));
+    const secondLineDone = terminalLines.some((line) => (
+      line?.id === CONVEYOR_FOCUS_LOCK_COMPLETE_LINE_2_ID && line.status === 'done'
+    ));
+    if (!firstLineDone || !secondLineDone) return;
+
+    setStoryState((prev) => {
+      if (!prev.flags?.conveyorFocusLockActive) return prev;
+      const nextState = {
+        ...prev,
+        flags: {
+          ...(prev.flags || {}),
+          conveyorFocusLockActive: false,
+          conveyorFocusLockResolved: true,
+          conveyorFocusLockResolvedAt: Date.now(),
+        },
+      };
+      persistRuntimeState(nextState);
+      return nextState;
+    });
+  }, [
+    persistRuntimeState,
+    storyState.flags,
+    storyState.terminal?.lines,
+  ]);
 
   const scheduleFriendSilenceFollowup = useCallback((delayMs = 20000) => {
     const friendChatId = 'chat-druk';
@@ -3244,7 +3688,7 @@ function App() {
     if (!hasFriendFinalTerminalComment) {
       appendTerminalLines([
         {
-          ...createTerminalProtocolLine('ну и ладно'),
+          ...createTerminalProtocolLine('вот и поговорили'),
           id: 'dynamic-friend-recon-final-terminal',
         },
       ]);
@@ -4164,6 +4608,7 @@ function App() {
       persistRuntimeState(nextState);
       return nextState;
     });
+
   }, [persistRuntimeState]);
 
   const closeMessengerPhotoViewer = useCallback(() => {
@@ -4215,20 +4660,41 @@ function App() {
     const chatId = TERMINAL_ADVENTURE_CHAT_ID;
     const normalizedConversation = hotspot.conversation
       .filter((entry) => entry?.direction && typeof entry?.text === 'string' && entry.text.length > 0);
-    const firstEntry = normalizedConversation[0];
+    const firstOutgoingIndex = normalizedConversation.findIndex((entry) => entry.direction === 'outgoing');
+    if (firstOutgoingIndex === -1) return;
+    const leadingIncomingEntries = normalizedConversation.slice(0, firstOutgoingIndex);
+    const queuedConversation = normalizedConversation.slice(firstOutgoingIndex);
+    const firstEntry = queuedConversation[0];
     if (!firstEntry || firstEntry.direction !== 'outgoing') return;
 
+    const queueEntryId = `photo-hotspot-${messageId}-${hotspot.id}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     const queueEntry = {
-      id: `photo-hotspot-${messageId}-${hotspot.id}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      id: queueEntryId,
       messageId,
       hotspotId: hotspot.id,
       label: hotspot.label || '',
-      conversation: normalizedConversation,
+      conversation: queuedConversation,
       postConversationEntries: Array.isArray(hotspot.postConversationEntries)
         ? hotspot.postConversationEntries
         : [],
       terminalComment: hotspot.terminalComment || '',
     };
+
+    let leadingOffsetMs = 0;
+    leadingIncomingEntries.forEach((entry, index) => {
+      leadingOffsetMs = scheduleIncomingChatEntry({
+        chatId,
+        entry: {
+          ...entry,
+          id: entry.id || `${queueEntryId}-leading-${index}`,
+          direction: 'incoming',
+        },
+        title: 'К.',
+        notificationText: entry.text,
+        delayMs: leadingOffsetMs,
+        sound: 'k',
+      }) + Number(editorConfig.timings.messageGapMs ?? 0);
+    });
 
     setStoryState((prev) => {
       const existingQueue = prev.messenger?.queuedPhotoRepliesByChat?.[chatId] || [];
@@ -4250,7 +4716,12 @@ function App() {
       persistRuntimeState(nextState);
       return nextState;
     });
-  }, [isMessengerChatFrontmost, persistRuntimeState]);
+  }, [
+    editorConfig.timings.messageGapMs,
+    isMessengerChatFrontmost,
+    persistRuntimeState,
+    scheduleIncomingChatEntry,
+  ]);
 
   const schedulePostConversationEntries = useCallback((chatId, postConversationEntries = []) => {
     if (!Array.isArray(postConversationEntries) || postConversationEntries.length === 0) return;
@@ -4936,6 +5407,9 @@ function App() {
           }
           return;
         }
+        if (entry?.id === K_SHED_PANIC_MUSIC_TRIGGER_MESSAGE_ID) {
+          playKShedPanicMusic();
+        }
         if (isLastAutoIncoming) {
           schedulePostConversationEntries(chatId, queuedReply.postConversationEntries);
         }
@@ -4988,7 +5462,7 @@ function App() {
         return nextState;
       });
     }
-  }, [appendTerminalLines, clearFriendReconTimers, editorConfig.timings.messageGapMs, isMessengerChatFrontmost, notifyIncomingMessage, persistRuntimeState, playMessageSendSound, scheduleIncomingChatEntry, schedulePostConversationEntries]);
+  }, [appendTerminalLines, clearFriendReconTimers, editorConfig.timings.messageGapMs, isMessengerChatFrontmost, notifyIncomingMessage, persistRuntimeState, playKShedPanicMusic, playMessageSendSound, scheduleIncomingChatEntry, schedulePostConversationEntries]);
 
   const completeQueuedDraftErase = useCallback((chatId, queuedReplyId) => {
     if (!chatId || !queuedReplyId) return;
@@ -5187,10 +5661,13 @@ function App() {
       : (activeTask.terminalMessageOnSubmit
         ? [{ text: activeTask.terminalMessageOnSubmit, delayMs: 0 }]
         : (activeTask.id === 'act1-task-dogs'
-          ? [{ text: '> > C:\\Users\\G> Великолепно. Мой magnum opus.', delayMs: 0 }]
+          ? [{ text: 'Великолепно. Мой magnum opus.', delayMs: 0 }]
           : []));
     const immediateTerminalMessages = terminalMessagesOnSubmit.filter((entry) => Number(entry?.delayMs || 0) <= 0);
     const delayedTerminalMessages = terminalMessagesOnSubmit.filter((entry) => Number(entry?.delayMs || 0) > 0);
+    const latestDelayedTerminalMessageMs = delayedTerminalMessages.reduce((maxDelayMs, entry) => (
+      Math.max(maxDelayMs, Number(entry?.delayMs || 0))
+    ), 0);
     const nextQueuedTask = queuedTasks.find((task) => {
       const fingerprint = getWorkTaskFingerprint(task);
       return !allTasks.some((existingTask) => (
@@ -5201,6 +5678,18 @@ function App() {
     setStoryState((prev) => {
       const submittedTaskIds = prev.work?.submittedTaskIds || [];
       if (submittedTaskIds.includes(taskId)) return prev;
+      const prevFlags = prev.flags || {};
+      const lockSubmittedTaskIds = Array.isArray(prevFlags.conveyorFocusLockSubmittedTaskIds)
+        ? prevFlags.conveyorFocusLockSubmittedTaskIds
+        : [];
+      const shouldTrackFocusLockSubmit = !!prevFlags.conveyorFocusLockActive
+        && !lockSubmittedTaskIds.includes(taskId);
+      const nextLockSubmittedTaskIds = shouldTrackFocusLockSubmit
+        ? [...lockSubmittedTaskIds, taskId]
+        : lockSubmittedTaskIds;
+      const shouldQueueFocusLockCompletion = !!prevFlags.conveyorFocusLockActive
+        && !prevFlags.conveyorFocusLockCompletionQueued
+        && nextLockSubmittedTaskIds.length >= 2;
 
       const nextRuntimeTasks = nextQueuedTask
         ? [...(prev.work?.tasks || []), nextQueuedTask]
@@ -5228,8 +5717,19 @@ function App() {
       const nextState = {
         ...prev,
         flags: {
-          ...(prev.flags || {}),
+          ...prevFlags,
           conveyorLastNotificationAt: Date.now(),
+          ...(prevFlags.conveyorFocusLockActive
+            ? { conveyorFocusLockSubmittedTaskIds: nextLockSubmittedTaskIds }
+            : {}),
+          ...(shouldQueueFocusLockCompletion
+            ? {
+              conveyorFocusLockCompletionQueued: true,
+              conveyorFocusLockCompletionReadyAt: Date.now()
+                + latestDelayedTerminalMessageMs
+                + CONVEYOR_FOCUS_LOCK_COMPLETION_BUFFER_MS,
+            }
+            : {}),
         },
         terminal: {
           ...prev.terminal,
@@ -5984,6 +6484,12 @@ function App() {
   const dragRef = useRef({ draggingId: null, offsetX: 0, offsetY: 0 });
 
   const onIconMouseDown = (e, id) => {
+    if (isConveyorFocusLockActive) {
+      e.preventDefault();
+      e.stopPropagation();
+      requestConveyorFocusLockNudge(`icon:${id}`);
+      return;
+    }
     e.preventDefault();
     const p = getDesktopPoint(e);
     if (!p) return;
@@ -5995,6 +6501,12 @@ function App() {
   const moveRef = useRef({ movingId: null, startX: 0, startY: 0, origX: 0, origY: 0 });
 
   const onWindowStartMove = (e, id) => {
+    if (isConveyorFocusLockActive && id !== 'app5') {
+      e.preventDefault();
+      e.stopPropagation();
+      requestConveyorFocusLockNudge(`move:${id}`);
+      return;
+    }
     e.preventDefault();
     const p = getDesktopPoint(e);
     if (!p) return;
@@ -6015,6 +6527,12 @@ function App() {
   });
 
   const onWindowStartResize = (e, id, dir) => {
+    if (isConveyorFocusLockActive && id !== 'app5') {
+      e.preventDefault();
+      e.stopPropagation();
+      requestConveyorFocusLockNudge(`resize:${id}`);
+      return;
+    }
     e.preventDefault();
     e.stopPropagation();
     const p = getDesktopPoint(e);
@@ -6190,6 +6708,25 @@ function App() {
       chapter1AudioRef.current.pause();
       chapter1AudioRef.current.src = '';
       chapter1AudioRef.current = null;
+    }
+    if (friendFightAudioRef.current) {
+      friendFightAudioRef.current.pause();
+      friendFightAudioRef.current.src = '';
+      friendFightAudioRef.current = null;
+    }
+    if (kShedBaseAudioRef.current) {
+      if (kShedBaseFadeFrameRef.current) {
+        window.cancelAnimationFrame(kShedBaseFadeFrameRef.current);
+        kShedBaseFadeFrameRef.current = null;
+      }
+      kShedBaseAudioRef.current.pause();
+      kShedBaseAudioRef.current.src = '';
+      kShedBaseAudioRef.current = null;
+    }
+    if (kShedPanicMusicAudioRef.current) {
+      kShedPanicMusicAudioRef.current.pause();
+      kShedPanicMusicAudioRef.current.src = '';
+      kShedPanicMusicAudioRef.current = null;
     }
     if (mamaNotificationAudioRef.current) {
       mamaNotificationAudioRef.current.pause();
@@ -6408,6 +6945,10 @@ function App() {
   }, [endingDone, endingStarted, view]);
 
   const closeWindow = (id) => {
+    if (isConveyorFocusLockActive) {
+      requestConveyorFocusLockNudge(`close:${id}`);
+      return;
+    }
     setOpen((p) => ({ ...p, [id]: false }));
     setMinimized((p) => ({ ...p, [id]: false }));
     if (focusedWindowAppIdRef.current === id) {
@@ -6545,6 +7086,10 @@ function App() {
   ]);
 
   const minimizeWindow = (id) => {
+    if (isConveyorFocusLockActive) {
+      requestConveyorFocusLockNudge(`minimize:${id}`);
+      return;
+    }
     setMinimized((p) => ({ ...p, [id]: true }));
     if (focusedWindowAppIdRef.current === id) {
       focusedWindowAppIdRef.current = '';
@@ -8288,7 +8833,7 @@ function App() {
       });
     };
 
-    const departingText = 'выхожу к домику';
+    const departingText = 'пошла к домику';
     const departingTypingDurationMs = Math.max(
       0,
       Math.ceil(departingText.length * PHOTO_REPLY_TYPING_SPEED_MS),
@@ -8505,15 +9050,11 @@ function App() {
 
     const sequenceEntries = [
       { id: 'dynamic-k-shed-seq-1', direction: 'incoming', text: 'иду в сарай', delayMs: 0 },
-      { id: 'dynamic-k-shed-seq-2', direction: 'incoming', text: 'окей, я в сарае. Тут ничего интересного.', delayMs: K_SHED_STATUS_DELAY_MS },
+      { id: 'dynamic-k-shed-seq-2', direction: 'incoming', text: 'окей, я в сарае.', delayMs: K_SHED_STATUS_DELAY_MS },
+      { id: 'dynamic-k-shed-seq-2b', direction: 'incoming', text: 'тут пахнет сеном', delayMs: 700 },
+      { id: 'dynamic-k-shed-seq-4', direction: 'incoming', text: 'не вижу следов мальчишек', delayMs: 900 },
       { id: 'dynamic-k-shed-mid-photo-2', direction: 'incoming', text: '', delayMs: 700 },
       { id: 'dynamic-k-shed-mid-photo-1', direction: 'incoming', text: '', delayMs: 700 },
-      { id: 'dynamic-k-shed-seq-3', direction: 'incoming', text: 'дед говорил, что тут шарится банда местных мальчишек. Романтично по-моему.', delayMs: 1200 },
-      { id: 'dynamic-k-shed-seq-4', direction: 'incoming', text: 'только я не вижу никаких следов мальчишек', delayMs: 900 },
-      { id: 'dynamic-k-shed-seq-5', direction: 'incoming', text: 'сейчас еще по лестнице залезу', delayMs: 1200 },
-      { id: 'dynamic-k-shed-seq-5b', direction: 'incoming', text: 'ты не поверишь………………….', delayMs: 20000 },
-      { id: 'dynamic-k-shed-video-1', direction: 'incoming', text: '', delayMs: 900 },
-      { id: 'dynamic-k-shed-seq-6', direction: 'incoming', text: 'ЭТО НАСТОЯЩИЙ ШТАБ.', delayMs: 1200 },
     ];
 
     let sequenceOffsetMs = 0;
@@ -8575,8 +9116,9 @@ function App() {
                 hotspotId: 'hq-dialogue',
                 label: 'Штаб',
                 conversation: [
-                  { direction: 'outgoing', text: 'Вау!!!' },
-                  { direction: 'outgoing', text: 'Опиши что ты видишь!' },
+                  { direction: 'outgoing', text: 'ВАУ' },
+                  { direction: 'outgoing', text: 'ЧТО' },
+                  { direction: 'outgoing', text: 'Опиши, что видишь' },
                   { direction: 'incoming', text: 'так, ну здесь никого нет, но повсюду куча приколов.', id: 'dynamic-k-shed-seq-9' },
                 ],
                 postConversationEntries: [
@@ -8601,6 +9143,35 @@ function App() {
     storyState.messenger?.historyByChat,
     storyState.messenger?.queuedPhotoRepliesByChat,
   ]);
+
+  useEffect(() => {
+    const history = storyState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [];
+    const hasBaseTriggerMessage = history.some((entry) => entry?.id === K_SHED_BASE_TRIGGER_MESSAGE_ID);
+    const hasBaseStopMessage = history.some((entry) => entry?.id === K_SHED_BASE_STOP_TRIGGER_MESSAGE_ID);
+    const hasPanicMessage = history.some((entry) => entry?.id === K_SHED_PANIC_MUSIC_TRIGGER_MESSAGE_ID);
+
+    if (hasBaseTriggerMessage && !hasBaseStopMessage && !hasPanicMessage) {
+      playKShedBaseBackground();
+      return;
+    }
+
+    if (hasBaseStopMessage || hasPanicMessage) {
+      stopKShedBaseBackground();
+    }
+  }, [
+    playKShedBaseBackground,
+    stopKShedBaseBackground,
+    storyState.messenger?.historyByChat,
+  ]);
+
+  useEffect(() => {
+    const history = storyState.messenger?.historyByChat?.[TERMINAL_ADVENTURE_CHAT_ID] || [];
+    const hasPanicMessage = history.some((entry) => entry?.id === K_SHED_PANIC_MUSIC_TRIGGER_MESSAGE_ID);
+    if (!hasPanicMessage) return;
+    if (kShedPanicMusicTriggerSeenRef.current) return;
+    kShedPanicMusicTriggerSeenRef.current = true;
+    playKShedPanicMusic();
+  }, [playKShedPanicMusic, storyState.messenger?.historyByChat]);
 
   useEffect(() => {
     const chatId = TERMINAL_ADVENTURE_CHAT_ID;
@@ -8940,6 +9511,7 @@ function App() {
       ]);
     }, delayMs);
     kHouseSequenceTimersRef.current.push(timerId);
+    return () => window.clearTimeout(timerId);
   }, [
     appendTerminalLines,
     storyState.flags?.kShedNarratorIntroStarted,
@@ -8993,6 +9565,7 @@ function App() {
     }, 1000);
 
     kHouseSequenceTimersRef.current.push(showChoiceTimerId);
+    return () => window.clearTimeout(showChoiceTimerId);
   }, [
     appendTerminalLines,
     persistRuntimeState,
@@ -9100,8 +9673,21 @@ function App() {
       openWindow('app5');
       bringToFront('app5');
     }, 7600);
+    const conveyorTaskNudgeTimerId = window.setTimeout(() => {
+      appendTerminalLines([
+        createTerminalProtocolLine(CONVEYOR_FOCUS_LOCK_INTRO_TEXT, {
+          id: CONVEYOR_FOCUS_LOCK_INTRO_LINE_ID,
+        }),
+      ]);
+    }, 8200);
 
-    kHouseSequenceTimersRef.current.push(step1TimerId, step2TimerId, step3TimerId, openConveyorTimerId);
+    kHouseSequenceTimersRef.current.push(
+      step1TimerId,
+      step2TimerId,
+      step3TimerId,
+      openConveyorTimerId,
+      conveyorTaskNudgeTimerId,
+    );
 
     setStoryState((prev) => {
       if (prev.flags?.kShedTerminalConveyorNudgeShown) return prev;
@@ -9171,8 +9757,8 @@ function App() {
     if (typingState?.active) return;
 
     const sequenceEntries = [
-      { id: 'dynamic-k-shed-range-seq-1', text: 'видишь, они просто играют.' },
-      { id: 'dynamic-k-shed-range-seq-2', text: 'аааа, слушай, я как-то даже не заметила, когда сюда шла. Это у них тир' },
+      { id: 'dynamic-k-shed-range-seq-1', text: 'я не заметила этого, когда шла.' },
+      { id: 'dynamic-k-shed-range-seq-2', text: 'у них тут тир' },
       { id: 'dynamic-k-shed-range-seq-3', text: 'стой я что-то слышу', delayMs: 5000 },
       { id: 'dynamic-k-shed-range-seq-4', text: 'Кто-то пришел!!', delayMs: 5000 },
     ];
@@ -9235,7 +9821,7 @@ function App() {
                 label: 'Тир',
                 conversation: [
                   { direction: 'outgoing', text: 'ПРЯЧЬСЯ' },
-                  { direction: 'incoming', text: 'ЗАЧЕМ??', id: 'dynamic-k-shed-range-seq-5' },
+                  { direction: 'incoming', text: '????????', id: 'dynamic-k-shed-range-seq-5' },
                   { direction: 'outgoing', text: 'Будешь подслушивать!!!!!!!' },
                   { direction: 'incoming', text: 'ААААААА', id: 'dynamic-k-shed-range-seq-7' },
                 ],
@@ -9547,6 +10133,10 @@ function App() {
   const handlePersistentNotifClick = (notif) => {
     if (!notif) return;
     const targetAppId = notif.appId || 'app3';
+    if (isConveyorFocusLockActive && targetAppId !== 'app5') {
+      requestConveyorFocusLockNudge(`notification:${targetAppId}`);
+      return;
+    }
     if (open[targetAppId]) {
       setMinimized((prev) => ({ ...prev, [targetAppId]: false }));
       bringToFront(targetAppId);
@@ -9559,6 +10149,42 @@ function App() {
     }
     dismissPersistentNotif(notif.id);
   };
+
+  const handleUserOpenWindow = useCallback((id) => {
+    if (isConveyorFocusLockActive && id !== 'app5') {
+      requestConveyorFocusLockNudge(`open:${id}`);
+      return;
+    }
+    openWindow(id);
+  }, [
+    isConveyorFocusLockActive,
+    openWindow,
+    requestConveyorFocusLockNudge,
+  ]);
+
+  const handleWindowFocus = useCallback((id) => {
+    if (isConveyorFocusLockActive && id !== 'app5') {
+      requestConveyorFocusLockNudge(`focus:${id}`);
+      return;
+    }
+    bringToFront(id);
+  }, [
+    bringToFront,
+    isConveyorFocusLockActive,
+    requestConveyorFocusLockNudge,
+  ]);
+
+  const handleDesktopMouseDownCapture = useCallback((event) => {
+    if (!isConveyorFocusLockActive) return;
+    const target = event.target;
+    if (target?.closest?.('.window--conveyor')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    requestConveyorFocusLockNudge('desktop');
+  }, [
+    isConveyorFocusLockActive,
+    requestConveyorFocusLockNudge,
+  ]);
 
   const taskbarTabs = [
     ...icons
@@ -9798,7 +10424,11 @@ function App() {
               ))}
             </div>
           )}
-          <div className="desktop" ref={desktopRef}>
+          <div
+            className="desktop"
+            ref={desktopRef}
+            onMouseDownCapture={handleDesktopMouseDownCapture}
+          >
             {!isTerminalLockScene && (
               <div className="icons">
               {icons.map((it) => (
@@ -9807,7 +10437,7 @@ function App() {
                   {...it}
                   pos={positions[it.id]}
                   onMouseDown={onIconMouseDown}
-                  onOpen={openWindow}
+                  onOpen={handleUserOpenWindow}
                   onMeasure={handleIconMeasure}
                 />
               ))}
@@ -9844,6 +10474,10 @@ function App() {
                 pos={winState[it.id].pos}
                 zIndex={winState[it.id].z}
                 onClose={(id) => {
+                  if (isConveyorFocusLockActive) {
+                    closeWindow(id);
+                    return;
+                  }
                   if (id === 'app7' && !storyState.flags?.kTerminalCloseUnlocked) {
                     window.alert('Терминал нельзя закрыть.');
                     return;
@@ -9853,7 +10487,7 @@ function App() {
                 onMinimize={minimizeWindow}
                 onStartResize={(e, id, dir) => onWindowStartResize(e, id, dir)}
                 onStartMove={(e, id) => onWindowStartMove(e, id)}
-                onFocus={bringToFront}
+                onFocus={handleWindowFocus}
                 body={
                   <AppWindowContent
                     activeAppId={it.id}
@@ -9898,6 +10532,10 @@ function App() {
                       type="button"
                       className={`taskbar-tab${tab.minimized ? ' is-minimized' : ''}`}
                       onClick={() => {
+                        if (isConveyorFocusLockActive && tab.id !== 'app5') {
+                          requestConveyorFocusLockNudge(`taskbar:${tab.id}`);
+                          return;
+                        }
                         setMinimized((p) => ({ ...p, [tab.id]: false }));
                         bringToFront(tab.id);
                       }}
