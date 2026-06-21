@@ -49,8 +49,8 @@ const PROLOGUE_AUDIO_SRC = '/files/audio/intro.mp3';
 const CHAPTER1_AUDIO_SRC = '/files/audio/im%20in!.mp3';
 const FRIEND_FIGHT_AUDIO_SRC = '/files/audio/D%20fight.mp3';
 const K_SHED_BASE_AUDIO_SRC = '/files/audio/base!.mp3';
-const K_HOUSE_VOICE_AUDIO_SRC = '/files/audio/voice.ogg';
-const K_SHED_BOYS_AUDIO_SRC = '/files/audio/boys.dialog.m4a';
+const K_HOUSE_VOICE_AUDIO_SRC = '/files/audio/voice.mp3';
+const K_SHED_BOYS_AUDIO_SRC = '/files/audio/boys.dialog.mp3';
 const MAMA_NOTIFICATION_AUDIO_SRC = '/files/audio/M_not.mp3';
 const FRIEND_NOTIFICATION_AUDIO_SRC = '/files/audio/D_not.mp3';
 const K_FIRST_NOTIFICATION_AUDIO_SRC = '/files/audio/K_first_not%20(new).mp3';
@@ -8909,7 +8909,7 @@ function App() {
 
     const terminalMessageTimerId = window.setTimeout(() => {
       appendTerminalLines([
-        createTerminalProtocolLine('развлекайся, но по крайней мерене забывай про работу'),
+        createTerminalProtocolLine('развлекайся, но по крайней мере не забывай про работу'),
       ]);
     }, departingTypingDurationMs + 1500);
 
