@@ -8444,11 +8444,33 @@ function App() {
     setEndingStage('title');
   };
 
-  const restartFromBeginning = () => {
+  const restartFromBeginning = useCallback(() => {
     if (typeof window === 'undefined') return;
     clearStoryState(runtimeSlot);
     window.location.reload();
-  };
+  }, [runtimeSlot]);
+
+  useEffect(() => {
+    const handleRestartShortcut = (event) => {
+      if (!event.ctrlKey || !event.shiftKey || event.key !== 'Backspace') return;
+
+      const target = event.target;
+      const isEditableTarget = target?.isContentEditable
+        || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target?.tagName);
+      if (isEditableTarget) return;
+
+      event.preventDefault();
+      const shouldRestart = window.confirm(
+        'Начать игру заново? Прогресс на этом устройстве будет удален.',
+      );
+      if (shouldRestart) {
+        restartFromBeginning();
+      }
+    };
+
+    window.addEventListener('keydown', handleRestartShortcut);
+    return () => window.removeEventListener('keydown', handleRestartShortcut);
+  }, [restartFromBeginning]);
 
   const renderExitBody = () => (
     <div className="game-panel">
