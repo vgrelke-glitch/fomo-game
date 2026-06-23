@@ -1,0 +1,37 @@
+{
+  "files": {
+    "main.css": "/fomo-game/static/css/main.f9810d25.css",
+    "main.js": "/fomo-game/static/js/main.afd944e2.js",
+    "static/js/563.af472889.chunk.js": "/fomo-game/static/js/563.af472889.chunk.js",
+    "static/js/356.b6c60e18.chunk.js": "/fomo-game/static/js/356.b6c60e18.chunk.js",
+    "static/js/312.3efc517e.chunk.js": "/fomo-game/static/js/312.3efc517e.chunk.js",
+    "static/js/206.7803caea.chunk.js": "/fomo-game/static/js/206.7803caea.chunk.js",
+    "static/media/штаб.К..mp4": "/fomo-game/static/media/штаб.К..01933fb7f6f7fb73f0d5.mp4",
+    "static/media/ph2.png": "/fomo-game/static/media/ph2.efdc0356b119fb505989.png",
+    "static/media/дед3.png": "/fomo-game/static/media/дед3.5995f6a8fd97351f345b.png",
+    "static/media/ph3.png": "/fomo-game/static/media/ph3.bfdb5a5b06b312d485c9.png",
+    "static/media/штаб4.png": "/fomo-game/static/media/штаб4.7e956a8e339bbec6c4bc.png",
+    "static/media/дед1.png": "/fomo-game/static/media/дед1.f42a68559f4093d60bcc.png",
+    "static/media/ph1.png": "/fomo-game/static/media/ph1.084589632d9faefc0a70.png",
+    "static/media/сарай1.png": "/fomo-game/static/media/сарай1.d2b7d877c3dcae54326a.png",
+    "static/media/штаб1.png": "/fomo-game/static/media/штаб1.5999eda959a49f646651.png",
+    "static/media/дед2.png": "/fomo-game/static/media/дед2.9fb122820675c06591fa.png",
+    "static/media/штаб3.png": "/fomo-game/static/media/штаб3.f310ce355ec592aaa122.png",
+    "static/media/выход 2.png": "/fomo-game/static/media/выход 2.d617a25784a46d681f57.png",
+    "static/media/штаб2.png": "/fomo-game/static/media/штаб2.6df581ab20581f41589a.png",
+    "static/media/сарай2.png": "/fomo-game/static/media/сарай2.afd6420f540502c93554.png",
+    "static/media/заметки1.png": "/fomo-game/static/media/заметки1.9f03c4dd7eb742eb3306.png",
+    "static/media/TTSlabsCondensed-Regular.ttf": "/fomo-game/static/media/TTSlabsCondensed-Regular.503a48d8efb9654b7112.ttf",
+    "static/media/картинка2.jpeg": "/fomo-game/static/media/картинка2.37c6064b53460d6b746b.jpeg",
+    "static/media/TT Squares Regular.otf": "/fomo-game/static/media/TT Squares Regular.b728749f3318fbbf43fd.otf",
+    "static/media/календарь2.png": "/fomo-game/static/media/календарь2.0580a01124a001f59a60.png",
+    "static/media/конвейер1.png": "/fomo-game/static/media/конвейер1.d97181b1d70e14ea6a72.png",
+    "static/media/соцсеть2.png": "/fomo-game/static/media/соцсеть2.5c051c395f7d642f5d51.png",
+    "static/media/logo.svg": "/fomo-game/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "index.html": "/fomo-game/index.html"
+  },
+  "entrypoints": [
+    "static/css/main.f9810d25.css",
+    "static/js/main.afd944e2.js"
+  ]
+}
