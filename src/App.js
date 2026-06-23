@@ -15,7 +15,7 @@ import fromKRoofClosePhoto from './fromK/дед2.png';
 import fromKShedGardenPhoto from './fromK/дед3.png';
 import fromKShedMidPhoto1 from './fromK/сарай1.png';
 import fromKShedMidPhoto2 from './fromK/сарай2.png';
-import fromKShedVideo from './fromK/видео.штаб.mp4';
+import fromKShedVideo from './fromK/штаб.К..mp4';
 import fromKShedHQPhoto1 from './fromK/штаб1.png';
 import fromKShedHQPhoto2 from './fromK/штаб2.png';
 import fromKShedHQPhoto3 from './fromK/штаб3.png';
